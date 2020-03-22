@@ -10,7 +10,7 @@
   #define DynLoad(s) dlopen(s, RTLD_LAZY)
   #define DynFunc(lib, name)  dlsym(lib,name)
   #define DynClose(lib) dlclose(lib)
-  #define DynSuffix ".so"
+  #define DynSuffix "so"
 /*
  *  Win 32
  */
@@ -23,10 +23,10 @@
   #define _USE_MATH_DEFINES
   #include <windows.h>
   
-  #define DynLoad(s) LoadLibrary(s)
+  #define DynLoad(s) (void*)LoadLibrary(s)
   #define DynFunc(lib, name)   GetProcAddress((HINSTANCE)lib, name)
-  #define DynClose(lib) FreeLibrary(lib)
-  #define DynSuffix ".dll"
+  #define DynClose(lib) FreeLibrary((HINSTANCE)lib)
+  #define DynSuffix "dll"
  /*
   *  Other systems (unsupported)
   */

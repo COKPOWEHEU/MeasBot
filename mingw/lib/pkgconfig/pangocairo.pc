@@ -1,0 +1,11 @@
+prefix=/usr/i686-w64-mingw32/sys-root/mingw
+exec_prefix=/usr/i686-w64-mingw32/sys-root/mingw
+libdir=/usr/i686-w64-mingw32/sys-root/mingw/lib
+includedir=/usr/i686-w64-mingw32/sys-root/mingw/include
+
+Name: Pango Cairo
+Description: Cairo rendering support for Pango
+Version: 1.30.0
+Requires: pango cairo  pangoft2 pangowin32
+Libs: -L${libdir} -lpangocairo-1.0
+Cflags: -I${includedir}/pango-1.0

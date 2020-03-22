@@ -32,8 +32,9 @@ int main(int argc, char **argv){
   int res;
   lua_State *g_LuaVM = NULL;
   
-  lib = DynLoad("../modules/experimental" DynSuffix);
-  if(lib == NULL){printf("Can not load library\n"); return 0;}
+  const char *libpath = "modules/" DynSuffix "/experimental." DynSuffix;
+  lib = DynLoad(libpath);
+  if(lib == NULL){printf("Can not load library [%s]\n", libpath); return 0;}
   imp = (mbimport)DynFunc(lib, "import");
   hlp = (mbhelp)DynFunc(lib, "help");
   if(imp == NULL){

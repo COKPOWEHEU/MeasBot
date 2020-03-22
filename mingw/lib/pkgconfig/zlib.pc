@@ -1,0 +1,13 @@
+prefix=/MinGW/pkg/zlib-1.2.7/zlib-1.2.7-binwin32
+exec_prefix=/MinGW/pkg/zlib-1.2.7/zlib-1.2.7-binwin32
+libdir=/MinGW/pkg/zlib-1.2.7/zlib-1.2.7-binwin32/lib
+sharedlibdir=/MinGW/pkg/zlib-1.2.7/zlib-1.2.7-binwin32/lib
+includedir=/MinGW/pkg/zlib-1.2.7/zlib-1.2.7-binwin32/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.7
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}

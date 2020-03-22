@@ -1,0 +1,16 @@
+prefix=/MinGW
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+sysconfdir=/MinGW/etc
+localstatedir=/MinGW/var
+PACKAGE=fontconfig
+confdir=@confdir@
+cachedir=WINDOWSTEMPDIR_FONTCONFIG_CACHE
+
+Name: Fontconfig
+Description: Font configuration and customization library
+Version: 2.10.0
+Libs: -L${libdir} -lfontconfig
+Libs.private:  -LC:/MinGW/lib -lexpat   -LC:/MinGW/lib -lfreetype   
+Cflags: -I${includedir}
