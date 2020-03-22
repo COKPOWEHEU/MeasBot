@@ -1,4 +1,7 @@
-package.cpath = package.cpath .. ModuleSuffix()
+--Хак с путями в винде и линуксе. Ужасная штука, но вроде работает
+package.cpath = package.cpath .. ";modules/lib/lib\\dyn/?.so"
+package.cpath = package.cpath .. ";modules/lib/lib\\dyn/?.dll"
+--package.cpath = package.cpath .. ModuleSuffix()
 --TODO эту загрузку надо как-то починить, а то больно криво смотрится
 
 function tblprint(tbl, pref, postf)
