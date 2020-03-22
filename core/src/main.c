@@ -8,6 +8,7 @@ extern "C"{
 #include <lua5.2/lua.h>
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
+#include <lua5.2/luaconf.h>
   
 typedef int (*mbimport)(lua_State *l);
 typedef const char* (*mbhelp)(void);
@@ -15,7 +16,7 @@ typedef const char* (*mbhelp)(void);
 #ifdef cplusplus
 }
 #endif
-
+/*
 int test(lua_State *luaVM){
   printf("Test\n");
   return 1;
@@ -23,9 +24,36 @@ int test(lua_State *luaVM){
 static void hook(lua_State *l, lua_Debug *ar) {
  // if(!run)
     luaL_error(l, "Program was closed!");
+}*/
+
+int addmodules(lua_State *L){
+  char *path = ";modules/" DynSuffix "/?." DynSuffix;
+  lua_pushstring(L, path);
+  return 1;
 }
 
 int main(int argc, char **argv){
+  char *scriptname = "data/script.lua";
+  int res = 0;
+  if(argc > 1){
+    scriptname = argv[1];
+  }
+  lua_State *L = luaL_newstate();
+  res = luaL_loadfile(L, scriptname);
+  if(res != 0){
+    printf("Error load script [%s]\n", scriptname); lua_close(L); return -1;
+  }
+  luaL_openlibs(L);
+  //addmodules(L);
+  lua_pushcfunction(L, addmodules);
+  lua_setglobal(L, "ModuleSuffix");
+  
+  lua_call(L,0,0);
+  
+  lua_close(L);
+}
+#if 0
+int main1(int argc, char **argv){
   void *lib;
   mbimport imp = NULL;
   mbhelp hlp = NULL;
@@ -80,3 +108,4 @@ int main(int argc, char **argv){
   
   lua_close(g_LuaVM);
 }
+#endif
