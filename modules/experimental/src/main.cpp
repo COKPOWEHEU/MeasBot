@@ -1,4 +1,4 @@
-#include "measbot_modules.h"
+#include "../measbot_modules.h"
 
 static const char helpstring[] = "Test string";
 

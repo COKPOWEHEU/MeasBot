@@ -1,6 +1,6 @@
-resdir = experimental/res
-srcdir = experimental/src
-builddir = experimental/build
+resdir = res
+srcdir = src
+builddir = build
 
 progname := $(resdir)/prog
 files = main
@@ -48,12 +48,12 @@ compiler =	$(_flagdiv_)arch_win32 i686-w64-mingw32- -win32\
 		
 spec_cflags  =	$(_flagdiv_)arch_lin32 -m32 -isystem /usr/include
 spec_cflags +=	$(_flagdiv_)arch_lin64
-spec_cflags +=	$(_flagdiv_)arch_win32 -I../mingw/mingw32/
+spec_cflags +=	$(_flagdiv_)arch_win32 -I../../mingw/mingw32/
 spec_cflags +=	$(_flagdiv_)arch_win64
 		
 spec_ldflags  =	$(_flagdiv_)arch_lin32 -m32 
 spec_ldflags +=	$(_flagdiv_)arch_lin64 -llua5.2
-spec_ldflags +=	$(_flagdiv_)arch_win32 -static-libgcc -static-libstdc++ -lmingw32 -L../mingw/mingw32 -llua52
+spec_ldflags +=	$(_flagdiv_)arch_win32 -static-libgcc -static-libstdc++ -lmingw32 -L../../mingw/mingw32 -llua52
 spec_ldflags +=	$(_flagdiv_)arch_win64 -static-libgcc -static-libstdc++ -lmingw32
 
 res_flags =	$(_flagdiv_)mode_debug -gdwarf-2
