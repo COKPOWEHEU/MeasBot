@@ -9,6 +9,7 @@ typedef struct{
   GtkWidget *obj;
   lua_State *L;
   int pool_idx;
+  double fontsize;
 }Plot;
 const float plot_colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1,1,0}, {1,0,1}, {0,1,1}, {1,1,1}};
 /*
@@ -370,6 +371,15 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   cairo_stroke(cr);
   
   cairo_set_line_width(cr, 1);
+  double fontsize = plot->fontsize;
+  if(fontsize < 0){
+    if(rect.height < rect.width){
+      fontsize *= -rect.height;
+    }else{
+      fontsize *= -rect.width;
+    }
+  }
+  cairo_set_font_size(cr, fontsize);
   char buf[100];
   double x,y;
   if(ymin < 0 && ymax > 0)y = 0; else y = ymin;
@@ -417,6 +427,7 @@ static int L_NewPlot(lua_State *L){
   plot->L = L;
   plot->obj = gtk_drawing_area_new();
   gtk_widget_set_size_request(plot->obj, w, h);
+  plot->fontsize = -0.03;
   
   gtk_fixed_put(GTK_FIXED(mainwindow.fixed), plot->obj, x, y);
   gtk_widget_show(plot->obj);
