@@ -12,53 +12,8 @@ typedef struct{
   double fontsize;
 }Plot;
 const float plot_colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1,1,0}, {1,0,1}, {0,1,1}, {1,1,1}};
-/*
-static void BtnOnClick(GtkWidget *obj, gpointer data){
-  Plot *plot = data;
-  lua_State *L = plot->L;
-  int prev = lua_gettop(L);
-  lua_settop(L, 0);
-  lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
-    lua_getmetatable(L, -1);
-      lua_getfield(L, -1, "pool");
-        lua_rawgeti(L, -1, plot->pool_idx);
-          lua_getfield(L, -1, "OnClick");
-            lua_pushvalue(L, -2);
-  if(lua_isfunction(L, -2)){
-    lua_pcall(L, 1, 0, 0);
-  }else{
-    plot->was_clicked = 1;
-  }
-  lua_settop(L, prev);
-}
 
-static int L_BtnWasClicked(lua_State *L){
-  int top = lua_gettop(L);
-  if(!lua_istable(L, -1)){
-    printf("Not table!\n");
-    return 0;
-  }
-  lua_getmetatable(L, -1);
-  if(!lua_istable(L, -1)){
-    printf("Not metatable!\n");
-    return 0;
-  }
-  
-  lua_getfield(L, -1, "handle");
-  if(!lua_islightuserdata(L, -1)){
-    printf("Err2\n");
-    return 0;
-  }
-  Plot *plot = (Plot*)lua_topointer(L, -1);
-  char res = plot->was_clicked;
-  plot->was_clicked = 0;
-
-  lua_settop(L, top);
-  lua_pushboolean(L, res);
-  return 1;
-}*/
 //TODO: добавить палитры
-//TODO: биндинг таблиц
 
 static int L_Plot_draw(lua_State *L){
   int top = lua_gettop(L);
@@ -158,13 +113,6 @@ double plot_autorange(double *a, double *b){
 }
 
 void fixlua_geti(lua_State *L, int idx, int i){
-  /*static char buffer[100]="";
-  lua_rawgeti(L, idx, i);
-  if(lua_isnil(L, -1)){
-    lua_pop(L, 1);
-    snprintf(buffer, 99, "%i", i);
-    lua_getfield(L, idx, buffer);
-  }*/
   lua_pushnumber(L, i);
   lua_gettable(L, idx-1);
 }
@@ -218,12 +166,6 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
                 ypos[i] = lua_tonumber(L, -1);
                 lua_pop(L, 1);
               }
-              /*printf("x=%i ; y=[", xpos);
-              for(int i=0; i<fmtlen; i++){
-                printf("%i\t", ypos[i]);
-              }
-              printf("]\n");
-              //*/
             }
           }else{ //а вдруг вместо таблицы в формат подсунули только номер иксового столбца?
             if(lua_isnumber(L, -1))xpos = lua_tonumber(L, -1);
@@ -257,7 +199,6 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
             lua_len(L, -1);
             if(lua_isnumber(L, -1))data_len = lua_tonumber(L, -1);
             lua_pop(L, 1);
-            //printf("mat %i x %i\n", data_len, fmtlen);
             fmtlen++; //добавлям столбец иксов
             arr = (float*)malloc(sizeof(float)*fmtlen*data_len);
             if(arr == NULL){
@@ -267,11 +208,9 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
             }
             
             size_t data_pos = 0;
-            //printf("Data = %s\n", lua_typename(L, lua_type(L, -1)));
             for(int i=0; i<data_len; i++){
               lua_pushnumber(L, i+1);
               lua_gettable(L, -2);
-              //printf("Data [%i] = %s\n", i+1, lua_typename(L, lua_type(L, -1)));
               if(!lua_istable(L, -1)){
                 data_len = i;
                 lua_pop(L, 1);
@@ -311,16 +250,6 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
               lua_pop(L, 1);
               data_pos += fmtlen;
             }
-            /*data_pos = 0;
-            printf("data(%i)[%i]:\n", data_len, fmtlen);
-            for(int i=0; i<data_len; i++){
-              printf("%f [", arr[data_pos]);
-              for(int j=1; j<fmtlen; j++){
-                printf("%f\t", arr[data_pos+j]);
-              }
-              printf("]\n");
-              data_pos += fmtlen;
-            }*/
           
             if(ypos)free(ypos);
           lua_pop(L, 1);
