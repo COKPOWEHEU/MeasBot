@@ -149,7 +149,7 @@ double plot_autorange(double *a, double *b){
   int diff = min % man;
   if(min > 0){min -= diff;}else{min -= man+diff;}
   diff = max % man;
-  if(max > 0){max += man-diff;}else{max -= diff;}
+  if(max < 0){max -= diff;}else{max += man-diff;}
   
   *a = (min)*pow(10, ipwr-1);
   *b = (max)*pow(10, ipwr-1);
@@ -381,19 +381,27 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   }
   cairo_set_font_size(cr, fontsize);
   char buf[100];
-  double x,y;
-  if(ymin < 0 && ymax > 0)y = 0; else y = ymin;
-  for(x = cmin; x<cmax; x+=dx){
-    cr_line(cr,bx+kx*x,0, bx+kx*x,rect.height);
+  double x,y, rx, ry, rd;
+  if(ymin < 0 && ymax > 0)y = by; else y = by + ky*ymin;
+  rx = bx + kx*cmin;
+  rd = kx*dx;
+  for(x = cmin; x<cmax; x+=dx, rx+=rd){
+    cr_line(cr, rx,0, rx,rect.height);
+    if(fabs(x) < dx/2)x = 0;
     sprintf(buf, "%g", x);
-    cairo_move_to(cr, bx+kx*x, by+ky*y);
+    cairo_move_to(cr, rx, y - 0.2*fontsize);
     cairo_show_text(cr, buf);
   }
-  if(cmin < 0 && cmax > 0)x=0; else x=cmin;
-  for(y = ymin; y<ymax; y+=dy){
-    cr_line(cr,0,by+ky*y, rect.width,by+ky*y);
+  
+  if(cmin < 0 && cmax > 0)x = bx; else x = bx + kx*cmin;
+  ry = by + ky*ymin;
+  rd = ky*dy;
+  ymax += dy;
+  for(y = ymin; y<ymax; y+=dy, ry+=rd){
+    cr_line(cr, 0,ry, rect.width,ry);
+    if(fabs(y) < dy/2)y = 0;
     sprintf(buf, "%g", y);
-    cairo_move_to(cr, bx+kx*x, by+ky*y);
+    cairo_move_to(cr, x, ry + 0.9*fontsize);
     cairo_show_text(cr, buf);
   }
   cairo_stroke(cr);
