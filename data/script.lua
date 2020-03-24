@@ -29,100 +29,24 @@ end
 function OnImport(a)
   print("On import:", a)
 end
-
-tblring={size=100, st=0}
-tblm={data={}}
-function tblm:__index(idx)
-  local mt = getmetatable(self)
-  idx = (idx + self.st) % self.size
-  local res = rawget(mt.data, idx)
-  if res == nil then res = rawget(mt.data, 0) end
-  return res
-end
-function tblm:__newindex(idx, val)
-  local mt = getmetatable(self)
-  local i = tonumber(idx)
-  if i == nil then
-    rawset(self, idx, val)
-  else
-    i = i % self.size
-    rawset(mt.data, i, val)
-  end
-end
-function tblm:__len()
-  return self.size
-end
-setmetatable(tblring, tblm)
-function tblring:add(val)
-  self[self.st] = val
-  self.st = (self.st-1)%self.size
-end
   
 gui = require("mygui_gtk")
 print("GUI = ", gui)
 tblprint(gui)
-btn = gui:NewButton(10,10,"Button")
-print("btn = ", btn)
-btn2 = gui:NewButton(10,50, "Кнопко")
-print("btn2 = ", btn2)
-ed = gui:NewEdit(10,100, "какой-то текст")
-print("ed = ", ed)
-tst = gui:NewTest()
-print("tst = ", tst)
-t2 = gui.NewTest()
-print("t2 = ", t2)
-plot = gui:NewPlot(100,0, 500, 500)
-print("plot = ", plot)
-tblprint(plot)
-plot.format={x=1}
---plot.data = {}
-tblprint(plot.format)
+wnd = gui:NewWindow(500, 500, "Test window")
 
-print(btn:WasClicked())
-ed:SetText("TPATATA")
-
-
-print("DELETE")
-tst = nil
-collectgarbage("collect")
-print("place to GC")
-print("GUI = ", gui)
-tblprint(gui)
-
-
-function btn.OnClick()
-  print(ed:GetText())
+function wnd:OnDestroy()
+  print("Destroy")
 end
-
-function btn2.OnClick()
-  --tblprint(plot.data)
-  if plot.data == tblring then
-    plot.data = aaa
-  else
-    plot.data = tblring
-  end
-end
-
-aaa = {}
-x = 1
-for i = 1,tblring.size do tblring:add({0,0,0,0}) end
-for i=1,10 do aaa[i] = {i,math.sin(i)} end
-
-plot.data = tblring
---plot.data = aaa
 
 while gui:update() do
   collectgarbage("collect")
   io.write("\r", tostring(collectgarbage("count")*1024))
   io.flush()
-  tblring:add({math.sin(x*0.1), math.sin(x*0.15), math.sin(x*0.13), math.sin(x*0.17)})
-  plot:Refresh()
-  x = x+1
   gui:delay_ms(10)
 end
 
 
-tblprint(gui)
 gmt = getmetatable(gui)
 print("GUI pool = ", gmt.pool)
 if gmt.pool ~= nil then
@@ -130,4 +54,3 @@ if gmt.pool ~= nil then
 end
 
 print("\n-----------END-------------")
---]]

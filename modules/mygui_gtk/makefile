@@ -3,7 +3,7 @@ srcdir = src
 builddir = build
 
 progname := $(resdir)/prog
-files = main button edit plot test
+files = main window button edit plot test
 
 regfuncs = $(addsuffix _reg(L);,$(files))
 regproto = $(addprefix void ,$(addsuffix _reg(lua_State*);,$(files)))

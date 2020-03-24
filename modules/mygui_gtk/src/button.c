@@ -2,6 +2,7 @@
 #include <lua5.2/lua.h>
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
+#include <stdlib.h>
 #include "common.h"
 
 typedef struct{
