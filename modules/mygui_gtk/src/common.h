@@ -11,12 +11,12 @@ extern "C" {
 #include <lua5.2/lauxlib.h>
 #include "window.h"
 
-struct Mainwindow{
+struct Gui{
   ssize_t openedwindows; //количество открытых окон
   unsigned int poolnum; //количество компонентов в пуле
   int poolidx; //идентификатор таблицы пула
 };
-extern struct Mainwindow mainwindow;
+extern struct Gui gui;
 
 void showstack(lua_State *L);
 

@@ -12,7 +12,7 @@
 
 void window_reg(lua_State*);
 
-struct Mainwindow mainwindow = {.openedwindows=0, .poolnum=0, .poolidx=0};
+struct Gui gui = {.openedwindows=0, .poolnum=0, .poolidx=0};
 
 //bash -c "cd /media/data_ext/prog/gtk/modules ; make"
 
@@ -28,7 +28,7 @@ void showstack(lua_State *L){
 
 int add_to_pool(lua_State *L, int idx){
   int res = 0;
-  lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
+  lua_rawgeti(L, LUA_REGISTRYINDEX, gui.poolidx);
     lua_getmetatable(L, -1);
       lua_getfield(L, -1, "pool");
         if(idx > 0){
@@ -36,9 +36,9 @@ int add_to_pool(lua_State *L, int idx){
         }else{
           lua_pushvalue(L, -3+idx);
         }
-        res = mainwindow.poolnum;
-        lua_rawseti(L, -2, mainwindow.poolnum);
-        mainwindow.poolnum++;
+        res = gui.poolnum;
+        lua_rawseti(L, -2, gui.poolnum);
+        gui.poolnum++;
       lua_pop(L, 1); //getfield
     lua_pop(L, 1); //getmetatable
   lua_pop(L, 1); //geti
@@ -83,7 +83,7 @@ void* read_handle(lua_State *L, int index, int *err){
 }
 
 int read_self(lua_State *L, int pool_idx){
-  lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx); //mainwindow
+  lua_rawgeti(L, LUA_REGISTRYINDEX, gui.poolidx); //gui
     if(!lua_istable(L,-1)){
       lua_pop(L, 1);
       return ERR_NOT_TABLE;
@@ -103,7 +103,7 @@ int read_self(lua_State *L, int pool_idx){
           lua_pop(L, 4);
           return ERR_NOT_CONTENT;
         }
-        lua_replace(L, -4); //move elem -> [mainwindow]
+        lua_replace(L, -4); //move elem -> [gui]
     lua_pop(L, 2); //stack is [self]
   return ERR_OK;
 }
@@ -133,8 +133,8 @@ static int L_update(lua_State *L){
   while(gtk_events_pending())gtk_main_iteration_do(0);
   usleep(0);
   
-  if(mainwindow.openedwindows <= 0)OnDestroy();
-  lua_pushboolean(L, (mainwindow.openedwindows>0));
+  if(gui.openedwindows <= 0)OnDestroy();
+  lua_pushboolean(L, (gui.openedwindows>0));
   return 1;
 }
 
@@ -155,8 +155,8 @@ static int L_delay_ms(lua_State *L){
 
 static int L_gc(lua_State *L){
   printf("GUI free\n");
-  if(mainwindow.poolidx != LUA_NOREF){
-    luaL_unref(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
+  if(gui.poolidx != LUA_NOREF){
+    luaL_unref(L, LUA_REGISTRYINDEX, gui.poolidx);
   }
   //TODO: допилить освобождение всего
   return 0;
@@ -192,9 +192,9 @@ int luaopen_mygui_gtk(lua_State *L){
       lua_setfield(L, -2, "__gc");
     lua_setmetatable(L, -2);
     
-    mainwindow.openedwindows = 0;
-    mainwindow.poolidx = luaL_ref(L, LUA_REGISTRYINDEX);
-    lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
+    gui.openedwindows = 0;
+    gui.poolidx = luaL_ref(L, LUA_REGISTRYINDEX);
+    lua_rawgeti(L, LUA_REGISTRYINDEX, gui.poolidx);
   
     lua_pushcfunction(L, L_update);
     lua_setfield(L, -2, "update");

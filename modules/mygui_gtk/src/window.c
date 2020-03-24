@@ -18,7 +18,7 @@ static int L_Wnd_GC(lua_State *L){
 void Wnd_OnDestroy(GtkWidget *obj, gpointer data){
   Wnd *wnd = data;
   wnd->runflag = 0;
-  mainwindow.openedwindows--;
+  gui.openedwindows--;
   lua_State *L = wnd->L;
   int prev = lua_gettop(L);
   lua_settop(L, 0);
@@ -62,7 +62,7 @@ static int L_NewWnd(lua_State *L){
   
   gtk_widget_show(wnd->obj);
   gtk_widget_show(wnd->fixed);
-  mainwindow.openedwindows++;
+  gui.openedwindows++;
   return 1;
 }
 
