@@ -12,9 +12,7 @@ extern "C" {
 #include "window.h"
 
 struct Mainwindow{
-  char runflag;
-  GtkWidget *window;
-  GtkWidget *fixed;
+  ssize_t openedwindows; //количество открытых окон
   unsigned int poolnum; //количество компонентов в пуле
   int poolidx; //идентификатор таблицы пула
 };

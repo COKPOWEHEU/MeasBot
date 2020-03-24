@@ -12,7 +12,7 @@
 
 void window_reg(lua_State*);
 
-struct Mainwindow mainwindow = {.runflag=1, .window=NULL, .fixed=NULL, .poolnum=0, .poolidx=0};
+struct Mainwindow mainwindow = {.openedwindows=0, .poolnum=0, .poolidx=0};
 
 //bash -c "cd /media/data_ext/prog/gtk/modules ; make"
 
@@ -121,6 +121,10 @@ static int L_help(lua_State *L){
   return 1;
 }
 
+static void OnDestroy(){
+  //do nothing
+}
+
 static int L_update(lua_State *L){
   if(!lua_istable(L, -1)){
     printf("Update: Error!\n");
@@ -129,8 +133,8 @@ static int L_update(lua_State *L){
   while(gtk_events_pending())gtk_main_iteration_do(0);
   usleep(0);
   
-  lua_settop(L, 0);
-  lua_pushboolean(L, mainwindow.runflag);
+  if(mainwindow.openedwindows <= 0)OnDestroy();
+  lua_pushboolean(L, (mainwindow.openedwindows>0));
   return 1;
 }
 
@@ -139,9 +143,7 @@ static int L_test(lua_State *L){
   return 0;
 }
 
-void OnDestroy(GtkWidget *obj, gpointer data){
-  mainwindow.runflag = 0;
-}
+
 
 static int L_delay_ms(lua_State *L){
   if(!lua_isnumber(L, -1))return 0;
@@ -177,16 +179,6 @@ int luaopen_mygui_gtk(lua_State *L){
     lua_setfield(L, -2, "help");
     lua_pushcfunction(L, L_delay_ms);
     lua_setfield(L, -2, "delay_ms");
-    mainwindow.runflag = 1;
-    mainwindow.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(mainwindow.window), "Test GTK");
-    //gtk_window_set_default_size(GTK_WINDOW(mainwindow.window), 800, 600);
-    mainwindow.fixed = gtk_fixed_new();
-    gtk_container_add(GTK_CONTAINER(mainwindow.window), mainwindow.fixed);
-    g_signal_connect(G_OBJECT(mainwindow.window), "destroy", G_CALLBACK(OnDestroy), NULL);
-  
-    lua_pushcfunction(L, L_update);
-    lua_setfield(L, -2, "update");
   
     lua_createtable(L, 0, 0); //meta
       lua_createtable(L, 0, 0); //pool
@@ -200,13 +192,13 @@ int luaopen_mygui_gtk(lua_State *L){
       lua_setfield(L, -2, "__gc");
     lua_setmetatable(L, -2);
     
+    mainwindow.openedwindows = 0;
     mainwindow.poolidx = luaL_ref(L, LUA_REGISTRYINDEX);
     lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
   
+    lua_pushcfunction(L, L_update);
+    lua_setfield(L, -2, "update");
     window_reg(L);
-//  REGFUNCS
-  
-  gtk_widget_show_all(mainwindow.window);
-  
+    
   return 1;
 }

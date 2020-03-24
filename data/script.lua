@@ -35,6 +35,7 @@ print("GUI = ", gui)
 tblprint(gui)
 wnd = gui:NewWindow(500, 500, "Test window")
 plot = wnd:NewPlot(0,0, 500, 500);
+wnd2 = gui:NewWindow(100, 100, "Wnd")
 
 plot.data = {{0,0}, {1,1}}
 
