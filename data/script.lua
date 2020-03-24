@@ -34,9 +34,13 @@ gui = require("mygui_gtk")
 print("GUI = ", gui)
 tblprint(gui)
 wnd = gui:NewWindow(500, 500, "Test window")
+plot = wnd:NewPlot(0,0, 500, 500);
+
+plot.data = {{0,0}, {1,1}}
 
 function wnd:OnDestroy()
   print("Destroy")
+  plot = nil
 end
 
 while gui:update() do

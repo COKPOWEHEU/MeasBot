@@ -17,21 +17,7 @@ const float plot_colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1,1,0}, {1,0,1}, {0,
 
 static int L_Plot_draw(lua_State *L){
   int top = lua_gettop(L);
-  if(!lua_istable(L, -1)){
-    printf("Not table!\n");
-    return 0;
-  }
-  lua_getmetatable(L, -1);
-  if(!lua_istable(L, -1)){
-    printf("Not metatable!\n");
-    return 0;
-  }
-  lua_getfield(L, -1, "handle");
-  if(!lua_islightuserdata(L, -1)){
-    printf("Err2\n");
-    return 0;
-  }
-  Plot *plot = (Plot*)lua_topointer(L, -1);
+  Plot *plot = (Plot*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(plot->obj))gtk_widget_queue_draw(plot->obj);
   lua_settop(L, top);
   return 0;
@@ -39,23 +25,11 @@ static int L_Plot_draw(lua_State *L){
 }
 
 static int L_Plot_GC(lua_State *L){
+#ifdef DEBUG
   printf("Plot GC\n");
+#endif
   int top = lua_gettop(L);
-  if(!lua_istable(L, -1)){
-    printf("Not table!\n");
-    return 0;
-  }
-  lua_getmetatable(L, -1);
-  if(!lua_istable(L, -1)){
-    printf("Not metatable!\n");
-    return 0;
-  }
-  lua_getfield(L, -1, "handle");
-  if(!lua_islightuserdata(L, -1)){
-    printf("Err2\n");
-    return 0;
-  }
-  Plot *plot = (Plot*)lua_topointer(L, -1);
+  Plot *plot = (Plot*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(plot->obj))gtk_widget_destroy(plot->obj);
   if(plot)free(plot);
   lua_settop(L, top);
@@ -74,10 +48,12 @@ char plot_minmax(float *data, int num, size_t points, int coord, double *_min, d
   *_min = min; *_max = max;
   return 0;
 }
+
 void cr_line(cairo_t *cr, int x1, int y1, int x2, int y2){
   cairo_move_to(cr, x1, y1);
   cairo_line_to(cr, x2, y2);
 }
+
 double plot_autorange(double *a, double *b){
   if(*b < *a){
     double temp = *b;
@@ -122,137 +98,136 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   lua_State *L = plot->L;
   int prev = lua_gettop(L);
   int xpos=-1, fmtlen=0, *ypos = NULL;
-  lua_settop(L, 0);
-  lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
-    lua_getmetatable(L, -1);
-      lua_getfield(L, -1, "pool");
-        lua_rawgeti(L, -1, plot->pool_idx);
-          //--- вот тут добрались до this
-          lua_getfield(L, -1, "format");
-          if(lua_istable(L, -1)){ //формат на месте
-            //читаем размер таблицы (количество столбцов данных)
-            lua_len(L, -1);
-            if(lua_isnumber(L, -1))fmtlen = lua_tonumber(L, -1);
-            lua_pop(L, 1);
-            //ищем столбец [0] или ['x']: если есть, используем в качестве икса, если нет - будет по номерам
-            lua_rawgeti(L, -1, 0);
-            if(lua_isnumber(L, -1)){
-              xpos = lua_tonumber(L, -1);
-              lua_pop(L, 1);
-            }else{
-              lua_getfield(L, -2, "x");
-              if(lua_isnumber(L, -1)){
-                xpos = lua_tonumber(L, -1);
-              }
-              lua_pop(L, 2);
-            }
-            if(xpos <= 0)xpos = -1;
-            //если форматная таблица вообще есть (кроме иксового столбца)
-            if(fmtlen != 0){
-              ypos = (int*)malloc(sizeof(int)*fmtlen);
-              if(ypos == NULL){
-                fprintf(stderr, "Can not allocate %lu bytes!\n", (unsigned long)sizeof(int)*fmtlen);
-                return 0;
-              }
-              //lua_pop(L, 1);
-              for(int i=0; i<fmtlen; i++){
-                lua_rawgeti(L, -1, i+1);
-                if(!lua_isnumber(L, -1)){
-                  fmtlen = i;
-                  lua_pop(L, 1);
-                  //TODO print error message
-                  break;
-                }
-                ypos[i] = lua_tonumber(L, -1);
-                lua_pop(L, 1);
-              }
-            }
-          }else{ //а вдруг вместо таблицы в формат подсунули только номер иксового столбца?
-            if(lua_isnumber(L, -1))xpos = lua_tonumber(L, -1);
+  read_self(L, plot->pool_idx);
+    lua_getfield(L, -1, "format");
+    if(lua_istable(L, -1)){ //формат на месте
+      //читаем размер таблицы (количество столбцов данных)
+      lua_len(L, -1);
+      if(lua_isnumber(L, -1))fmtlen = lua_tonumber(L, -1);
+      lua_pop(L, 1); //pop len
+      //ищем столбец [0] или ['x']: если есть, используем в качестве икса, если нет - будет по номерам
+      lua_rawgeti(L, -1, 0); //
+       if(lua_isnumber(L, -1)){
+         xpos = lua_tonumber(L, -1);
+         lua_pop(L, 1);
+        }else{
+          lua_getfield(L, -2, "x");
+          if(lua_isnumber(L, -1)){
+            xpos = lua_tonumber(L, -1);
           }
-          lua_pop(L, 1); //format
-          
-          //read data
-          lua_getfield(L, -1, "data");
-          if(!lua_istable(L, -1)){
-            printf("Draw: data not table\n");
-            if(ypos)free(ypos);
+          lua_pop(L, 2);
+        }
+        if(xpos <= 0)xpos = -1;
+        //если форматная таблица вообще есть (кроме иксового столбца)
+        if(fmtlen != 0){
+          ypos = (int*)malloc(sizeof(int)*fmtlen);
+          if(ypos == NULL){
+            fprintf(stderr, "Can not allocate %lu bytes!\n", (unsigned long)sizeof(int)*fmtlen);
             return 0;
           }
-            if(ypos == NULL){
-              lua_pushnumber(L, 1);
-              lua_gettable(L, -2);
-              if(!lua_istable(L, -1)){
-                lua_pop(L, 2);
-                //TODO: обработка ошибки
-                return 0;
-              }
-              lua_len(L, -1);
-              fmtlen = lua_tonumber(L, -1);
-              if(xpos != -1)fmtlen--;
-              lua_pop(L, 2);
-            }
-            
-            int data_len = 0;
-            float *arr;
-            //читаем размер таблицы (количество столбцов данных)
-            lua_len(L, -1);
-            if(lua_isnumber(L, -1))data_len = lua_tonumber(L, -1);
-            lua_pop(L, 1);
-            fmtlen++; //добавлям столбец иксов
-            arr = (float*)malloc(sizeof(float)*fmtlen*data_len);
-            if(arr == NULL){
-              fprintf(stderr, "Can not allocate %lu bytes!\n", (unsigned long)sizeof(float)*fmtlen*data_len);
-              if(ypos)free(ypos);
-              return 0;
-            }
-            
-            size_t data_pos = 0;
-            for(int i=0; i<data_len; i++){
-              lua_pushnumber(L, i+1);
-              lua_gettable(L, -2);
-              if(!lua_istable(L, -1)){
-                data_len = i;
-                lua_pop(L, 1);
-                printf("Plot: data[%i] not table\n", i);
-                //TODO print error message
-                break;
-              }
-              if(xpos > 0){
-                lua_rawgeti(L, -1, xpos);
-                if(lua_isnumber(L, -1))arr[data_pos]=lua_tonumber(L, -1); else arr[data_pos] = i+1;
-                lua_pop(L, 1);
-              }else arr[data_pos] = i+1;
-              for(int j=1; j<fmtlen; j++){
-                int yidx;
-                if(ypos != NULL){
-                  yidx = ypos[j-1];
-                }else{
-                  if(xpos == -1){
-                    yidx = j;
-                  }else if(xpos <= j){
-                    yidx = j+1;
-                  }else{
-                    yidx = j;
-                  }
-                }
-               lua_rawgeti(L, -1, yidx);
-                if(!lua_isnumber(L, -1)){
-                  
-                  printf("Plot: data[%i][%i(%i)] not number\n", i, j, yidx);
-                  data_len = 0;
-                  lua_pop(L, 1);
-                  break;
-                }
-                arr[data_pos + j] = lua_tonumber(L, -1);
-                lua_pop(L, 1);
-              }
+          //lua_pop(L, 1);
+          for(int i=0; i<fmtlen; i++){
+            lua_rawgeti(L, -1, i+1);
+            if(!lua_isnumber(L, -1)){
+              fmtlen = i;
               lua_pop(L, 1);
-              data_pos += fmtlen;
+              //TODO print error message
+              break;
             }
+            ypos[i] = lua_tonumber(L, -1);
+            lua_pop(L, 1);
+          }
+        }
+      }else{ //а вдруг вместо таблицы в формат подсунули только номер иксового столбца?
+        if(lua_isnumber(L, -1))xpos = lua_tonumber(L, -1);
+      }
+      lua_pop(L, 1); //format
+//READ DATA
+      //read data
+      lua_getfield(L, -1, "data");
+      if(!lua_istable(L, -1)){
+        printf("Draw: data is not table\n");
+        if(ypos)free(ypos);
+        return 0;
+      }
+        if(ypos == NULL){
+          lua_pushnumber(L, 1);
+          lua_gettable(L, -2); //доступ к data[1]
+          if(!lua_istable(L, -1)){ //если оно не таблица, то ошибка
+            lua_pop(L, 2);
+            //TODO: обработка ошибки
+            return 0;
+          }
+          lua_len(L, -1);
+          fmtlen = lua_tonumber(L, -1);
+          if(xpos != -1)fmtlen--;
+          lua_pop(L, 2); //pop len ; data[0]
+        }
+            
+        int data_len = 0;
+        float *arr;
+        //читаем размер таблицы (количество столбцов данных)
+        lua_len(L, -1);
+        if(lua_isnumber(L, -1))data_len = lua_tonumber(L, -1);
+        lua_pop(L, 1); //pop len
+        fmtlen++; //добавлям столбец иксов
+        arr = (float*)malloc(sizeof(float)*fmtlen*data_len);
+        if(arr == NULL){
+          fprintf(stderr, "Can not allocate %lu bytes!\n", (unsigned long)sizeof(float)*fmtlen*data_len);
+          if(ypos)free(ypos);
+          return 0;
+        }
+        size_t data_pos = 0;
+        for(int i=0; i<data_len; i++){
+          lua_pushnumber(L, i+1);
+          lua_gettable(L, -2); //data[i+1]
+          if(!lua_istable(L, -1)){
+            data_len = i;
+            lua_pop(L, 1);
+            printf("Plot: data[%i] not table\n", i);
+            //TODO print error message
+            break;
+          }
+          //читаем data[i][xpos] либо, если xpos<0 или data[xpos]==nil, заполняем порядковыи номерами
+          if(xpos > 0){
+            lua_rawgeti(L, -1, xpos);
+            if(lua_isnumber(L, -1))arr[data_pos]=lua_tonumber(L, -1); else arr[data_pos] = i+1;
+            lua_pop(L, 1); //pos xpos
+          }else arr[data_pos] = i+1;
           
-            if(ypos)free(ypos);
-          lua_pop(L, 1);
+          for(int j=1; j<fmtlen; j++){
+            int yidx;
+            
+            //ищем номер следующего столбца либо из формата, либо по порядку
+            if(ypos != NULL){
+              yidx = ypos[j-1];
+            }else{
+              if(xpos == -1){
+                yidx = j;
+              }else if(xpos <= j){
+                yidx = j+1;
+              }else{
+                yidx = j;
+              }
+            }
+            
+            lua_rawgeti(L, -1, yidx);
+            if(!lua_isnumber(L, -1)){
+              printf("Plot: data[%i][%i(%i)] not number\n", i, j, yidx);
+              data_len = 0;
+              lua_pop(L, 1);
+              break;
+            }
+            arr[data_pos + j] = lua_tonumber(L, -1);
+            lua_pop(L, 1); //pop data[i][yidx]
+          }
+          lua_pop(L, 1); //pop data[0]
+          data_pos += fmtlen;
+        }
+          
+        if(ypos)free(ypos);
+      lua_pop(L, 1); //pop data
+    lua_pop(L, 1); //self
         
   cairo_t *cr = gdk_cairo_create (gtk_widget_get_window(widget));
   GdkRectangle rect;
@@ -338,14 +313,21 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   cairo_destroy (cr);
   
   free(arr);
-  
   lua_settop(L, prev);
   return 1;
 }
 
 static int L_NewPlot(lua_State *L){
+  Wnd *wnd = NULL;
   Plot *plot = (Plot*)malloc(sizeof(Plot));
   int x=0, y=0, w=100, h=100;
+  if(lua_gettop(L) < 1){
+    printf("Call function as METHOD!\n");
+    lua_settop(L, 0);
+    lua_pushnil(L);
+    return 1;
+  }
+  wnd = (Wnd*)read_handle(L, 1, NULL);
   if(lua_gettop(L) >= 5){
     if(lua_isnumber(L, 2))x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))y = lua_tonumber(L, 3);
@@ -366,7 +348,7 @@ static int L_NewPlot(lua_State *L){
   gtk_widget_set_size_request(plot->obj, w, h);
   plot->fontsize = -0.03;
   
-  gtk_fixed_put(GTK_FIXED(mainwindow.fixed), plot->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(wnd->fixed), plot->obj, x, y);
   gtk_widget_show(plot->obj);
   g_signal_connect(G_OBJECT(plot->obj), "draw", G_CALLBACK(PlotOnDraw), plot);
   return 1;

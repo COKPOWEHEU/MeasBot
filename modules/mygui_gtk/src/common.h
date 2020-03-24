@@ -9,6 +9,7 @@ extern "C" {
 #include <lua5.2/lua.h>
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
+#include "window.h"
 
 struct Mainwindow{
   char runflag;
@@ -26,6 +27,17 @@ int add_to_pool(lua_State *L, int idx);
 
 //создает шаблон таблицы (с юзердатой и мусорщиком в метатаблице), добавляет в пул и возвращает индекс в нем
 int mk_blank_table(lua_State *L, void *handle, lua_CFunction gc);
+
+//чтение handle из таблицы
+void* read_handle(lua_State *L, int index, int *err);
+//и из глобального пула
+int read_self(lua_State *L, int pool_idx);
+#define ERR_OK 0
+#define ERR_NOT_TABLE -1
+#define ERR_NOT_METATABLE -2
+#define ERR_NOT_HANDLE -3
+#define ERR_NOT_CONTENT -4
+
 
 //небольшой ХАК мейкфайла: прототипы всех методов регистрации компонентов
 REGPROTOS

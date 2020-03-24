@@ -10,6 +10,8 @@
 
 #include "common.h"
 
+void window_reg(lua_State*);
+
 struct Mainwindow mainwindow = {.runflag=1, .window=NULL, .fixed=NULL, .poolnum=0, .poolidx=0};
 
 //bash -c "cd /media/data_ext/prog/gtk/modules ; make"
@@ -54,6 +56,56 @@ int mk_blank_table(lua_State *L, void *handle, lua_CFunction gc){
     lua_setmetatable(L, -2);
     res = add_to_pool(L, -1);
   return res;
+}
+
+void* read_handle(lua_State *L, int index, int *err){
+  void *res = NULL;
+  if(!lua_istable(L, index)){
+    if(err)*err = ERR_NOT_TABLE;
+    return NULL;
+  }
+    lua_getmetatable(L, index);
+    if(!lua_istable(L, -1)){
+      if(err)*err = ERR_NOT_METATABLE;
+      lua_pop(L, 1);
+      return NULL;
+    }
+      lua_getfield(L, -1, "handle");
+      if(!lua_islightuserdata(L, -1)){
+        if(err)*err = ERR_NOT_HANDLE;
+        lua_pop(L, 2);
+        return NULL;
+      }
+      res = (void*)lua_topointer(L, -1);
+  lua_pop(L, 2);
+  if(err)*err = ERR_OK;
+  return res;
+}
+
+int read_self(lua_State *L, int pool_idx){
+  lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx); //mainwindow
+    if(!lua_istable(L,-1)){
+      lua_pop(L, 1);
+      return ERR_NOT_TABLE;
+    }
+    lua_getmetatable(L, -1); //maintwindow.metatable
+      if(!lua_istable(L, -1)){
+        lua_pop(L, 2);
+        return ERR_NOT_METATABLE;
+      }
+      lua_getfield(L, -1, "pool"); //pool
+        if(!lua_istable(L, -1)){
+          lua_pop(L, 3);
+          return ERR_NOT_HANDLE;
+        }
+        lua_rawgeti(L, -1, pool_idx); //elem
+        if(!lua_istable(L, -1)){
+          lua_pop(L, 4);
+          return ERR_NOT_CONTENT;
+        }
+        lua_replace(L, -4); //move elem -> [mainwindow]
+    lua_pop(L, 2); //stack is [self]
+  return ERR_OK;
 }
 
 void main_reg(lua_State *L){
@@ -151,7 +203,8 @@ int luaopen_mygui_gtk(lua_State *L){
     mainwindow.poolidx = luaL_ref(L, LUA_REGISTRYINDEX);
     lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
   
-  REGFUNCS
+    window_reg(L);
+//  REGFUNCS
   
   gtk_widget_show_all(mainwindow.window);
   

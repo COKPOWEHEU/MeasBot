@@ -12,25 +12,8 @@ typedef struct{
 }Edit;
 
 int L_Ed_GC(lua_State *L){
-  printf("Edit GC\n");
   int top = lua_gettop(L);
-  if(!lua_istable(L, -1)){
-    printf("Not table!\n");
-    return 0;
-  }
-  lua_getmetatable(L, -1);
-  if(!lua_istable(L, -1)){
-    lua_settop(L, top);
-    printf("Not metatable!\n");
-    return 0;
-  }
-  lua_getfield(L, -1, "handle");
-  if(!lua_islightuserdata(L, -1)){
-    lua_settop(L, top);
-    printf("Err2\n");
-    return 0;
-  }
-  Edit *ed = (Edit*)lua_topointer(L, -1);
+  Edit *ed = read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(ed->obj))gtk_widget_destroy(ed->obj);
   free(ed);
   lua_settop(L, top);
@@ -56,6 +39,7 @@ static int L_Ed_SetText(lua_State *L){
   Edit *ed = (Edit*)lua_topointer(L, -1);
   
   gtk_entry_set_text((GtkEntry*)(ed->obj), text);
+  lua_pop(L, 2);
   return 0;
 }
 
@@ -77,9 +61,19 @@ static int L_Ed_GetText(lua_State *L){
 }
 
 static int L_NewEdit(lua_State *L){
-  Edit *ed = (Edit*)malloc(sizeof(Edit));
+  Wnd *wnd = NULL;
   int x=0, y=0;
   const char *text="";
+  //получаем объект родительского окна
+  if(lua_gettop(L) < 1){
+    printf("Call function as METHOD!\n");
+    lua_settop(L, 0);
+    lua_pushnil(L);
+    return 1;
+  }
+  wnd = (Wnd*)read_handle(L, 1, NULL);
+  Edit *ed = (Edit*)malloc(sizeof(Edit));
+  
   if(lua_gettop(L) >= 4){
     if(lua_isnumber(L, 2))x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))y = lua_tonumber(L, 3);
@@ -96,7 +90,7 @@ static int L_NewEdit(lua_State *L){
   ed->obj = gtk_entry_new();
   gtk_entry_set_text((GtkEntry*)(ed->obj), text);
   
-  gtk_fixed_put(GTK_FIXED(mainwindow.fixed), ed->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(wnd->fixed), ed->obj, x, y);
   gtk_widget_show(ed->obj);
   
   return 1;

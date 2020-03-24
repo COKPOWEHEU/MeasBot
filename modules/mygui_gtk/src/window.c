@@ -8,40 +8,29 @@
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
 #include "common.h"
+#include "window.h"
 
-typedef struct{
-  GtkWidget *obj;
-  lua_State *L;
-  char runflag;
-  int pool_idx;
-  GtkWidget *fixed;
-}Wnd;
-
-static L_Wnd_GC(lua_State *L){
+static int L_Wnd_GC(lua_State *L){
   printf("Window GC\n");
   return 0;
 }
 
 void Wnd_OnDestroy(GtkWidget *obj, gpointer data){
-  printf("OnDestroy\n");
   Wnd *wnd = data;
   wnd->runflag = 0;
   lua_State *L = wnd->L;
   int prev = lua_gettop(L);
   lua_settop(L, 0);
-  lua_rawgeti(L, LUA_REGISTRYINDEX, mainwindow.poolidx);
-    if(!lua_istable(L, -1)){
-      //TODO: добавить обработку ошибок
-      printf("Not table\n");
-    }
-    lua_getmetatable(L, -1);
-      lua_getfield(L, -1, "pool");
-        lua_rawgeti(L, -1, wnd->pool_idx);
-          lua_getfield(L, -1, "OnDestroy");
-            lua_pushvalue(L, -2);
+  read_self(L, wnd->pool_idx);
+  lua_getfield(L, -1, "OnDestroy");
+  lua_pushvalue(L, -2);
   if(lua_isfunction(L, -2)){
     lua_pcall(L, 1, 0, 0);
+    lua_pop(L, 1);
+  }else{
+    lua_pop(L, 3);
   }
+  lua_settop(L, prev);
 }
 
 static int L_NewWnd(lua_State *L){
@@ -68,7 +57,10 @@ static int L_NewWnd(lua_State *L){
   gtk_container_add(GTK_CONTAINER(wnd->obj), wnd->fixed);
   g_signal_connect(G_OBJECT(wnd->obj), "destroy", G_CALLBACK(Wnd_OnDestroy), wnd);
   
+  REGFUNCS
+  
   gtk_widget_show(wnd->obj);
+  gtk_widget_show(wnd->fixed);
   return 1;
 }
 
