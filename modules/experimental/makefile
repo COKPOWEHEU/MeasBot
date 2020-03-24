@@ -14,10 +14,8 @@ LDFLAGS = -lm -fPIC -shared
 #-lSDL2_ttf -lSDL2_image -lSDL2_net -lSDL2_mixer
 
 # Выбор архитектуры
-#arch := arch_lin32
 arch := arch_lin64
 #arch := arch_win32
-#arch := arch_win64
 
 # Выбор режима
 mode := mode_debug
@@ -97,10 +95,8 @@ cleanall:
 	rm -rf $(builddir)
 	rm -f $(progname)*
 allarch:
-#	make -r -j 10 arch=arch_lin32
 	make -r -j 10 arch=arch_lin64
 	make -r -j 10 arch=arch_win32
-	make -r -j 10 arch=arch_win64
 
 $(builddir)/%.$(arch).o: $(srcdir)/%.c
 	mkdir -p $(builddir)
