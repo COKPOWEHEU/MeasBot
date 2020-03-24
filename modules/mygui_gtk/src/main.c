@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <inttypes.h>
 #include <math.h>
-
+#include <stdlib.h>
 #include <lua5.2/lua.h>
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
@@ -63,13 +63,13 @@ void main_reg(lua_State *L){
   //do nothing
 }
 
-int L_help(lua_State *L){
+static int L_help(lua_State *L){
   lua_settop(L, 0);
   lua_pushstring(L, helpstring);
   return 1;
 }
 
-int L_update(lua_State *L){
+static int L_update(lua_State *L){
   if(!lua_istable(L, -1)){
     printf("Update: Error!\n");
     return 0;
@@ -82,7 +82,7 @@ int L_update(lua_State *L){
   return 1;
 }
 
-int L_test(lua_State *L){
+static int L_test(lua_State *L){
   printf("lua: test\n");
   return 0;
 }
@@ -91,7 +91,7 @@ void OnDestroy(GtkWidget *obj, gpointer data){
   mainwindow.runflag = 0;
 }
 
-int L_delay_ms(lua_State *L){
+static int L_delay_ms(lua_State *L){
   if(!lua_isnumber(L, -1))return 0;
   size_t n = lua_tonumber(L, -1);
   if(n > 0)lua_gc(L, LUA_GCSTEP, 0);

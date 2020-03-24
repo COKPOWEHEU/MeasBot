@@ -3,6 +3,7 @@
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
 #include <math.h>
+#include <stdlib.h>
 #include "common.h"
 
 typedef struct{
@@ -12,7 +13,6 @@ typedef struct{
   double fontsize;
 }Plot;
 const float plot_colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1,1,0}, {1,0,1}, {0,1,1}, {1,1,1}};
-
 //TODO: добавить палитры
 
 static int L_Plot_draw(lua_State *L){
@@ -315,8 +315,8 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   rx = bx + kx*cmin;
   rd = kx*dx;
   for(x = cmin; x<cmax; x+=dx, rx+=rd){
-    cr_line(cr, rx,0, rx,rect.height);
     if(fabs(x) < dx/2)x = 0;
+    cr_line(cr,rx,0, rx,rect.height);
     sprintf(buf, "%g", x);
     cairo_move_to(cr, rx, y - 0.2*fontsize);
     cairo_show_text(cr, buf);
@@ -325,9 +325,9 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   if(cmin < 0 && cmax > 0)x = bx; else x = bx + kx*cmin;
   ry = by + ky*ymin;
   rd = ky*dy;
-  ymax += dy;
-  for(y = ymin; y<ymax; y+=dy, ry+=rd){
-    cr_line(cr, 0,ry, rect.width,ry);
+  for(y = ymin; y<ymax+dy; y+=dy, ry+=rd){
+    if(fabs(y) < dy/2)y = 0;
+    cr_line(cr,0,ry, rect.width,ry);
     if(fabs(y) < dy/2)y = 0;
     sprintf(buf, "%g", y);
     cairo_move_to(cr, x, ry + 0.9*fontsize);
