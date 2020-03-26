@@ -22,4 +22,5 @@ static int e24_read(lua_State *L) {
 }
 
 static int e24_close(lua_State *L) {
+  fs.close();
 }
