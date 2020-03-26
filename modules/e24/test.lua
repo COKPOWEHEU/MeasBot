@@ -1,4 +1,4 @@
-package.cpath = package.cpath .. ";modules/e24/\\?.so"
+--package.cpath = package.cpath .. ";modules/e24/\\?.so"
 e24 = require("e24")
 
 check = e24.e24_init("test.txt")
@@ -8,10 +8,8 @@ if check == 0 then
   os.exit()
 end
 
-a,b = e24.e24_read()
-print(a,' ', b)
-a,b = e24.e24_read()
-print(a,' ', b)
+print(e24.e24_read())
+print(e24.e24_read())
 print(e24.e24_read())
 
 e24.e24_close()
