@@ -57,86 +57,42 @@ function tblring:add(val)
   self[self.st] = val
   self.st = (self.st-1)%self.size
 end
-
-aaa = {}
-x = 1
-for i = 1,tblring.size do tblring:add({0,0,0,0}) end
-for i=1,10 do aaa[i] = {i,math.sin(i)} end
-
-
+  
 gui = require("mygui_gtk")
 gui.wnd = gui:NewWindow(800, 600, "Test gtk")
 print("GUI = ", gui)
 tblprint(gui)
 btn = gui.wnd:NewButton(10,10,"Button")
 print("btn = ", btn)
-btn2 = gui.wnd:NewButton(10,50, "Кнопко")
-print("btn2 = ", btn2)
-ed = gui.wnd:NewEdit(10,100, "какой-то текст")
-print("ed = ", ed)
---[[tst = gui.wnd:NewTest()
-print("tst = ", tst)
-t2 = gui.wnd.NewTest()
-print("t2 = ", t2)--]]
-plot = gui.wnd:NewPlot(100,0, 500, 500)
-print("plot = ", plot)
-tblprint(plot)
-plot.format={x=1}
-rb1 = gui.wnd:NewRadioButton(10, 140, "Regilar plot", nil)
-rb1.data = aaa
-rb2 = gui.wnd:NewRadioButton(10, 170, "Circular buffer", rb1)
-rb2.data = tblring
---plot.data = {}
-tblprint(plot.format)
+rbtn1 = gui.wnd:NewRadioButton(10, 50, "Line 1", nil)
+rbtn1.val = 1
+print("rbtn1 = ", rbtn1)
+rbtn2 = gui.wnd:NewRadioButton(10, 80, "Line 2", rbtn1)
+rbtn2.val = 2
+print("rbtn2 = ", rbtn2)
+rbtn3 = gui.wnd:NewRadioButton(10, 110,"Line 3", rbtn1)
+rbtn3.val = 3
+print("rbtn3 = ", rbtn3)
 
-print(btn:WasClicked())
-ed:SetText("TPATATA")
-
-
-print("DELETE")
-tst = nil
-collectgarbage("collect")
-print("place to GC")
-print("GUI = ", gui)
-tblprint(gui)
-
-
-function btn.OnClick()
-  print(ed:GetText())
+function btn:OnClick()
+  sel = rbtn1:GetSelected()
+  if sel ~= nil then
+    print(sel.val)
+  end
 end
-
-function btn2.OnClick()
-  --tblprint(plot.data)
-  --[[if plot.data == tblring then
-    plot.data = aaa
-  else
-    plot.data = tblring
-  end--]]
-  --plot.data = 
-  plot.data = rb1:GetSelected().data
-end
-
-plot.data = tblring
---plot.data = aaa
 
 while gui:update() do
   collectgarbage("collect")
-  io.write("\r", tostring(collectgarbage("count")*1024))
-  io.flush()
-  tblring:add({math.sin(x*0.1), math.sin(x*0.15), math.sin(x*0.13), math.sin(x*0.17)})
-  plot:Refresh()
-  x = x+1
   gui:delay_ms(10)
 end
 
 
---[[tblprint(gui)
+tblprint(gui)
 gmt = getmetatable(gui)
 print("GUI pool = ", gmt.pool)
 if gmt.pool ~= nil then
   tblprint(gmt.pool)
 end
---]]
 
 print("\n-----------END-------------")
 --]]
