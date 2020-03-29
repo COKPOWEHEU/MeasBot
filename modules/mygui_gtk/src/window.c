@@ -12,6 +12,12 @@
 
 static int L_Wnd_GC(lua_State *L){
   printf("Window GC\n");
+  int top = lua_gettop(L);
+  Wnd *wnd = (Wnd*)read_handle(L, -1, NULL);
+  if(GTK_IS_WIDGET(wnd->obj))gtk_widget_destroy(wnd->obj);
+  free_index(L, wnd->pool_idx);
+  free(wnd);
+  lua_settop(L, top);
   return 0;
 }
 

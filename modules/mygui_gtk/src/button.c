@@ -48,6 +48,7 @@ static int L_Btn_GC(lua_State *L){
   int top = lua_gettop(L);
   Button *btn = (Button*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(btn->obj))gtk_widget_destroy(btn->obj);
+  free_index(L, btn->pool_idx);
   free(btn);
   lua_settop(L, top);
   return 0;

@@ -16,6 +16,7 @@ static int L_RBtn_GC(lua_State *L){
   int top = lua_gettop(L);
   RadioButton *btn = (RadioButton*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(btn->obj))gtk_widget_destroy(btn->obj);
+  free_index(L, btn->pool_idx);
   free(btn);
   lua_settop(L, top);
   return 0;
@@ -71,6 +72,11 @@ static int L_RBtn_Get_Selected(lua_State *L){
   for(int i=0; i<gui.poolnum; i++){
     printf("%i/%i ", i, gui.poolnum);
         lua_rawgeti(L, -1, i); //elem
+          if(!lua_istable(L, -1)){
+            printf("%i - not table\n");
+            lua_pop(L, 1);
+            continue;
+          }
           lua_getmetatable(L, -1);
             lua_getfield(L, -1, "__gc");
               if(lua_iscfunction(L, -1)){

@@ -74,10 +74,8 @@ btn2 = gui.wnd:NewButton(10,50, "Кнопко")
 print("btn2 = ", btn2)
 ed = gui.wnd:NewEdit(10,100, "какой-то текст")
 print("ed = ", ed)
---[[tst = gui.wnd:NewTest()
-print("tst = ", tst)
+tst = gui.wnd:NewTest()
 t2 = gui.wnd.NewTest()
-print("t2 = ", t2)--]]
 plot = gui.wnd:NewPlot(100,0, 500, 500)
 print("plot = ", plot)
 tblprint(plot)
@@ -86,6 +84,11 @@ rb1 = gui.wnd:NewRadioButton(10, 140, "Regilar plot", nil)
 rb1.data = aaa
 rb2 = gui.wnd:NewRadioButton(10, 170, "Circular buffer", rb1)
 rb2.data = tblring
+rb3 = gui.wnd:NewRadioButton(10, 200, "Circular buffer", rb1)
+rb4 = gui.wnd:NewRadioButton(10, 230, "Circular buffer", rb1)
+rb5 = gui.wnd:NewRadioButton(10, 260, "Circular buffer", rb1)
+rb6 = gui.wnd:NewRadioButton(10, 290, "Circular buffer", rb1)
+rb6.data = tblring
 --plot.data = {}
 tblprint(plot.format)
 
@@ -129,8 +132,8 @@ while gui:update() do
   gui:delay_ms(10)
 end
 
-
---[[tblprint(gui)
+--[[
+tblprint(gui)
 gmt = getmetatable(gui)
 print("GUI pool = ", gmt.pool)
 if gmt.pool ~= nil then

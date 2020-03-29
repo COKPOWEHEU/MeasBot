@@ -30,6 +30,9 @@ int mk_blank_table(lua_State *L, void *handle, lua_CFunction gc);
 void* read_handle(lua_State *L, int index, int *err);
 //и из глобального пула
 int read_self(lua_State *L, int pool_idx);
+
+//удаление handle после сборки мусора
+void free_index(lua_State *L, int idx);
 #define ERR_OK 0
 #define ERR_NOT_TABLE -1
 #define ERR_NOT_METATABLE -2

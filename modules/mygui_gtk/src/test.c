@@ -20,6 +20,7 @@ static int L_Tst_GC(lua_State *L){
     return 0;
   }
   Test *btn = (Test*)lua_topointer(L, -1);
+  free_index(L, btn->lua_self);
   free(btn);
   lua_settop(L, 0);
   return 0;

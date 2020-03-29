@@ -108,6 +108,27 @@ int read_self(lua_State *L, int pool_idx){
   return ERR_OK;
 }
 
+void free_index(lua_State *L, int pool_idx){
+  lua_rawgeti(L, LUA_REGISTRYINDEX, gui.poolidx); //gui
+    if(!lua_istable(L,-1)){
+      lua_pop(L, 1);
+      return;
+    }
+    lua_getmetatable(L, -1); //maintwindow.metatable
+      if(!lua_istable(L, -1)){
+        lua_pop(L, 2);
+        return;
+      }
+      lua_getfield(L, -1, "pool"); //pool
+        if(!lua_istable(L, -1)){
+          lua_pop(L, 3);
+          return;
+        }
+        lua_pushnil(L);
+        lua_rawseti(L, -2, pool_idx); //elem
+    lua_pop(L, 3);
+}
+
 void main_reg(lua_State *L){
 #ifdef DEBUG
   printf("Main registred\n");

@@ -31,7 +31,10 @@ static int L_Plot_GC(lua_State *L){
   int top = lua_gettop(L);
   Plot *plot = (Plot*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(plot->obj))gtk_widget_destroy(plot->obj);
-  if(plot)free(plot);
+  if(plot){
+    free_index(L, plot->pool_idx);
+    free(plot);
+  }
   lua_settop(L, top);
   return 0;
 }
@@ -148,7 +151,8 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
       if(!lua_istable(L, -1)){
         printf("Draw: data is not table\n");
         if(ypos)free(ypos);
-        return 0;
+        lua_settop(L, prev);
+        return 1;
       }
         if(ypos == NULL){
           lua_pushnumber(L, 1);
