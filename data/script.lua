@@ -84,11 +84,7 @@ rb1 = gui.wnd:NewRadioButton(10, 140, "Regilar plot", nil)
 rb1.data = aaa
 rb2 = gui.wnd:NewRadioButton(10, 170, "Circular buffer", rb1)
 rb2.data = tblring
-rb3 = gui.wnd:NewRadioButton(10, 200, "Circular buffer", rb1)
-rb4 = gui.wnd:NewRadioButton(10, 230, "Circular buffer", rb1)
-rb5 = gui.wnd:NewRadioButton(10, 260, "Circular buffer", rb1)
-rb6 = gui.wnd:NewRadioButton(10, 290, "Circular buffer", rb1)
-rb6.data = tblring
+lbl = gui.wnd:NewLabel(10, 200, "Label")
 --plot.data = {}
 tblprint(plot.format)
 
@@ -105,7 +101,10 @@ tblprint(gui)
 
 
 function btn.OnClick()
-  print(ed:GetText())
+  --print(ed:GetText())
+  local txt = lbl:GetText()
+  print(txt)
+  lbl:SetText("Text")
 end
 
 function btn2.OnClick()
