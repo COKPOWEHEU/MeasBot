@@ -66,8 +66,8 @@ for i=1,10 do aaa[i] = {i,math.sin(i)} end
 
 gui = require("mygui_gtk")
 gui.wnd = gui:NewWindow(800, 600, "Test gtk")
-print("GUI = ", gui)
-tblprint(gui)
+print("GUI.WND = ", gui.wnd)
+tblprint(gui.wnd)
 btn = gui.wnd:NewButton(10,10,"Button")
 print("btn = ", btn)
 btn2 = gui.wnd:NewButton(10,50, "Кнопко")
@@ -85,8 +85,18 @@ rb1.data = aaa
 rb2 = gui.wnd:NewRadioButton(10, 170, "Circular buffer", rb1)
 rb2.data = tblring
 lbl = gui.wnd:NewLabel(10, 200, "Label")
---plot.data = {}
-tblprint(plot.format)
+tc = gui.wnd:NewTabControl(600, 0, 200, 200);
+print("TabCtl = ", tc)
+tblprint(tc)
+tc[0] = {text="Tab1"}
+tc[1] = "Tab2"
+
+mt = getmetatable(tc)
+print("Tc.tab = ")
+tblprint(mt.tab)
+
+print("tab[0] = ", tc[0])
+tblprint(tc[0])
 
 print(btn:WasClicked())
 ed:SetText("TPATATA")
