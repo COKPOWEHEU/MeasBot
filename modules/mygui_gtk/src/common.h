@@ -9,7 +9,6 @@ extern "C" {
 #include <lua5.2/lua.h>
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
-#include "window.h"
 
 struct Gui{
   lua_State *L;
@@ -31,6 +30,8 @@ int mk_blank_table(lua_State *L, void *handle, lua_CFunction gc);
 void* read_handle(lua_State *L, int index, int *err);
 //и из глобального пула
 int read_self(lua_State *L, int pool_idx);
+//чтение контейнера (ТОЛЬКО ДЛЯ КОНТЕЙНЕРОВ!) из таблицы
+GtkWidget* read_container(lua_State *L, int index, int *err);
 
 //удаление handle после сборки мусора
 void free_index(lua_State *L, int idx);

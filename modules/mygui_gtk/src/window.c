@@ -53,8 +53,6 @@ static int L_NewWnd(lua_State *L){
     if(lua_isstring(L, 4))caption = lua_tostring(L, 4);
   }
   
-  wnd->pool_idx = mk_blank_table(L, wnd, L_Wnd_GC);
-  
   wnd->runflag = 1;
   wnd->obj = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(wnd->obj), caption);
@@ -63,6 +61,11 @@ static int L_NewWnd(lua_State *L){
   gtk_container_add(GTK_CONTAINER(wnd->obj), wnd->fixed);
   g_signal_connect(G_OBJECT(wnd->obj), "destroy", G_CALLBACK(Wnd_OnDestroy), wnd);
   
+  wnd->pool_idx = mk_blank_table(L, wnd, L_Wnd_GC);
+  lua_getmetatable(L, -1);
+    lua_pushlightuserdata(L, wnd->fixed);
+    lua_setfield(L, -2, "gtk_container");
+  lua_setmetatable(L, -2);
   REGFUNCS
   
   gtk_widget_show(wnd->obj);

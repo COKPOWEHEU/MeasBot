@@ -60,7 +60,6 @@ static int L_Ed_GetText(lua_State *L){
 }
 
 static int L_NewEdit(lua_State *L){
-  Wnd *wnd = NULL;
   int x=0, y=0;
   const char *text="";
   //получаем объект родительского окна
@@ -70,7 +69,7 @@ static int L_NewEdit(lua_State *L){
     lua_pushnil(L);
     return 1;
   }
-  wnd = (Wnd*)read_handle(L, 1, NULL);
+  GtkWidget *cont = read_container(L, 1, NULL);
   Edit *ed = (Edit*)malloc(sizeof(Edit));
   
   if(lua_gettop(L) >= 4){
@@ -88,7 +87,7 @@ static int L_NewEdit(lua_State *L){
   ed->obj = gtk_entry_new();
   gtk_entry_set_text((GtkEntry*)(ed->obj), text);
   
-  gtk_fixed_put(GTK_FIXED(wnd->fixed), ed->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(cont), ed->obj, x, y);
   gtk_widget_show(ed->obj);
   
   return 1;

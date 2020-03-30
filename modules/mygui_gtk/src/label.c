@@ -39,7 +39,6 @@ static int L_GetText(lua_State *L){
 }
 
 static int L_NewLbl(lua_State *L){
-  Wnd *wnd = NULL;
   int x=0, y=0;
   const char *text="NONAME";
   //получаем объект родительского окна
@@ -49,7 +48,7 @@ static int L_NewLbl(lua_State *L){
     lua_pushnil(L);
     return 1;
   }
-  wnd = (Wnd*)read_handle(L, 1, NULL);
+  GtkWidget *cont = read_container(L, 1, NULL);
   Label *lbl = (Label*)malloc(sizeof(Label));
   
   if(lua_gettop(L) >= 4){
@@ -66,7 +65,7 @@ static int L_NewLbl(lua_State *L){
   
   lbl->obj = gtk_label_new(text);
   
-  gtk_fixed_put(GTK_FIXED(wnd->fixed), lbl->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(cont), lbl->obj, x, y);
   gtk_widget_show(lbl->obj);
   return 1;
 }

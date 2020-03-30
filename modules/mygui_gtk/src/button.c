@@ -54,7 +54,6 @@ static int L_Btn_GC(lua_State *L){
 }
 
 static int L_NewBtn(lua_State *L){
-  Wnd *wnd = NULL;
   int x=0, y=0;
   const char *caption="NONAME";
   //получаем объект родительского окна
@@ -64,7 +63,7 @@ static int L_NewBtn(lua_State *L){
     lua_pushnil(L);
     return 1;
   }
-  wnd = (Wnd*)read_handle(L, 1, NULL);
+  GtkWidget *cont = read_container(L, 1, NULL);
   Button *btn = (Button*)malloc(sizeof(Button));
   
   if(lua_gettop(L) >= 4){
@@ -81,7 +80,7 @@ static int L_NewBtn(lua_State *L){
   btn->obj = gtk_button_new_with_label(caption);
   btn->was_clicked = 0;
   
-  gtk_fixed_put(GTK_FIXED(wnd->fixed), btn->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(cont), btn->obj, x, y);
   gtk_widget_show(btn->obj);
   g_signal_connect(G_OBJECT(btn->obj), "clicked", G_CALLBACK(BtnOnClick), btn);
   return 1;

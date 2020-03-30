@@ -5,7 +5,6 @@
 #include <lua5.2/lauxlib.h>
 #include "common.h"
 
-
 typedef struct{
   int lua_self;
 }Test;

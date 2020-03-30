@@ -321,7 +321,6 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
 }
 
 static int L_NewPlot(lua_State *L){
-  Wnd *wnd = NULL;
   Plot *plot = (Plot*)malloc(sizeof(Plot));
   int x=0, y=0, w=100, h=100;
   if(lua_gettop(L) < 1){
@@ -330,7 +329,7 @@ static int L_NewPlot(lua_State *L){
     lua_pushnil(L);
     return 1;
   }
-  wnd = (Wnd*)read_handle(L, 1, NULL);
+  GtkWidget *cont = read_container(L, 1, NULL);
   if(lua_gettop(L) >= 5){
     if(lua_isnumber(L, 2))x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))y = lua_tonumber(L, 3);
@@ -350,7 +349,7 @@ static int L_NewPlot(lua_State *L){
   gtk_widget_set_size_request(plot->obj, w, h);
   plot->fontsize = -0.03;
   
-  gtk_fixed_put(GTK_FIXED(wnd->fixed), plot->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(cont), plot->obj, x, y);
   gtk_widget_show(plot->obj);
   g_signal_connect(G_OBJECT(plot->obj), "draw", G_CALLBACK(PlotOnDraw), plot);
   return 1;

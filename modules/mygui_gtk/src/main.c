@@ -82,6 +82,30 @@ void* read_handle(lua_State *L, int index, int *err){
   return res;
 }
 
+GtkWidget* read_container(lua_State *L, int index, int *err){
+  GtkWidget *res = NULL;
+  if(!lua_istable(L, index)){
+    if(err)*err = ERR_NOT_TABLE;
+    return NULL;
+  }
+    lua_getmetatable(L, index);
+    if(!lua_istable(L, -1)){
+      if(err)*err = ERR_NOT_METATABLE;
+      lua_pop(L, 1);
+      return NULL;
+    }
+      lua_getfield(L, -1, "gtk_container");
+      if(!lua_islightuserdata(L, -1)){
+        if(err)*err = ERR_NOT_HANDLE;
+        lua_pop(L, 2);
+        return NULL;
+      }
+      res = (GtkWidget*)lua_topointer(L, -1);
+  lua_pop(L, 2);
+  if(err)*err = ERR_OK;
+  return res;
+}
+
 int read_self(lua_State *L, int pool_idx){
   lua_rawgeti(L, LUA_REGISTRYINDEX, gui.poolidx); //gui
     if(!lua_istable(L,-1)){

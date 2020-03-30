@@ -48,7 +48,6 @@ static int L_RBtn_SetSelected(lua_State *L){
   return 0;
 }
 
-
 static gint FindSelected(gconstpointer a, gconstpointer b){
   GtkWidget *obj = (RadioButton*)a;
   if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(obj)) )return 0;
@@ -108,7 +107,6 @@ static int L_RBtn_Get_Selected(lua_State *L){
 }
 
 static int L_RNewBtn(lua_State *L){
-  Wnd *wnd = NULL;
   int x=0, y=0;
   const char *caption="NONAME";
   //получаем объект родительского окна
@@ -118,7 +116,7 @@ static int L_RNewBtn(lua_State *L){
     lua_pushnil(L);
     return 1;
   }
-  wnd = (Wnd*)read_handle(L, 1, NULL);
+  GtkWidget *cont = read_container(L, 1, NULL);
   RadioButton *btn = (RadioButton*)malloc(sizeof(RadioButton));
   
   if(lua_gettop(L) >= 4){
@@ -147,7 +145,7 @@ static int L_RNewBtn(lua_State *L){
 
   btn->obj = gtk_radio_button_new_with_label(group, caption);
   
-  gtk_fixed_put(GTK_FIXED(wnd->fixed), btn->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(cont), btn->obj, x, y);
   gtk_widget_show(btn->obj);
   return 1;
 }
