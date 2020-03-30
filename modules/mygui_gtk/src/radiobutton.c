@@ -49,7 +49,7 @@ static int L_RBtn_SetSelected(lua_State *L){
 }
 
 static gint FindSelected(gconstpointer a, gconstpointer b){
-  GtkWidget *obj = (RadioButton*)a;
+  RadioButton *obj = (RadioButton*)a;
   if( gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(obj)) )return 0;
   return 1;
 }
@@ -68,10 +68,8 @@ static int L_RBtn_Get_Selected(lua_State *L){
     lua_getmetatable(L, -1); //mainwindow.metatable
       lua_getfield(L, -1, "pool"); //pool
   for(int i=0; i<gui.poolnum; i++){
-    printf("%i/%i ", i, gui.poolnum);
         lua_rawgeti(L, -1, i); //elem
           if(!lua_istable(L, -1)){
-            printf("%i - not table\n");
             lua_pop(L, 1);
             continue;
           }
@@ -86,11 +84,8 @@ static int L_RBtn_Get_Selected(lua_State *L){
     //ЫЫЫ =8-] я проверяю совпадает ли тип элемента по адресу сборщика мусора
     if(gc != L_RBtn_GC){
       lua_pop(L, 1);
-      showstack(L);
-      printf("Not RB %p\n", gc);
       continue;
     }
-    printf("RB ");
     lua_getmetatable(L, -1);
       lua_getfield(L, -1, "handle");
         RadioButton *btn = (RadioButton*)lua_topointer(L, -1);
@@ -99,7 +94,6 @@ static int L_RBtn_Get_Selected(lua_State *L){
       printf("OK\n");
       return 1;
     }
-    printf("Not pressed\n");
     lua_pop(L, 1);
   }
   lua_settop(L, prev);
