@@ -12,25 +12,22 @@ typedef struct{
 }TabCtl;
 
 static int L_TabCtl_GC(lua_State *L){
-#warning TODO
 #ifdef DEBUG
-  printf("Plot GC\n");
-#endif/*
+  printf("TabControl GC\n");
+#endif
   int top = lua_gettop(L);
-  Plot *plot = (Plot*)read_handle(L, -1, NULL);
-  if(GTK_IS_WIDGET(plot->obj))gtk_widget_destroy(plot->obj);
-  if(plot){
-    free_index(L, plot->pool_idx);
-    free(plot);
+  TabCtl *tctl = (TabCtl*)read_handle(L, -1, NULL);
+  if(GTK_IS_WIDGET(tctl->obj))gtk_widget_destroy(tctl->obj);
+  if(tctl){
+    free_index(L, tctl->pool_idx);
+    free(tctl);
   }
-  lua_settop(L, top);*/
+  lua_settop(L, top);
   return 0;
 }
 //tab[idx] = val;
 static int L_SetTab(lua_State *L){
   int top = lua_gettop(L);
-  printf("New tab\n"); //-1=new value, -2=index, -3=self
-  //showstack(L);
   if(!lua_isnumber(L, -2)){
     //TODO: добавить индексацию по имени (поиск по элементам)
     printf("Index of tab must me integer\n");
@@ -54,7 +51,11 @@ static int L_SetTab(lua_State *L){
       lua_pop(L, 1);
     }
   }else if(lua_isnil(L, -1)){
-    //TODO: delete tab
+    //TODO проверить не является ли num последним
+    gtk_notebook_remove_page(GTK_NOTEBOOK(tctl->obj), num);
+    printf("Delete [%i]\n", num);
+    lua_settop(L, top);
+    return 0;
   }
   lua_pop(L, 2);
   lua_getmetatable(L, -1);
@@ -69,6 +70,7 @@ static int L_SetTab(lua_State *L){
       lua_createtable(L, 0, 0);
         lua_pushstring(L, text);
         lua_setfield(L, -2, "text");
+        REGFUNCS //добавляем все элементы, доступные для окна
         lua_createtable(L, 0, 0);
           GtkWidget *label = gtk_label_new(text);
           GtkWidget *fixed = gtk_fixed_new();
@@ -87,7 +89,6 @@ static int L_SetTab(lua_State *L){
 // return tab[idx]
 static int L_GetTab(lua_State *L){
   int top = lua_gettop(L);
-  //showstack(L);
   if(!lua_isnumber(L, -1)){
     //TODO: добавить индексацию по имени (поиск по элементам)
     printf("Index of tab must me integer\n");

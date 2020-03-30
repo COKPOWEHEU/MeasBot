@@ -91,6 +91,8 @@ tblprint(tc)
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 
+bbb = tc[1]:NewButton(10, 10, "BBB")
+
 mt = getmetatable(tc)
 print("Tc.tab = ")
 tblprint(mt.tab)
