@@ -8,7 +8,13 @@
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
 #include "common.h"
-#include "window.h"
+
+typedef struct{
+  GtkWidget *obj;
+  char runflag;
+  int pool_idx;
+  GtkWidget *fixed;
+}Wnd;
 
 static int L_Wnd_GC(lua_State *L){
   printf("Window GC\n");
