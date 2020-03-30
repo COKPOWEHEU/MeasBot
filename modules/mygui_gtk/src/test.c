@@ -7,7 +7,6 @@
 
 
 typedef struct{
-  lua_State *L;
   int lua_self;
 }Test;
 
@@ -58,7 +57,6 @@ static int L_NewTest(lua_State *L){
     
     
   btn->lua_self = res;
-  btn->L = L;
   return 1;  
 }
 

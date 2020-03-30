@@ -7,7 +7,6 @@
 
 typedef struct{
   GtkWidget *obj;
-  lua_State *L;
   int pool_idx;
 }Edit;
 
@@ -86,7 +85,6 @@ static int L_NewEdit(lua_State *L){
   lua_pushcfunction(L, L_Ed_SetText);
   lua_setfield(L, -2, "SetText");
   
-  ed->L = L;
   ed->obj = gtk_entry_new();
   gtk_entry_set_text((GtkEntry*)(ed->obj), text);
   

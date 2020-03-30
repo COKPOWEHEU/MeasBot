@@ -12,6 +12,7 @@ extern "C" {
 #include "window.h"
 
 struct Gui{
+  lua_State *L;
   ssize_t openedwindows; //количество открытых окон
   unsigned int poolnum; //количество компонентов в пуле
   int poolidx; //идентификатор таблицы пула

@@ -25,7 +25,7 @@ void Wnd_OnDestroy(GtkWidget *obj, gpointer data){
   Wnd *wnd = data;
   wnd->runflag = 0;
   gui.openedwindows--;
-  lua_State *L = wnd->L;
+  lua_State *L = gui.L;
   int prev = lua_gettop(L);
   lua_settop(L, 0);
   read_self(L, wnd->pool_idx);
@@ -55,7 +55,6 @@ static int L_NewWnd(lua_State *L){
   
   wnd->pool_idx = mk_blank_table(L, wnd, L_Wnd_GC);
   
-  wnd->L = L;
   wnd->runflag = 1;
   wnd->obj = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(wnd->obj), caption);

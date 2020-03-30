@@ -7,7 +7,6 @@
 
 typedef struct{
   GtkWidget *obj;
-  lua_State *L;
   int pool_idx;
 }RadioButton;
 
@@ -145,8 +144,7 @@ static int L_RNewBtn(lua_State *L){
   lua_setfield(L, -2, "SetSelected");
   lua_pushcfunction(L, L_RBtn_Get_Selected);
   lua_setfield(L, -2, "GetSelected");
-  
-  btn->L = L;
+
   btn->obj = gtk_radio_button_new_with_label(group, caption);
   
   gtk_fixed_put(GTK_FIXED(wnd->fixed), btn->obj, x, y);

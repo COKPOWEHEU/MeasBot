@@ -8,7 +8,6 @@
 
 typedef struct{
   GtkWidget *obj;
-  lua_State *L;
   int pool_idx;
   double fontsize;
 }Plot;
@@ -98,7 +97,7 @@ void fixlua_geti(lua_State *L, int idx, int i){
 
 static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer data){
   Plot *plot = data;
-  lua_State *L = plot->L;
+  lua_State *L = gui.L;
   int prev = lua_gettop(L);
   int xpos=-1, fmtlen=0, *ypos = NULL;
   read_self(L, plot->pool_idx);
@@ -347,7 +346,6 @@ static int L_NewPlot(lua_State *L){
   lua_pushcfunction(L, L_Plot_draw);
   lua_setfield(L, -2, "Refresh");
   
-  plot->L = L;
   plot->obj = gtk_drawing_area_new();
   gtk_widget_set_size_request(plot->obj, w, h);
   plot->fontsize = -0.03;

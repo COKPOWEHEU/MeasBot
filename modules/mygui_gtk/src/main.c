@@ -12,7 +12,7 @@
 
 void window_reg(lua_State*);
 
-struct Gui gui = {.openedwindows=0, .poolnum=0, .poolidx=0};
+struct Gui gui = {.L=NULL, .openedwindows=0, .poolnum=0, .poolidx=0};
 
 //bash -c "cd /media/data_ext/prog/gtk/modules ; make"
 
@@ -220,6 +220,6 @@ int luaopen_mygui_gtk(lua_State *L){
     lua_pushcfunction(L, L_update);
     lua_setfield(L, -2, "update");
     window_reg(L);
-    
+    gui.L = L;
   return 1;
 }

@@ -7,7 +7,6 @@
 
 typedef struct{
   GtkWidget *obj;
-  lua_State *L;
   int pool_idx;
   char was_clicked;
 }Button;
@@ -15,7 +14,7 @@ typedef struct{
 
 static void BtnOnClick(GtkWidget *obj, gpointer data){
   Button *btn = data;
-  lua_State *L = btn->L;
+  lua_State *L = gui.L;
   int prev = lua_gettop(L);
   //lua_settop(L, 0);
   read_self(L, btn->pool_idx);
@@ -78,7 +77,7 @@ static int L_NewBtn(lua_State *L){
   lua_pushcfunction(L, L_BtnWasClicked);
   lua_setfield(L, -2, "WasClicked");
   
-  btn->L = L;
+  gui.L = L;
   btn->obj = gtk_button_new_with_label(caption);
   btn->was_clicked = 0;
   

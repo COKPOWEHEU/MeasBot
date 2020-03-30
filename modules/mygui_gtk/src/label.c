@@ -7,7 +7,6 @@
 
 typedef struct{
   GtkWidget *obj;
-  lua_State *L;
   int pool_idx;
 }Label;
 
@@ -65,7 +64,6 @@ static int L_NewLbl(lua_State *L){
   lua_pushcfunction(L, L_GetText);
   lua_setfield(L, -2, "GetText");
   
-  lbl->L = L;
   lbl->obj = gtk_label_new(text);
   
   gtk_fixed_put(GTK_FIXED(wnd->fixed), lbl->obj, x, y);
