@@ -50,8 +50,8 @@ spec_cflags +=	$(_flagdiv_)arch_win32 -I../../mingw/mingw32/
 spec_cflags +=	$(_flagdiv_)arch_win64
 		
 spec_ldflags  =	$(_flagdiv_)arch_lin32 -m32 
-spec_ldflags +=	$(_flagdiv_)arch_lin64 -llua5.3
-spec_ldflags +=	$(_flagdiv_)arch_win32 -static-libgcc -static-libstdc++ -lmingw32 -L../../mingw/mingw32 -llua53
+spec_ldflags +=	$(_flagdiv_)arch_lin64 -llua5.2
+spec_ldflags +=	$(_flagdiv_)arch_win32 -static-libgcc -static-libstdc++ -lmingw32 -L../../mingw/mingw32 -llua52
 spec_ldflags +=	$(_flagdiv_)arch_win64 -static-libgcc -static-libstdc++ -lmingw32
 
 res_flags =	$(_flagdiv_)mode_debug -gdwarf-2
