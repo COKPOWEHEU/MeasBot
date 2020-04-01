@@ -20,13 +20,13 @@ struct IntVariables{
 static int setter_min(lua_State *L, int tblindex){
   float min = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  gtk_level_bar_set_min_value(pb->obj, min);
+  gtk_level_bar_set_min_value(GTK_LEVEL_BAR(pb->obj), min);
   printf("Set min = %f\n", min);
   return 0;
 }
 static int getter_min(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float min = gtk_level_bar_get_min_value(pb->obj);
+  float min = gtk_level_bar_get_min_value(GTK_LEVEL_BAR(pb->obj));
   lua_pushnumber(L, min);
   return 1;
 }
@@ -34,41 +34,41 @@ static int getter_min(lua_State *L, int tblindex){
 static int setter_max(lua_State *L, int tblindex){
   float max = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  gtk_level_bar_set_max_value(pb->obj, max);
+  gtk_level_bar_set_max_value(GTK_LEVEL_BAR(pb->obj), max);
   printf("Set max = %f\n", max);
   return 0;
 }
 static int getter_max(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float max = gtk_level_bar_get_max_value(pb->obj);
+  float max = gtk_level_bar_get_max_value(GTK_LEVEL_BAR(pb->obj));
   lua_pushnumber(L, max);
   return 1;
 }
 static int setter_val(lua_State *L, int tblindex){
   float val = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  gtk_level_bar_set_value(pb->obj, val);
+  gtk_level_bar_set_value(GTK_LEVEL_BAR(pb->obj), val);
   return 0;
 }
 static int getter_val(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float val = gtk_level_bar_get_value(pb->obj);
+  float val = gtk_level_bar_get_value(GTK_LEVEL_BAR(pb->obj));
   lua_pushnumber(L, val);
   return 1;
 }
 static int setter_frac(lua_State *L, int tblindex){
   float val = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float min = gtk_level_bar_get_min_value(pb->obj);
-  float max = gtk_level_bar_get_max_value(pb->obj);
-  gtk_level_bar_set_value(pb->obj, min + val*(max-min));
+  float min = gtk_level_bar_get_min_value(GTK_LEVEL_BAR(pb->obj));
+  float max = gtk_level_bar_get_max_value(GTK_LEVEL_BAR(pb->obj));
+  gtk_level_bar_set_value(GTK_LEVEL_BAR(pb->obj), min + val*(max-min));
   return 0;
 }
 static int getter_frac(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float val = gtk_level_bar_get_value(pb->obj);
-  float min = gtk_level_bar_get_min_value(pb->obj);
-  float max = gtk_level_bar_get_max_value(pb->obj);
+  float val = gtk_level_bar_get_value(GTK_LEVEL_BAR(pb->obj));
+  float min = gtk_level_bar_get_min_value(GTK_LEVEL_BAR(pb->obj));
+  float max = gtk_level_bar_get_max_value(GTK_LEVEL_BAR(pb->obj));
   lua_pushnumber(L, (val-min)/(max-min));
   return 1;
 }
