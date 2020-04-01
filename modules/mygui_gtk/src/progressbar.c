@@ -122,7 +122,7 @@ static int getter_height(lua_State *L, int tblindex){
   return 1;
 }
 
-struct IntVariables intvars[] = {
+struct IntVariables progressbar_intvars[] = {
   {.name = "x", .setter = setter_x, .getter = getter_x},
   {.name = "y", .setter = setter_y, .getter = getter_y},
   {.name = "width", .setter = setter_width, .getter = getter_width},
@@ -144,9 +144,9 @@ static int L_iterator(lua_State *L){
     val = 0;
     lua_pushnil(L);  //какой-то костыль. Что туда кладется?
   }
-  if(val < ARR_COUNT(intvars)){
-    lua_pushstring(L, intvars[val].name); //index
-    intvars[val].getter(L, -3); //data
+  if(val < ARR_COUNT(progressbar_intvars)){
+    lua_pushstring(L, progressbar_intvars[val].name); //index
+    progressbar_intvars[val].getter(L, -3); //data
     val++;
     lua_pushnumber(L, val);
     lua_replace(L, lua_upvalueindex(1));
@@ -166,9 +166,9 @@ static int L_getter(lua_State *L){
   const char *idx = NULL;
   if(lua_isstring(L, -1))idx = lua_tostring(L, -1);
   lua_pop(L, 1);
-  for(int i=0; i<ARR_COUNT(intvars); i++){
-    if(strcmp(idx, intvars[i].name)==0){
-      return intvars[i].getter(L, -1);
+  for(int i=0; i<ARR_COUNT(progressbar_intvars); i++){
+    if(strcmp(idx, progressbar_intvars[i].name)==0){
+      return progressbar_intvars[i].getter(L, -1);
     }
   }
   lua_pushnil(L);
@@ -179,9 +179,9 @@ static int L_getter(lua_State *L){
 static int L_setter(lua_State *L){
   const char *idx = NULL;
   if(lua_isstring(L, -2))idx = lua_tostring(L, -2);
-  for(int i=0; i<ARR_COUNT(intvars); i++){
-    if(strcmp(idx, intvars[i].name)==0){
-      return intvars[i].setter(L, -3);
+  for(int i=0; i<ARR_COUNT(progressbar_intvars); i++){
+    if(strcmp(idx, progressbar_intvars[i].name)==0){
+      return progressbar_intvars[i].setter(L, -3);
     }
   }
 #if ALLOW_APPEND_TABLE
