@@ -91,8 +91,8 @@ tc = gui.wnd:NewTabControl(600, 0, 200, 200);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 
-
 check = tc[0]:NewCheckBox(10, 10, "BBB")
+spined = tc[0]:NewSpinEdit(10, 30)
 
 mt = getmetatable(tc)
 print("Tc.tab = ")
