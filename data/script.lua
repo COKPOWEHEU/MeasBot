@@ -91,6 +91,8 @@ tc = gui.wnd:NewTabControl(600, 0, 200, 200);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 
+--name = gui.wnd:OpenFileDialog("TPATATA")
+
 check = tc[0]:NewCheckBox(10, 10, "BBB")
 spined = tc[0]:NewSpinEdit(10, 30)
 

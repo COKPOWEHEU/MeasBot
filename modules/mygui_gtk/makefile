@@ -3,7 +3,7 @@ srcdir = src
 builddir = build
 
 progname := $(resdir)/prog
-files = main window button radiobutton checkbox edit spinedit plot label tabcontrol progressbar test
+files = main window button radiobutton checkbox edit spinedit plot label tabcontrol progressbar dialog test
 
 regfuncs = $(addsuffix _reg(L);,$(files))
 regproto = $(addprefix void ,$(addsuffix _reg(lua_State*);,$(files)))
