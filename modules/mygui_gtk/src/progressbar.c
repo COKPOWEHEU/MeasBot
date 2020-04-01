@@ -134,7 +134,7 @@ struct IntVariables intvars[] = {
   {.name = "fraction", .setter = setter_frac, .getter = getter_frac},
   {.name = "frac", .setter = setter_frac, .getter = getter_frac},
 };
-#define ARR_COUNT(arr) (sizeof(intvars)/sizeof(intvars[0]))
+#define ARR_COUNT(arr) (sizeof(arr)/sizeof(arr[0]))
 
 static int L_iterator(lua_State *L){
   int val = lua_tonumber(L, lua_upvalueindex(1));
