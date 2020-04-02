@@ -91,6 +91,45 @@ static int L_getVoltage(lua_State *L) {
   return 1;
 }
 
+static int L_getRange(lua_State *L) {
+  if(!lua_istable(L, -1)) {
+    printf("Call 'getRange' as method: e24[0]:getRange()\n");
+    lua_pushnil(L);
+    return 1;
+  }
+
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)) {
+    printf("E24: something is wrong...\n");
+    lua_pushnil(L);
+    return 1;
+  }
+
+  lua_getfield(L, -1, "ADC_channel");
+  int ch = lua_tonumber(L, -1);
+  if(ch < 1 || ch > 4) {
+    printf("Do not edit hidden fields if you dont know why!\n");
+    lua_pushnil(L);
+    return 1;
+  }
+
+  switch (ch) {
+  case CHANNEL1:
+    lua_pushnumber(L, ch1_range);
+    break;
+  case CHANNEL2:
+    lua_pushnumber(L, ch2_range);
+    break;
+  case CHANNEL3:
+    lua_pushnumber(L, ch3_range);
+    break;
+  case CHANNEL4:
+    lua_pushnumber(L, ch4_range);
+    break;
+  }
+  return 1;
+}
+
 static int L_setRange(lua_State *L) {
   double range = luaL_checknumber(L, -1);
   lua_pop(L, 1);
@@ -150,6 +189,7 @@ extern "C" int luaopen_e24(lua_State *L) {
 
     lua_pushcfunction(L, L_help);
     lua_setfield(L, -2, "help");
+    
     for(int i=1; i<=4; i++){
       lua_createtable(L, 0, 0);
         lua_createtable(L, 0, 0);
@@ -158,6 +198,8 @@ extern "C" int luaopen_e24(lua_State *L) {
         lua_setmetatable(L, -2);
         lua_pushcfunction(L, L_setRange);
         lua_setfield(L, -2, "setRange");
+        lua_pushcfunction(L, L_getRange);
+        lua_setfield(L, -2, "getRange");
         lua_pushcfunction(L, L_getVoltage);
         lua_setfield(L, -2, "getVoltage");
       lua_rawseti(L, -2, i);
