@@ -1,226 +1,110 @@
 #include <lua5.2/lua.hpp>
-#include <fstream>
+#include <math.h>
 
-double ch1_begin = -5, ch1_end = 5,
-       ch2_begin = -5, ch2_end = 5,
-       ch3_begin = -5, ch3_end = 5,
-       ch4_begin = -5, ch4_end = 5;
+#define TEST_ADC
 
-static int ch1_getVoltage(lua_State *L) {
-  double voltage;
-  std::fstream fs ("/opt/dev/e24/adc1.adc", std::fstream::in);
-  if(!fs.is_open()) {
+#if defined(TEST_ADC)
+  #define DEVICE_PATH_FMT "modules/e24/test_adc/adc%d.adc"
+#elif defined(linux) || defined(__linux) || defined(__linux__) || defined(__GNU__) || defined(__GLIBC__)
+  #define DEVICE_PATH_FMT "/opt/dev/e24/adc%d.adc"
+#elif defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+  #define DEVICE_PATH_FMT "C:/dev/e24/adc%d.adc"
+#else
+  #error "Unsupported platform"
+#endif
+
+static int L_getVoltage(lua_State *L){
+  if(!lua_istable(L, -1)){
+    printf("Call 'readVoltage' as method: e24[0]:readVoltage()\n");
     lua_pushnil(L);
     return 1;
   }
 
-  fs >> voltage;
-  fs.close();
-
-  if(ch1_begin > voltage || ch1_end < voltage) {
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)){
+    printf("E24: something is wrong...\n");
     lua_pushnil(L);
     return 1;
   }
 
-  lua_pushnumber(L, voltage);
+  lua_getfield(L, -1, "ADC_channel");
+  int ch = lua_tonumber(L, -1);
+  if(ch < 1 || ch > 4){
+    printf("Do not edit hidden fields if you dont know why!\n");
+    lua_pushnil(L);
+    return 1;
+  }
+
+  char fname[100];
+  sprintf(fname, DEVICE_PATH_FMT, ch);
+  FILE *pf = fopen(fname, "rt");
+  if(pf == NULL) {
+    lua_pushnil(L);
+    return 1;
+  }
+  double adc = 0;
+  fscanf(pf, "%lf", &adc);
+  fclose(pf);
+
+  lua_pushnumber(L, adc);
   return 1;
 }
 
-static int ch1_setVoltScale(lua_State *L) {
-  double begin = luaL_checknumber(L, -2);
-  double end = luaL_checknumber(L, -1);
-
-  if(begin < (double)-5 || end > (double)5 || begin > (double)5 || end < (double)-5) {
-    ch1_begin = -5;
-    ch1_end = 5;
-  } else {
-    ch1_begin = begin;
-    ch1_end = end;
-  }
-  return 0;
-}
-
-static int ch2_getVoltage(lua_State *L) {
-  double voltage;
-  std::fstream fs ("/opt/dev/e24/adc2.adc", std::fstream::in);
-  if(!fs.is_open()) {
+static int L_setRange(lua_State *L){
+  double range = luaL_checknumber(L, -1);
+  lua_pop(L, 1);
+  if(fabs(range) > 2.5){
+    printf("Wrong value of range. Read specification of E-24\n");
     lua_pushnil(L);
     return 1;
   }
 
-  fs >> voltage;
-  fs.close();
-
-  if(ch2_begin > voltage || ch2_end < voltage) {
+  if(!lua_istable(L, -1)){
+    printf("Call 'setRange' as method: e24[0]:setRange()\n");
     lua_pushnil(L);
     return 1;
   }
 
-  lua_pushnumber(L, voltage);
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)){
+    printf("E24: something is wrong...\n");
+    lua_pushnil(L);
+    return 1;
+  }
+
+  lua_getfield(L, -1, "ADC_channel");
+  int ch = lua_tonumber(L, -1);
+  if(ch < 1 || ch > 4){
+    printf("Do not edit hidden fields if you dont know why!\n");
+    lua_pushnil(L);
+    return 1;
+  }
+
+  lua_pushnumber(L, range);
   return 1;
 }
 
-static int ch2_setVoltScale(lua_State *L) {
-  double begin = luaL_checknumber(L, -2);
-  double end = luaL_checknumber(L, -1);
-
-  if(begin < (double)-5 || end > (double)5 || begin > (double)5 || end < (double)-5) {
-    ch2_begin = -5;
-    ch2_end = 5;
-  } else {
-    ch2_begin = begin;
-    ch2_end = end;
-  }
-  return 0;
-}
-
-static int ch3_getVoltage(lua_State *L) {
-  double voltage;
-  std::fstream fs ("/opt/dev/e24/adc3.adc", std::fstream::in);
-  if(!fs.is_open()) {
-    lua_pushnil(L);
-    return 1;
-  }
-
-  fs >> voltage;
-  fs.close();
-
-  if(ch3_begin > voltage || ch3_end < voltage) {
-    lua_pushnil(L);
-    return 1;
-  }
-
-  lua_pushnumber(L, voltage);
-  return 1;
-}
-
-static int ch3_setVoltScale(lua_State *L) {
-  double begin = luaL_checknumber(L, -2);
-  double end = luaL_checknumber(L, -1);
-
-  if(begin < (double)-5 || end > (double)5 || begin > (double)5 || end < (double)-5) {
-    ch3_begin = -5;
-    ch3_end = 5;
-  } else {
-    ch3_begin = begin;
-    ch3_end = end;
-  }
-  return 0;
-}
-
-static int ch4_getVoltage(lua_State *L) {
-  double voltage;
-  std::fstream fs ("/opt/dev/e24/adc4.adc", std::fstream::in);
-  if(!fs.is_open()) {
-    lua_pushnil(L);
-    return 1;
-  }
-
-  fs >> voltage;
-  fs.close();
-
-  if(ch4_begin > voltage || ch4_end < voltage) {
-    lua_pushnil(L);
-    return 1;
-  }
-
-  lua_pushnumber(L, voltage);
-  return 1;
-}
-
-static int ch4_setVoltScale(lua_State *L) {
-  double begin = luaL_checknumber(L, -2);
-  double end = luaL_checknumber(L, -1);
-
-  if(begin < (double)-5 || end > (double)5 || begin > (double)5 || end < (double)-5) {
-    ch4_begin = -5;
-    ch4_end = 5;
-  } else {
-    ch4_begin = begin;
-    ch4_end = end;
-  }
-  return 0;
-}
-
-static int L_help(lua_State *L) {
+static int L_help(lua_State *L){
   lua_pushstring(L, "This module is needed  to work with a voltmeter e24");
   return 1;
 }
 
-static int L_ReadADC(lua_State *L) {
-  int nchannel = luaL_checkinteger(L, -1);
-  double voltage;
+extern "C" int luaopen_e24(lua_State *L){
+  lua_createtable(L, 0, 0);
 
-  char path[22];
-  sprintf(path, "/opt/dev/e24/adc%i.adc", nchannel);
-
-  std::fstream fs (path, std::fstream::in);
-  if(!fs.is_open()) {
-    lua_pushnil(L);
-    return 1;
-  }
-
-  fs >> voltage;
-  fs.close();
-
-  lua_pushnumber(L, voltage);
-  return 1;
-}
-
-extern "C" int luaopen_e24(lua_State *L) {
-  lua_newtable(L);
-
-    lua_pushstring(L, "help");
     lua_pushcfunction(L, L_help);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "readADC");
-    lua_pushcfunction(L, L_ReadADC);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "channel1");
-    lua_newtable(L);
-      lua_pushstring(L, "getVoltage");
-      lua_pushcfunction(L, ch1_getVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "setVoltScale");
-      lua_pushcfunction(L, ch1_setVoltScale);
-      lua_rawset(L, -3);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "channel2");
-    lua_newtable(L);
-      lua_pushstring(L, "getVoltage");
-      lua_pushcfunction(L, ch2_getVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "setVoltScale");
-      lua_pushcfunction(L, ch2_setVoltScale);
-      lua_rawset(L, -3);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "channel3");
-    lua_newtable(L);
-      lua_pushstring(L, "getVoltage");
-      lua_pushcfunction(L, ch3_getVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "setVoltScale");
-      lua_pushcfunction(L, ch3_setVoltScale);
-      lua_rawset(L, -3);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "channel4");
-    lua_newtable(L);
-      lua_pushstring(L, "getVoltage");
-      lua_pushcfunction(L, ch4_getVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "setVoltScale");
-      lua_pushcfunction(L, ch4_setVoltScale);
-      lua_rawset(L, -3);
-    lua_rawset(L, -3);
-
-    return 1;
+    lua_setfield(L, -2, "help");
+    for(int i=1; i<=4; i++){
+      lua_createtable(L, 0, 0);
+        lua_createtable(L, 0, 0);
+          lua_pushnumber(L, i);
+          lua_setfield(L, -2, "ADC_channel");
+        lua_setmetatable(L, -2);
+        lua_pushcfunction(L, L_setRange);
+        lua_setfield(L, -2, "setRange");
+        lua_pushcfunction(L, L_getVoltage);
+        lua_setfield(L, -2, "getVoltage");
+      lua_rawseti(L, -2, i);
+    }
+  return 1;
 }
