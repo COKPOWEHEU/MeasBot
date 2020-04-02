@@ -16,6 +16,100 @@ typedef struct{
   GtkWidget *fixed;
 }Wnd;
 
+struct WndIntVariables{
+  char *name;
+  int (*setter)(lua_State *L, int tblindex);
+  int (*getter)(lua_State *L, int tblindex);
+};
+
+static int setter_enabled(lua_State *L, int tblindex){
+  Wnd *wnd = (Wnd*)read_handle(L, tblindex, NULL);
+  char en = lua_toboolean(L, tblindex+2);
+  gtk_widget_set_sensitive(GTK_WIDGET(wnd->obj), en);
+  return 0;
+}
+static int getter_enabled(lua_State *L, int tblindex){
+  Wnd *wnd = (Wnd*)read_handle(L, tblindex, NULL);
+  char en = gtk_widget_get_sensitive(GTK_WIDGET(wnd->obj));
+  lua_pushboolean(L, en);
+  return 1;
+}
+static int setter_resizable(lua_State *L, int tblindex){
+  Wnd *wnd = (Wnd*)read_handle(L, tblindex, NULL);
+  char en = lua_toboolean(L, tblindex+2);
+  gtk_window_set_resizable(GTK_WINDOW(wnd->obj), en);
+  return 0;
+}
+static int getter_resizable(lua_State *L, int tblindex){
+  Wnd *wnd = (Wnd*)read_handle(L, tblindex, NULL);
+  char en = gtk_window_get_resizable(GTK_WINDOW(wnd->obj));
+  lua_pushboolean(L, en);
+  return 1;
+}
+
+struct WndIntVariables wnd_intvars[] = {
+  {.name = "enabled", .setter = setter_enabled, .getter = getter_enabled},
+  {.name = "resizable", .setter = setter_resizable, .getter = getter_resizable},
+};
+#define ARR_COUNT(arr) (sizeof(arr)/sizeof(arr[0]))
+
+static int L_Wnditerator(lua_State *L){
+  int val = lua_tonumber(L, lua_upvalueindex(1));
+  if(val == -1){
+    int prev = lua_next(L, -2);
+    if(prev > 0)return 2;
+    val = 0;
+    lua_pushnil(L);  //какой-то костыль. Что туда кладется?
+  }
+  if(val < ARR_COUNT(wnd_intvars)){
+    lua_pushstring(L, wnd_intvars[val].name); //index
+    wnd_intvars[val].getter(L, -3); //data
+    val++;
+    lua_pushnumber(L, val);
+    lua_replace(L, lua_upvalueindex(1));
+    return 2;
+  }
+  return 0;
+}
+
+static int L_Wndpairs(lua_State *L){
+  lua_pushnumber(L, -1);
+  lua_pushcclosure(L, L_Wnditerator, 1);
+  lua_pushvalue(L, -2);
+  return 2;
+}
+
+static int L_Wndgetter(lua_State *L){
+  const char *idx = NULL;
+  if(lua_isstring(L, -1))idx = lua_tostring(L, -1);
+  lua_pop(L, 1);
+  for(int i=0; i<ARR_COUNT(wnd_intvars); i++){
+    if(strcmp(idx, wnd_intvars[i].name)==0){
+      return wnd_intvars[i].getter(L, -1);
+    }
+  }
+  lua_pushnil(L);
+  return 1;
+}
+
+#define ALLOW_APPEND_TABLE 1
+static int L_Wndsetter(lua_State *L){
+  const char *idx = NULL;
+  if(lua_isstring(L, -2))idx = lua_tostring(L, -2);
+  for(int i=0; i<ARR_COUNT(wnd_intvars); i++){
+    if(strcmp(idx, wnd_intvars[i].name)==0){
+      return wnd_intvars[i].setter(L, -3);
+    }
+  }
+#if ALLOW_APPEND_TABLE
+  lua_pushstring(L, idx);
+  lua_pushvalue(L, -2);
+  lua_rawset(L, -3-2);
+#endif
+  lua_pop(L, 3);
+  return 0;
+}
+
 static int L_Wnd_GC(lua_State *L){
   printf("Window GC\n");
   int top = lua_gettop(L);
@@ -71,6 +165,12 @@ static int L_NewWnd(lua_State *L){
   lua_getmetatable(L, -1);
     lua_pushlightuserdata(L, wnd->fixed);
     lua_setfield(L, -2, "gtk_container");
+    lua_pushcfunction(L, L_Wndsetter);
+    lua_setfield(L, -2, "__newindex");
+    lua_pushcfunction(L, L_Wndgetter);
+    lua_setfield(L, -2, "__index");
+    lua_pushcfunction(L, L_Wndpairs);
+    lua_setfield(L, -2, "__pairs");
   lua_setmetatable(L, -2);
   REGFUNCS
   

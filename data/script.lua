@@ -91,7 +91,7 @@ tc = gui.wnd:NewTabControl(600, 0, 200, 200);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 
-name = gui.wnd:OpenFileDialog("TPATATA")
+--name = gui.wnd:OpenFileDialog("TPATATA")
 --res = gui.wnd:QuestionDialog()
 
 check = tc[0]:NewCheckBox(10, 10, "BBB")
@@ -105,7 +105,7 @@ print("tab[0] = ", tc[0])
 tblprint(tc[0])
 
 print(btn:WasClicked())
-ed:SetText("TPATATA")
+ed.text = "TPATATA"
 
 
 print("DELETE")

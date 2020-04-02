@@ -4,15 +4,149 @@
 #include <lua5.2/lauxlib.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 
 typedef struct{
   GtkWidget *obj;
   int pool_idx;
   double fontsize;
+  int x, y, w, h;
 }Plot;
 const float plot_colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1,1,0}, {1,0,1}, {0,1,1}, {1,1,1}};
 //TODO: добавить палитры
+
+struct PlotIntVariables{
+  char *name;
+  int (*setter)(lua_State *L, int tblindex);
+  int (*getter)(lua_State *L, int tblindex);
+};
+
+static int setter_x(lua_State *L, int tblindex){
+  float x = lua_tonumber(L, tblindex+2);
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  plot->x = x;
+  gtk_fixed_move(GTK_FIXED(gtk_widget_get_parent(plot->obj)), plot->obj, plot->x, plot->y);
+  return 0;
+}
+static int getter_x(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  lua_pushnumber(L, plot->x);
+  return 1;
+}
+static int setter_y(lua_State *L, int tblindex){
+  float y = lua_tonumber(L, tblindex+2);
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  plot->y = y;
+  gtk_fixed_move(GTK_FIXED(gtk_widget_get_parent(plot->obj)), plot->obj, plot->x, plot->y);
+  return 0;
+}
+static int getter_y(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  lua_pushnumber(L, plot->y);
+  return 1;
+}
+static int setter_width(lua_State *L, int tblindex){
+  float w = lua_tonumber(L, tblindex+2);
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  plot->w = w;
+  gtk_widget_set_size_request(plot->obj, plot->w, plot->h);
+  return 0;
+}
+static int getter_width(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  lua_pushnumber(L, plot->w);
+  return 1;
+}
+static int setter_height(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  plot->h = lua_tonumber(L, tblindex+2);
+  gtk_widget_set_size_request(plot->obj, plot->w, plot->h);
+  return 0;
+}
+static int getter_height(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  lua_pushnumber(L, plot->h);
+  return 1;
+}
+static int setter_enabled(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  char en = lua_toboolean(L, tblindex+2);
+  gtk_widget_set_sensitive(GTK_WIDGET(plot->obj), en);
+  return 0;
+}
+static int getter_enabled(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  char en = gtk_widget_get_sensitive(GTK_WIDGET(plot->obj));
+  lua_pushboolean(L, en);
+  return 1;
+}
+
+struct PlotIntVariables plot_intvars[] = {
+  {.name = "x", .setter = setter_x, .getter = getter_x},
+  {.name = "y", .setter = setter_y, .getter = getter_y},
+  {.name = "width", .setter = setter_width, .getter = getter_width},
+  {.name = "height", .setter = setter_height, .getter = getter_height},
+  {.name = "enabled", .setter = setter_enabled, .getter = getter_enabled},
+};
+#define ARR_COUNT(arr) (sizeof(arr)/sizeof(arr[0]))
+
+static int L_Plotiterator(lua_State *L){
+  int val = lua_tonumber(L, lua_upvalueindex(1));
+  if(val == -1){
+    int prev = lua_next(L, -2);
+    if(prev > 0)return 2;
+    val = 0;
+    lua_pushnil(L);  //какой-то костыль. Что туда кладется?
+  }
+  if(val < ARR_COUNT(plot_intvars)){
+    lua_pushstring(L, plot_intvars[val].name); //index
+    plot_intvars[val].getter(L, -3); //data
+    val++;
+    lua_pushnumber(L, val);
+    lua_replace(L, lua_upvalueindex(1));
+    return 2;
+  }
+  return 0;
+}
+
+static int L_Plotpairs(lua_State *L){
+  lua_pushnumber(L, -1);
+  lua_pushcclosure(L, L_Plotiterator, 1);
+  lua_pushvalue(L, -2);
+  return 2;
+}
+
+static int L_Plotgetter(lua_State *L){
+  const char *idx = NULL;
+  if(lua_isstring(L, -1))idx = lua_tostring(L, -1);
+  lua_pop(L, 1);
+  for(int i=0; i<ARR_COUNT(plot_intvars); i++){
+    if(strcmp(idx, plot_intvars[i].name)==0){
+      return plot_intvars[i].getter(L, -1);
+    }
+  }
+  lua_pushnil(L);
+  return 1;
+}
+
+#define ALLOW_APPEND_TABLE 1
+static int L_Plotsetter(lua_State *L){
+  const char *idx = NULL;
+  if(lua_isstring(L, -2))idx = lua_tostring(L, -2);
+  for(int i=0; i<ARR_COUNT(plot_intvars); i++){
+    if(strcmp(idx, plot_intvars[i].name)==0){
+      return plot_intvars[i].setter(L, -3);
+    }
+  }
+#if ALLOW_APPEND_TABLE
+  lua_pushstring(L, idx);
+  lua_pushvalue(L, -2);
+  lua_rawset(L, -3-2);
+#endif
+  lua_pop(L, 3);
+  return 0;
+}
 
 static int L_Plot_draw(lua_State *L){
   int top = lua_gettop(L);
@@ -20,7 +154,6 @@ static int L_Plot_draw(lua_State *L){
   if(GTK_IS_WIDGET(plot->obj))gtk_widget_queue_draw(plot->obj);
   lua_settop(L, top);
   return 0;
-  
 }
 
 static int L_Plot_GC(lua_State *L){
@@ -321,8 +454,7 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
 }
 
 static int L_NewPlot(lua_State *L){
-  Plot *plot = (Plot*)malloc(sizeof(Plot));
-  int x=0, y=0, w=100, h=100;
+  
   if(lua_gettop(L) < 1){
     printf("Call function as METHOD!\n");
     lua_settop(L, 0);
@@ -330,11 +462,13 @@ static int L_NewPlot(lua_State *L){
     return 1;
   }
   GtkWidget *cont = read_container(L, 1, NULL);
+  Plot *plot = (Plot*)malloc(sizeof(Plot));
+  plot->x=0; plot->y=0; plot->w=100; plot->h=100;
   if(lua_gettop(L) >= 5){
-    if(lua_isnumber(L, 2))x = lua_tonumber(L, 2);
-    if(lua_isnumber(L, 3))y = lua_tonumber(L, 3);
-    if(lua_isnumber(L, 4))w = lua_tonumber(L, 4);
-    if(lua_isnumber(L, 5))h = lua_tonumber(L, 5);
+    if(lua_isnumber(L, 2))plot->x = lua_tonumber(L, 2);
+    if(lua_isnumber(L, 3))plot->y = lua_tonumber(L, 3);
+    if(lua_isnumber(L, 4))plot->w = lua_tonumber(L, 4);
+    if(lua_isnumber(L, 5))plot->h = lua_tonumber(L, 5);
   }
   
   plot->pool_idx = mk_blank_table(L, plot, L_Plot_GC);
@@ -344,12 +478,20 @@ static int L_NewPlot(lua_State *L){
   lua_setfield(L, -2, "format");
   lua_pushcfunction(L, L_Plot_draw);
   lua_setfield(L, -2, "Refresh");
+  lua_getmetatable(L, -1);
+    lua_pushcfunction(L, L_Plotsetter);
+    lua_setfield(L, -2, "__newindex");
+    lua_pushcfunction(L, L_Plotgetter);
+    lua_setfield(L, -2, "__index");
+    lua_pushcfunction(L, L_Plotpairs);
+    lua_setfield(L, -2, "__pairs");
+  lua_setmetatable(L, -2);
   
   plot->obj = gtk_drawing_area_new();
-  gtk_widget_set_size_request(plot->obj, w, h);
+  gtk_widget_set_size_request(plot->obj, plot->w, plot->h);
   plot->fontsize = -0.03;
   
-  gtk_fixed_put(GTK_FIXED(cont), plot->obj, x, y);
+  gtk_fixed_put(GTK_FIXED(cont), plot->obj, plot->x, plot->y);
   gtk_widget_show(plot->obj);
   g_signal_connect(G_OBJECT(plot->obj), "draw", G_CALLBACK(PlotOnDraw), plot);
   return 1;

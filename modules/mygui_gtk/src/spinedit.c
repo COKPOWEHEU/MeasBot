@@ -3,6 +3,7 @@
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 
 typedef struct{
@@ -66,6 +67,18 @@ static int getter_step(lua_State *L, int tblindex){
   lua_pushnumber(L, spined->step);
   return 1;
 }
+static int setter_enabled(lua_State *L, int tblindex){
+  SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
+  char en = lua_toboolean(L, tblindex+2);
+  gtk_widget_set_sensitive(GTK_SPIN_BUTTON(spined->obj), en);
+  return 0;
+}
+static int getter_enabled(lua_State *L, int tblindex){
+  SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
+  char en = gtk_widget_get_sensitive(GTK_SPIN_BUTTON(spined->obj));
+  lua_pushboolean(L, en);
+  return 1;
+}
 
 static int setter_x(lua_State *L, int tblindex){
   float x = lua_tonumber(L, tblindex+2);
@@ -125,6 +138,7 @@ struct SpinEdIntVariables spined_intvars[] = {
   {.name = "value", .setter = setter_val, .getter = getter_val},
   {.name = "val", .setter = setter_val, .getter = getter_val},
   {.name = "step", .setter = setter_step, .getter = getter_step},
+  {.name = "enabled", .setter = setter_enabled, .getter = getter_enabled},
 };
 #define ARR_COUNT(arr) (sizeof(arr)/sizeof(arr[0]))
 
