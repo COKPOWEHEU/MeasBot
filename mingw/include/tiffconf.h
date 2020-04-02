@@ -33,10 +33,19 @@
 #define TIFF_UINT8_T unsigned char
 
 /* Signed size type */
-#define TIFF_SSIZE_T signed int
+#define TIFF_SSIZE_T signed long
 
 /* Pointer difference type */
 #define TIFF_PTRDIFF_T ptrdiff_t
+
+/* Define to 1 if the system has the type `int16'. */
+/* #undef HAVE_INT16 */
+
+/* Define to 1 if the system has the type `int32'. */
+/* #undef HAVE_INT32 */
+
+/* Define to 1 if the system has the type `int8'. */
+/* #undef HAVE_INT8 */
 
 /* Compatibility stuff. */
 
@@ -58,7 +67,7 @@
 #define JPEG_SUPPORT 1
 
 /* Support JBIG compression (requires JBIG-KIT library) */
-/* #undef JBIG_SUPPORT */
+#define JBIG_SUPPORT 1
 
 /* Support LogLuv high dynamic range encoding */
 #define LOGLUV_SUPPORT 1

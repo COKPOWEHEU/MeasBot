@@ -22,13 +22,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_BOX_H__
-#define __GTK_BOX_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_BOX_H__
+#define __GTK_BOX_H__
+
 
 #include <gtk/gtkcontainer.h>
 
@@ -56,15 +56,9 @@ struct _GtkBox
   GtkBoxPrivate *priv;
 };
 
-/**
- * GtkBoxClass:
- * @parent_class: The parent class.
- */
 struct _GtkBoxClass
 {
   GtkContainerClass parent_class;
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -74,66 +68,44 @@ struct _GtkBoxClass
 };
 
 
-GDK_AVAILABLE_IN_ALL
 GType       gtk_box_get_type            (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
 GtkWidget*  gtk_box_new                 (GtkOrientation  orientation,
                                          gint            spacing);
 
-GDK_AVAILABLE_IN_ALL
 void        gtk_box_pack_start          (GtkBox         *box,
                                          GtkWidget      *child,
                                          gboolean        expand,
                                          gboolean        fill,
                                          guint           padding);
-GDK_AVAILABLE_IN_ALL
 void        gtk_box_pack_end            (GtkBox         *box,
                                          GtkWidget      *child,
                                          gboolean        expand,
                                          gboolean        fill,
                                          guint           padding);
 
-GDK_AVAILABLE_IN_ALL
 void        gtk_box_set_homogeneous     (GtkBox         *box,
                                          gboolean        homogeneous);
-GDK_AVAILABLE_IN_ALL
 gboolean    gtk_box_get_homogeneous     (GtkBox         *box);
-GDK_AVAILABLE_IN_ALL
 void        gtk_box_set_spacing         (GtkBox         *box,
                                          gint            spacing);
-GDK_AVAILABLE_IN_ALL
 gint        gtk_box_get_spacing         (GtkBox         *box);
-GDK_AVAILABLE_IN_3_10
-void        gtk_box_set_baseline_position (GtkBox             *box,
-					   GtkBaselinePosition position);
-GDK_AVAILABLE_IN_3_10
-GtkBaselinePosition gtk_box_get_baseline_position (GtkBox         *box);
 
-GDK_AVAILABLE_IN_ALL
 void        gtk_box_reorder_child       (GtkBox         *box,
                                          GtkWidget      *child,
                                          gint            position);
 
-GDK_AVAILABLE_IN_ALL
 void        gtk_box_query_child_packing (GtkBox         *box,
                                          GtkWidget      *child,
                                          gboolean       *expand,
                                          gboolean       *fill,
                                          guint          *padding,
                                          GtkPackType    *pack_type);
-GDK_AVAILABLE_IN_ALL
 void        gtk_box_set_child_packing   (GtkBox         *box,
                                          GtkWidget      *child,
                                          gboolean        expand,
                                          gboolean        fill,
                                          guint           padding,
                                          GtkPackType     pack_type);
-
-GDK_AVAILABLE_IN_3_12
-void        gtk_box_set_center_widget   (GtkBox         *box,
-                                         GtkWidget      *widget);
-GDK_AVAILABLE_IN_3_12
-GtkWidget  *gtk_box_get_center_widget   (GtkBox         *box);
 
 G_END_DECLS
 

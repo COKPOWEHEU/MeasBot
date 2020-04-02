@@ -4,7 +4,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -12,21 +12,22 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General
- * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
  */
-#ifndef __G_OBJECT_H__
-#define __G_OBJECT_H__
-
 #if !defined (__GLIB_GOBJECT_H_INSIDE__) && !defined (GOBJECT_COMPILATION)
 #error "Only <glib-object.h> can be included directly."
 #endif
+
+#ifndef __G_OBJECT_H__
+#define __G_OBJECT_H__
 
 #include        <gobject/gtype.h>
 #include        <gobject/gvalue.h>
 #include        <gobject/gparam.h>
 #include        <gobject/gclosure.h>
 #include        <gobject/gsignal.h>
-#include        <gobject/gboxed.h>
 
 G_BEGIN_DECLS
 
@@ -62,11 +63,7 @@ G_BEGIN_DECLS
  * 
  * Checks whether a valid #GTypeInstance pointer is of type %G_TYPE_OBJECT.
  */
-#if GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_42
-#define G_IS_OBJECT(object)         (G_TYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE ((object), G_TYPE_OBJECT))
-#else
 #define G_IS_OBJECT(object)         (G_TYPE_CHECK_INSTANCE_TYPE ((object), G_TYPE_OBJECT))
-#endif
 /**
  * G_IS_OBJECT_CLASS:
  * @class: a #GObjectClass
@@ -239,7 +236,7 @@ typedef void (*GWeakNotify)		(gpointer      data,
 /**
  * GObject:
  * 
- * All the fields in the GObject structure are private 
+ * All the fields in the <structname>GObject</structname> structure are private 
  * to the #GObject implementation and should never be accessed directly.
  */
 struct  _GObject
@@ -259,10 +256,9 @@ struct  _GObject
  *  @constructor of the parent class. Overriding @constructor should be rarely 
  *  needed, e.g. to handle construct properties, or to implement singletons.
  * @set_property: the generic setter for all properties of this type. Should be
- *  overridden for every type with properties. If implementations of
- *  @set_property don't emit property change notification explicitly, this will
- *  be done implicitly by the type system. However, if the notify signal is
- *  emitted explicitly, the type system will not emit it a second time.
+ *  overridden for every type with properties. Implementations of @set_property
+ *  don't need to emit property change notification explicitly, this is handled
+ *  by the type system.
  * @get_property: the generic getter for all properties of this type. Should be
  *  overridden for every type with properties.
  * @dispose: the @dispose function is supposed to drop all references to other 
@@ -285,10 +281,11 @@ struct  _GObject
  *  should chain up to the @constructed call of their parent class to allow it
  *  to complete its initialisation.
  * 
- * The class structure for the GObject type.
+ * The class structure for the <structname>GObject</structname> type.
  * 
- * |[<!-- language="C" -->
- * // Example of implementing a singleton using a constructor.
+ * <example>
+ * <title>Implementing singletons using a constructor</title>
+ * <programlisting>
  * static MySingleton *the_singleton = NULL;
  * 
  * static GObject*
@@ -310,7 +307,7 @@ struct  _GObject
  * 
  *   return object;
  * }
- * ]|
+ * </programlisting></example>
  */
 struct  _GObjectClass
 {
@@ -357,7 +354,7 @@ struct  _GObjectClass
  * @pspec: the #GParamSpec of the construct parameter
  * @value: the value to set the parameter to
  * 
- * The GObjectConstructParam struct is an auxiliary 
+ * The <structname>GObjectConstructParam</structname> struct is an auxiliary 
  * structure used to hand #GParamSpec/#GValue pairs to the @constructor of
  * a #GObjectClass.
  */
@@ -370,154 +367,94 @@ struct _GObjectConstructParam
 /**
  * GInitiallyUnowned:
  * 
- * All the fields in the GInitiallyUnowned structure 
+ * All the fields in the <structname>GInitiallyUnowned</structname> structure 
  * are private to the #GInitiallyUnowned implementation and should never be 
  * accessed directly.
  */
 /**
  * GInitiallyUnownedClass:
  * 
- * The class structure for the GInitiallyUnowned type.
+ * The class structure for the <structname>GInitiallyUnowned</structname> type.
  */
 
 
 /* --- prototypes --- */
-GLIB_AVAILABLE_IN_ALL
 GType       g_initially_unowned_get_type      (void);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_class_install_property   (GObjectClass   *oclass,
 					       guint           property_id,
 					       GParamSpec     *pspec);
-GLIB_AVAILABLE_IN_ALL
 GParamSpec* g_object_class_find_property      (GObjectClass   *oclass,
 					       const gchar    *property_name);
-GLIB_AVAILABLE_IN_ALL
 GParamSpec**g_object_class_list_properties    (GObjectClass   *oclass,
 					       guint	      *n_properties);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_class_override_property  (GObjectClass   *oclass,
 					       guint           property_id,
 					       const gchar    *name);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_class_install_properties (GObjectClass   *oclass,
                                                guint           n_pspecs,
                                                GParamSpec    **pspecs);
 
-GLIB_AVAILABLE_IN_ALL
 void        g_object_interface_install_property (gpointer     g_iface,
 						 GParamSpec  *pspec);
-GLIB_AVAILABLE_IN_ALL
 GParamSpec* g_object_interface_find_property    (gpointer     g_iface,
 						 const gchar *property_name);
-GLIB_AVAILABLE_IN_ALL
 GParamSpec**g_object_interface_list_properties  (gpointer     g_iface,
 						 guint       *n_properties_p);
 
-GLIB_AVAILABLE_IN_ALL
 GType       g_object_get_type                 (void) G_GNUC_CONST;
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_new                      (GType           object_type,
 					       const gchar    *first_property_name,
 					       ...);
-GLIB_AVAILABLE_IN_2_54
-GObject*    g_object_new_with_properties      (GType           object_type,
-                                               guint           n_properties,
-                                               const char     *names[],
-                                               const GValue    values[]);
-
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-
-GLIB_DEPRECATED_IN_2_54_FOR(g_object_new_with_properties)
 gpointer    g_object_newv		      (GType           object_type,
 					       guint	       n_parameters,
 					       GParameter     *parameters);
-
-G_GNUC_END_IGNORE_DEPRECATIONS
-
-GLIB_AVAILABLE_IN_ALL
 GObject*    g_object_new_valist               (GType           object_type,
 					       const gchar    *first_property_name,
 					       va_list         var_args);
-GLIB_AVAILABLE_IN_ALL
 void	    g_object_set                      (gpointer	       object,
 					       const gchar    *first_property_name,
 					       ...) G_GNUC_NULL_TERMINATED;
-GLIB_AVAILABLE_IN_ALL
 void        g_object_get                      (gpointer        object,
 					       const gchar    *first_property_name,
 					       ...) G_GNUC_NULL_TERMINATED;
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_connect                  (gpointer	       object,
 					       const gchar    *signal_spec,
 					       ...) G_GNUC_NULL_TERMINATED;
-GLIB_AVAILABLE_IN_ALL
 void	    g_object_disconnect               (gpointer	       object,
 					       const gchar    *signal_spec,
 					       ...) G_GNUC_NULL_TERMINATED;
-GLIB_AVAILABLE_IN_2_54
-void        g_object_setv                     (GObject        *object,
-                                               guint           n_properties,
-                                               const gchar    *names[],
-                                               const GValue    values[]);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_set_valist               (GObject        *object,
 					       const gchar    *first_property_name,
 					       va_list         var_args);
-GLIB_AVAILABLE_IN_2_54
-void        g_object_getv                     (GObject        *object,
-                                               guint           n_properties,
-                                               const gchar    *names[],
-                                               GValue          values[]);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_get_valist               (GObject        *object,
 					       const gchar    *first_property_name,
 					       va_list         var_args);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_set_property             (GObject        *object,
 					       const gchar    *property_name,
 					       const GValue   *value);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_get_property             (GObject        *object,
 					       const gchar    *property_name,
 					       GValue         *value);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_freeze_notify            (GObject        *object);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_notify                   (GObject        *object,
 					       const gchar    *property_name);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_notify_by_pspec          (GObject        *object,
 					       GParamSpec     *pspec);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_thaw_notify              (GObject        *object);
-GLIB_AVAILABLE_IN_ALL
 gboolean    g_object_is_floating    	      (gpointer        object);
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_ref_sink       	      (gpointer	       object);
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_ref                      (gpointer        object);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_unref                    (gpointer        object);
-GLIB_AVAILABLE_IN_ALL
 void	    g_object_weak_ref		      (GObject	      *object,
 					       GWeakNotify     notify,
 					       gpointer	       data);
-GLIB_AVAILABLE_IN_ALL
 void	    g_object_weak_unref		      (GObject	      *object,
 					       GWeakNotify     notify,
 					       gpointer	       data);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_add_weak_pointer         (GObject        *object, 
                                                gpointer       *weak_pointer_location);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_remove_weak_pointer      (GObject        *object, 
                                                gpointer       *weak_pointer_location);
-
-#if defined(g_has_typeof) && GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_56
-/* Make reference APIs type safe with macros */
-#define g_object_ref(Obj)      ((__typeof__(Obj)) (g_object_ref) (Obj))
-#define g_object_ref_sink(Obj) ((__typeof__(Obj)) (g_object_ref_sink) (Obj))
-#endif
 
 /**
  * GToggleNotify:
@@ -535,94 +472,47 @@ typedef void (*GToggleNotify) (gpointer      data,
 			       GObject      *object,
 			       gboolean      is_last_ref);
 
-GLIB_AVAILABLE_IN_ALL
 void g_object_add_toggle_ref    (GObject       *object,
 				 GToggleNotify  notify,
 				 gpointer       data);
-GLIB_AVAILABLE_IN_ALL
 void g_object_remove_toggle_ref (GObject       *object,
 				 GToggleNotify  notify,
 				 gpointer       data);
 
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_get_qdata                (GObject        *object,
 					       GQuark          quark);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_set_qdata                (GObject        *object,
 					       GQuark          quark,
 					       gpointer        data);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_set_qdata_full           (GObject        *object,
 					       GQuark          quark,
 					       gpointer        data,
 					       GDestroyNotify  destroy);
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_steal_qdata              (GObject        *object,
 					       GQuark          quark);
-
-GLIB_AVAILABLE_IN_2_34
-gpointer    g_object_dup_qdata                (GObject        *object,
-                                               GQuark          quark,
-                                               GDuplicateFunc  dup_func,
-					       gpointer         user_data);
-GLIB_AVAILABLE_IN_2_34
-gboolean    g_object_replace_qdata            (GObject        *object,
-                                               GQuark          quark,
-                                               gpointer        oldval,
-                                               gpointer        newval,
-                                               GDestroyNotify  destroy,
-					       GDestroyNotify *old_destroy);
-
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_get_data                 (GObject        *object,
 					       const gchar    *key);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_set_data                 (GObject        *object,
 					       const gchar    *key,
 					       gpointer        data);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_set_data_full            (GObject        *object,
 					       const gchar    *key,
 					       gpointer        data,
 					       GDestroyNotify  destroy);
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_object_steal_data               (GObject        *object,
 					       const gchar    *key);
-
-GLIB_AVAILABLE_IN_2_34
-gpointer    g_object_dup_data                 (GObject        *object,
-                                               const gchar    *key,
-                                               GDuplicateFunc  dup_func,
-					       gpointer         user_data);
-GLIB_AVAILABLE_IN_2_34
-gboolean    g_object_replace_data             (GObject        *object,
-                                               const gchar    *key,
-                                               gpointer        oldval,
-                                               gpointer        newval,
-                                               GDestroyNotify  destroy,
-					       GDestroyNotify *old_destroy);
-
-
-GLIB_AVAILABLE_IN_ALL
 void        g_object_watch_closure            (GObject        *object,
 					       GClosure       *closure);
-GLIB_AVAILABLE_IN_ALL
 GClosure*   g_cclosure_new_object             (GCallback       callback_func,
 					       GObject	      *object);
-GLIB_AVAILABLE_IN_ALL
 GClosure*   g_cclosure_new_object_swap        (GCallback       callback_func,
 					       GObject	      *object);
-GLIB_AVAILABLE_IN_ALL
 GClosure*   g_closure_new_object              (guint           sizeof_closure,
 					       GObject        *object);
-GLIB_AVAILABLE_IN_ALL
 void        g_value_set_object                (GValue         *value,
 					       gpointer        v_object);
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_value_get_object                (const GValue   *value);
-GLIB_AVAILABLE_IN_ALL
 gpointer    g_value_dup_object                (const GValue   *value);
-GLIB_AVAILABLE_IN_ALL
 gulong	    g_signal_connect_object           (gpointer	       instance,
 					       const gchar    *detailed_signal,
 					       GCallback       c_handler,
@@ -630,13 +520,10 @@ gulong	    g_signal_connect_object           (gpointer	       instance,
 					       GConnectFlags   connect_flags);
 
 /*< protected >*/
-GLIB_AVAILABLE_IN_ALL
 void        g_object_force_floating           (GObject        *object);
-GLIB_AVAILABLE_IN_ALL
 void        g_object_run_dispose	      (GObject	      *object);
 
 
-GLIB_AVAILABLE_IN_ALL
 void        g_value_take_object               (GValue         *value,
 					       gpointer        v_object);
 GLIB_DEPRECATED_FOR(g_value_take_object)
@@ -650,16 +537,16 @@ gsize	    g_object_compat_control	      (gsize	       what,
 /* --- implementation macros --- */
 #define G_OBJECT_WARN_INVALID_PSPEC(object, pname, property_id, pspec) \
 G_STMT_START { \
-  GObject *_glib__object = (GObject*) (object); \
-  GParamSpec *_glib__pspec = (GParamSpec*) (pspec); \
-  guint _glib__property_id = (property_id); \
-  g_warning ("%s:%d: invalid %s id %u for \"%s\" of type '%s' in '%s'", \
-             __FILE__, __LINE__, \
+  GObject *_object = (GObject*) (object); \
+  GParamSpec *_pspec = (GParamSpec*) (pspec); \
+  guint _property_id = (property_id); \
+  g_warning ("%s: invalid %s id %u for \"%s\" of type `%s' in `%s'", \
+             G_STRLOC, \
              (pname), \
-             _glib__property_id, \
-             _glib__pspec->name, \
-             g_type_name (G_PARAM_SPEC_TYPE (_glib__pspec)), \
-             G_OBJECT_TYPE_NAME (_glib__object)); \
+             _property_id, \
+             _pspec->name, \
+             g_type_name (G_PARAM_SPEC_TYPE (_pspec)), \
+             G_OBJECT_TYPE_NAME (_object)); \
 } G_STMT_END
 /**
  * G_OBJECT_WARN_INVALID_PROPERTY_ID:
@@ -673,243 +560,18 @@ G_STMT_START { \
 #define G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec) \
     G_OBJECT_WARN_INVALID_PSPEC ((object), "property", (property_id), (pspec))
 
-GLIB_AVAILABLE_IN_ALL
-void    g_clear_object (GObject **object_ptr);
+void    g_clear_object (volatile GObject **object_ptr);
 #define g_clear_object(object_ptr) g_clear_pointer ((object_ptr), g_object_unref)
-
-/**
- * g_set_object: (skip)
- * @object_ptr: a pointer to a #GObject reference
- * @new_object: (nullable) (transfer none): a pointer to the new #GObject to
- *   assign to it, or %NULL to clear the pointer
- *
- * Updates a #GObject pointer to refer to @new_object. It increments the
- * reference count of @new_object (if non-%NULL), decrements the reference
- * count of the current value of @object_ptr (if non-%NULL), and assigns
- * @new_object to @object_ptr. The assignment is not atomic.
- *
- * @object_ptr must not be %NULL.
- *
- * A macro is also included that allows this function to be used without
- * pointer casts. The function itself is static inline, so its address may vary
- * between compilation units.
- *
- * One convenient usage of this function is in implementing property setters:
- * |[
- *   void
- *   foo_set_bar (Foo *foo,
- *                Bar *new_bar)
- *   {
- *     g_return_if_fail (IS_FOO (foo));
- *     g_return_if_fail (new_bar == NULL || IS_BAR (new_bar));
- *
- *     if (g_set_object (&foo->bar, new_bar))
- *       g_object_notify (foo, "bar");
- *   }
- * ]|
- *
- * Returns: %TRUE if the value of @object_ptr changed, %FALSE otherwise
- *
- * Since: 2.44
- */
-static inline gboolean
-(g_set_object) (GObject **object_ptr,
-                GObject  *new_object)
-{
-  GObject *old_object = *object_ptr;
-
-  /* rely on g_object_[un]ref() to check the pointers are actually GObjects;
-   * elide a (object_ptr != NULL) check because most of the time we will be
-   * operating on struct members with a constant offset, so a NULL check would
-   * not catch bugs
-   */
-
-  if (old_object == new_object)
-    return FALSE;
-
-  if (new_object != NULL)
-    g_object_ref (new_object);
-
-  *object_ptr = new_object;
-
-  if (old_object != NULL)
-    g_object_unref (old_object);
-
-  return TRUE;
-}
-
-/* We need GCC for __extension__, which we need to sort out strict aliasing of @object_ptr */
-#if defined(__GNUC__)
-
-#define g_set_object(object_ptr, new_object) \
-  (G_GNUC_EXTENSION ({ \
-    G_STATIC_ASSERT (sizeof *(object_ptr) == sizeof (new_object)); \
-    /* Only one access, please; work around type aliasing */ \
-    union { char *in; GObject **out; } _object_ptr; \
-    _object_ptr.in = (char *) (object_ptr); \
-    /* Check types match */ \
-    (void) (0 ? *(object_ptr) = (new_object), FALSE : FALSE); \
-    (g_set_object) (_object_ptr.out, (GObject *) new_object); \
-  })) \
-  GLIB_AVAILABLE_MACRO_IN_2_44
-
-#else  /* if !defined(__GNUC__) */
-
-#define g_set_object(object_ptr, new_object) \
- (/* Check types match. */ \
-  0 ? *(object_ptr) = (new_object), FALSE : \
-  (g_set_object) ((GObject **) (object_ptr), (GObject *) (new_object)) \
- )
-
-#endif  /* !defined(__GNUC__) */
-
-/**
- * g_assert_finalize_object: (skip)
- * @object: (transfer full) (type GObject.Object): an object
- *
- * Assert that @object is non-%NULL, then release one reference to it with
- * g_object_unref() and assert that it has been finalized (i.e. that there
- * are no more references).
- *
- * If assertions are disabled via `G_DISABLE_ASSERT`,
- * this macro just calls g_object_unref() without any further checks.
- *
- * This macro should only be used in regression tests.
- *
- * Since: 2.62
- */
-static inline void
-(g_assert_finalize_object) (GObject *object)
-{
-  gpointer weak_pointer = object;
-
-  g_assert_true (G_IS_OBJECT (weak_pointer));
-  g_object_add_weak_pointer (object, &weak_pointer);
-  g_object_unref (weak_pointer);
-  g_assert_null (weak_pointer);
-}
-
-#ifdef G_DISABLE_ASSERT
-#define g_assert_finalize_object(object) g_object_unref (object)
-#else
-#define g_assert_finalize_object(object) (g_assert_finalize_object ((GObject *) object))
-#endif
-
-/**
- * g_clear_weak_pointer: (skip)
- * @weak_pointer_location: The memory address of a pointer
- *
- * Clears a weak reference to a #GObject.
- *
- * @weak_pointer_location must not be %NULL.
- *
- * If the weak reference is %NULL then this function does nothing.
- * Otherwise, the weak reference to the object is removed for that location
- * and the pointer is set to %NULL.
- *
- * A macro is also included that allows this function to be used without
- * pointer casts. The function itself is static inline, so its address may vary
- * between compilation units.
- *
- * Since: 2.56
- */
-static inline void
-(g_clear_weak_pointer) (gpointer *weak_pointer_location)
-{
-  GObject *object = (GObject *) *weak_pointer_location;
-
-  if (object != NULL)
-    {
-      g_object_remove_weak_pointer (object, weak_pointer_location);
-      *weak_pointer_location = NULL;
-    }
-}
-
-#define g_clear_weak_pointer(weak_pointer_location) \
- (/* Check types match. */ \
-  (g_clear_weak_pointer) ((gpointer *) (weak_pointer_location)) \
- )
-
-/**
- * g_set_weak_pointer: (skip)
- * @weak_pointer_location: the memory address of a pointer
- * @new_object: (nullable) (transfer none): a pointer to the new #GObject to
- *   assign to it, or %NULL to clear the pointer
- *
- * Updates a pointer to weakly refer to @new_object. It assigns @new_object
- * to @weak_pointer_location and ensures that @weak_pointer_location will
- * automaticaly be set to %NULL if @new_object gets destroyed. The assignment
- * is not atomic. The weak reference is not thread-safe, see
- * g_object_add_weak_pointer() for details.
- *
- * @weak_pointer_location must not be %NULL.
- *
- * A macro is also included that allows this function to be used without
- * pointer casts. The function itself is static inline, so its address may vary
- * between compilation units.
- *
- * One convenient usage of this function is in implementing property setters:
- * |[
- *   void
- *   foo_set_bar (Foo *foo,
- *                Bar *new_bar)
- *   {
- *     g_return_if_fail (IS_FOO (foo));
- *     g_return_if_fail (new_bar == NULL || IS_BAR (new_bar));
- *
- *     if (g_set_weak_pointer (&foo->bar, new_bar))
- *       g_object_notify (foo, "bar");
- *   }
- * ]|
- *
- * Returns: %TRUE if the value of @weak_pointer_location changed, %FALSE otherwise
- *
- * Since: 2.56
- */
-static inline gboolean
-(g_set_weak_pointer) (gpointer *weak_pointer_location,
-                      GObject  *new_object)
-{
-  GObject *old_object = (GObject *) *weak_pointer_location;
-
-  /* elide a (weak_pointer_location != NULL) check because most of the time we
-   * will be operating on struct members with a constant offset, so a NULL
-   * check would not catch bugs
-   */
-
-  if (old_object == new_object)
-    return FALSE;
-
-  if (old_object != NULL)
-    g_object_remove_weak_pointer (old_object, weak_pointer_location);
-
-  *weak_pointer_location = new_object;
-
-  if (new_object != NULL)
-    g_object_add_weak_pointer (new_object, weak_pointer_location);
-
-  return TRUE;
-}
-
-#define g_set_weak_pointer(weak_pointer_location, new_object) \
- (/* Check types match. */ \
-  0 ? *(weak_pointer_location) = (new_object), FALSE : \
-  (g_set_weak_pointer) ((gpointer *) (weak_pointer_location), (GObject *) (new_object)) \
- )
 
 typedef struct {
     /*<private>*/
     union { gpointer p; } priv;
 } GWeakRef;
 
-GLIB_AVAILABLE_IN_ALL
 void     g_weak_ref_init       (GWeakRef *weak_ref,
                                 gpointer  object);
-GLIB_AVAILABLE_IN_ALL
 void     g_weak_ref_clear      (GWeakRef *weak_ref);
-GLIB_AVAILABLE_IN_ALL
 gpointer g_weak_ref_get        (GWeakRef *weak_ref);
-GLIB_AVAILABLE_IN_ALL
 void     g_weak_ref_set        (GWeakRef *weak_ref,
                                 gpointer  object);
 

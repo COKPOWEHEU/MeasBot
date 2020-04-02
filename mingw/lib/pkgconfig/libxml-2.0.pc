@@ -1,13 +1,13 @@
-prefix=/mingw32
+prefix=/MinGW
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 modules=1
 
 Name: libXML
-Version: 2.9.10
+Version: 2.8.0
 Description: libXML library version2.
 Requires:
 Libs: -L${libdir} -lxml2
-Libs.private:   -L${libdir} -lz -L${libdir} -llzma  -liconv  -lws2_32 
+Libs.private:  -lz  -liconv  -lws2_32 
 Cflags: -I${includedir}/libxml2 

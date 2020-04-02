@@ -16,12 +16,12 @@
  *          Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __GTK_OFFSCREEN_WINDOW_H__
-#define __GTK_OFFSCREEN_WINDOW_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_OFFSCREEN_WINDOW_H__
+#define __GTK_OFFSCREEN_WINDOW_H__
 
 #include <gtk/gtkwindow.h>
 
@@ -42,15 +42,9 @@ struct _GtkOffscreenWindow
   GtkWindow parent_object;
 };
 
-/**
- * GtkOffscreenWindowClass:
- * @parent_class: The parent class.
- */
 struct _GtkOffscreenWindowClass
 {
   GtkWindowClass parent_class;
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -59,14 +53,10 @@ struct _GtkOffscreenWindowClass
   void (*_gtk_reserved4) (void);
 };
 
-GDK_AVAILABLE_IN_ALL
 GType            gtk_offscreen_window_get_type    (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_ALL
 GtkWidget       *gtk_offscreen_window_new         (void);
-GDK_AVAILABLE_IN_ALL
 cairo_surface_t *gtk_offscreen_window_get_surface (GtkOffscreenWindow *offscreen);
-GDK_AVAILABLE_IN_ALL
 GdkPixbuf       *gtk_offscreen_window_get_pixbuf  (GtkOffscreenWindow *offscreen);
 
 G_END_DECLS

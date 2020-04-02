@@ -22,13 +22,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_EVENT_BOX_H__
-#define __GTK_EVENT_BOX_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_EVENT_BOX_H__
+#define __GTK_EVENT_BOX_H__
+
 
 #include <gtk/gtkbin.h>
 
@@ -54,15 +54,9 @@ struct _GtkEventBox
   GtkEventBoxPrivate *priv;
 };
 
-/**
- * GtkEventBoxClass:
- * @parent_class: The parent class.
- */
 struct _GtkEventBoxClass
 {
   GtkBinClass parent_class;
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -71,18 +65,12 @@ struct _GtkEventBoxClass
   void (*_gtk_reserved4) (void);
 };
 
-GDK_AVAILABLE_IN_ALL
 GType      gtk_event_box_get_type           (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
 GtkWidget* gtk_event_box_new                (void);
-GDK_AVAILABLE_IN_ALL
 gboolean   gtk_event_box_get_visible_window (GtkEventBox *event_box);
-GDK_AVAILABLE_IN_ALL
 void       gtk_event_box_set_visible_window (GtkEventBox *event_box,
                                              gboolean     visible_window);
-GDK_AVAILABLE_IN_ALL
 gboolean   gtk_event_box_get_above_child    (GtkEventBox *event_box);
-GDK_AVAILABLE_IN_ALL
 void       gtk_event_box_set_above_child    (GtkEventBox *event_box,
                                              gboolean     above_child);
 

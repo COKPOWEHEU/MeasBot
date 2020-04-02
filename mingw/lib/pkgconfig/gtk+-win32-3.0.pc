@@ -1,16 +1,16 @@
-prefix=/mingw32
+prefix=/MinGW
 exec_prefix=${prefix}
-libdir=${prefix}/lib
+libdir=${exec_prefix}/lib
 includedir=${prefix}/include
-targets=broadway win32
+targets=win32
 
 gtk_binary_version=3.0.0
-gtk_host=x86-windows
+gtk_host=i686-pc-mingw32
 
 Name: GTK+
 Description: GTK+ Graphical UI Library
-Version: 3.24.14
-Requires: gdk-3.0 atk >= 2.15.1  cairo >= 1.14.0 cairo-gobject >= 1.14.0 gdk-pixbuf-2.0 >= 2.30.0 gio-2.0 >= 2.57.2
-Requires.private: atk epoxy >= 1.4 fribidi >= 0.19.7 gio-2.0 >= 2.57.2
+Version: 3.5.4
+Requires: gdk-3.0 atk cairo cairo-gobject gdk-pixbuf-2.0 gio-2.0
+Requires.private: 
 Libs: -L${libdir} -lgtk-3 
-Cflags: -I${includedir}/gtk-3.0 
+Cflags: -I${includedir}/gtk-3.0 -mms-bitfields

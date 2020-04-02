@@ -1,16 +1,16 @@
-prefix=/mingw32
-libdir=${prefix}/lib
+prefix=/MinGW
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-bindir=${prefix}/bin
-glib_genmarshal=${bindir}/glib-genmarshal
-gobject_query=${bindir}/gobject-query
-glib_mkenums=${bindir}/glib-mkenums
+glib_genmarshal=glib-genmarshal
+gobject_query=gobject-query
+glib_mkenums=glib-mkenums
 
 Name: GLib
 Description: C Utility Library
-Version: 2.64.1
-Requires.private: libpcre >=  8.31
-Libs: -L${libdir} -lglib-2.0 -lintl
-Libs.private: -lws2_32 -lole32 -lwinmm -lshlwapi -pthread -lm
+Version: 2.33.8
+Requires.private: libpcre
+Libs: -L${libdir} -lglib-2.0 -lintl 
+Libs.private:  -lws2_32 -lole32 -lwinmm -lshlwapi -L/MinGW/lib -lpcre -lintl  
 Cflags: -I${includedir}/glib-2.0 -I${libdir}/glib-2.0/include -mms-bitfields

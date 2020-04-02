@@ -5,7 +5,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,7 +13,9 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General
- * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
  *
  * Author: David Zeuthen <davidz@redhat.com>
  */
@@ -85,41 +87,27 @@ struct _GDBusInterfaceSkeletonClass
   gpointer signal_padding[8];
 };
 
-GLIB_AVAILABLE_IN_ALL
 GType                        g_dbus_interface_skeleton_get_type        (void) G_GNUC_CONST;
-GLIB_AVAILABLE_IN_ALL
 GDBusInterfaceSkeletonFlags  g_dbus_interface_skeleton_get_flags       (GDBusInterfaceSkeleton      *interface_);
-GLIB_AVAILABLE_IN_ALL
 void                         g_dbus_interface_skeleton_set_flags       (GDBusInterfaceSkeleton      *interface_,
                                                                         GDBusInterfaceSkeletonFlags  flags);
-GLIB_AVAILABLE_IN_ALL
 GDBusInterfaceInfo          *g_dbus_interface_skeleton_get_info        (GDBusInterfaceSkeleton      *interface_);
-GLIB_AVAILABLE_IN_ALL
 GDBusInterfaceVTable        *g_dbus_interface_skeleton_get_vtable      (GDBusInterfaceSkeleton      *interface_);
-GLIB_AVAILABLE_IN_ALL
 GVariant                    *g_dbus_interface_skeleton_get_properties  (GDBusInterfaceSkeleton      *interface_);
-GLIB_AVAILABLE_IN_ALL
 void                         g_dbus_interface_skeleton_flush           (GDBusInterfaceSkeleton      *interface_);
 
-GLIB_AVAILABLE_IN_ALL
 gboolean                     g_dbus_interface_skeleton_export          (GDBusInterfaceSkeleton      *interface_,
                                                                         GDBusConnection             *connection,
                                                                         const gchar                 *object_path,
                                                                         GError                     **error);
-GLIB_AVAILABLE_IN_ALL
 void                         g_dbus_interface_skeleton_unexport        (GDBusInterfaceSkeleton      *interface_);
-GLIB_AVAILABLE_IN_ALL
 void                g_dbus_interface_skeleton_unexport_from_connection (GDBusInterfaceSkeleton      *interface_,
                                                                         GDBusConnection             *connection);
 
-GLIB_AVAILABLE_IN_ALL
 GDBusConnection             *g_dbus_interface_skeleton_get_connection  (GDBusInterfaceSkeleton      *interface_);
-GLIB_AVAILABLE_IN_ALL
 GList                       *g_dbus_interface_skeleton_get_connections (GDBusInterfaceSkeleton      *interface_);
-GLIB_AVAILABLE_IN_ALL
 gboolean                     g_dbus_interface_skeleton_has_connection  (GDBusInterfaceSkeleton      *interface_,
                                                                         GDBusConnection             *connection);
-GLIB_AVAILABLE_IN_ALL
 const gchar                 *g_dbus_interface_skeleton_get_object_path (GDBusInterfaceSkeleton      *interface_);
 
 G_END_DECLS

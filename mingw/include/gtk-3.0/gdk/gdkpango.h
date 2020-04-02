@@ -15,26 +15,23 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GDK_PANGO_H__
-#define __GDK_PANGO_H__
-
 #if !defined (__GDK_H_INSIDE__) && !defined (GDK_COMPILATION)
 #error "Only <gdk/gdk.h> can be included directly."
 #endif
 
+#ifndef __GDK_PANGO_H__
+#define __GDK_PANGO_H__
+
 #include <gdk/gdktypes.h>
-#include <gdk/gdkversionmacros.h>
 
 G_BEGIN_DECLS
 
 /************************************************************************/
 
-GDK_AVAILABLE_IN_ALL
 PangoContext *gdk_pango_context_get_for_screen (GdkScreen    *screen);
-GDK_AVAILABLE_IN_3_22
-PangoContext *gdk_pango_context_get_for_display (GdkDisplay *display);
-GDK_AVAILABLE_IN_ALL
+#ifndef GDK_MULTIHEAD_SAFE
 PangoContext *gdk_pango_context_get            (void);
+#endif
 
 
 /* Get a clip region to draw only part of a layout or
@@ -43,13 +40,11 @@ PangoContext *gdk_pango_context_get            (void);
  * draw with the region as clip, only the given ranges are drawn.
  */
 
-GDK_AVAILABLE_IN_ALL
 cairo_region_t    *gdk_pango_layout_line_get_clip_region (PangoLayoutLine *line,
                                                      gint             x_origin,
                                                      gint             y_origin,
                                                      const gint      *index_ranges,
                                                      gint             n_ranges);
-GDK_AVAILABLE_IN_ALL
 cairo_region_t    *gdk_pango_layout_get_clip_region      (PangoLayout     *layout,
                                                      gint             x_origin,
                                                      gint             y_origin,

@@ -48,9 +48,8 @@
 	__o__ = va_arg (va, const char *);			    \
 	if (!__o__)		    				    \
 	    break;		    				    \
-	__v__.type = va_arg (va, int);				    \
+	__v__.type = va_arg (va, FcType);			    \
 	switch (__v__.type) {	    				    \
-	case FcTypeUnknown:					    \
 	case FcTypeVoid:					    \
 	    goto _FcPatternVapBuild_bail1;       		    \
 	case FcTypeInteger:	    				    \
@@ -76,9 +75,6 @@
 	    break;						    \
 	case FcTypeLangSet:					    \
 	    __v__.u.l = va_arg (va, const FcLangSet *);		    \
-	    break;						    \
-	case FcTypeRange:					    \
-	    __v__.u.r = va_arg (va, const FcRange *);		    \
 	    break;						    \
 	}							    \
 	if (!FcPatternAdd (__p__, __o__, __v__, FcTrue))	    \
@@ -123,12 +119,5 @@ _FcObjectSetVapBuild_bail0:						\
     ;									\
 }
 
-#ifndef FC_ATTRIBUTE_VISIBILITY_HIDDEN
-#define FC_ATTRIBUTE_VISIBILITY_HIDDEN __attribute((visibility("hidden")))
-#endif
-
-#ifndef FC_ATTRIBUTE_VISIBILITY_EXPORT
-#define FC_ATTRIBUTE_VISIBILITY_EXPORT __attribute((visibility("default")))
-#endif
-
 #endif /* _FCPRIVATE_H_ */
+

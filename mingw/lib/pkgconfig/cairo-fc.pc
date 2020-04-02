@@ -1,11 +1,11 @@
-prefix=/mingw32
-exec_prefix=${prefix}
-libdir=${exec_prefix}/lib
-includedir=${prefix}/include
+prefix=/usr/i686-w64-mingw32/sys-root/mingw
+exec_prefix=/usr/i686-w64-mingw32/sys-root/mingw
+libdir=/usr/i686-w64-mingw32/sys-root/mingw/lib
+includedir=/usr/i686-w64-mingw32/sys-root/mingw/include
 
 Name: cairo-fc
 Description: Fontconfig font backend for cairo graphics library
-Version: 1.16.0
+Version: 1.10.2
 
 Requires: cairo fontconfig >= 2.2.95
 Libs:  

@@ -38,17 +38,14 @@ typedef struct _GtkActionable                               GtkActionable;
 
 struct _GtkActionableInterface
 {
-  /*< private >*/
   GTypeInterface g_iface;
-
-  /*< public >*/
 
   const gchar * (* get_action_name)             (GtkActionable *actionable);
   void          (* set_action_name)             (GtkActionable *actionable,
                                                  const gchar   *action_name);
   GVariant *    (* get_action_target_value)     (GtkActionable *actionable);
   void          (* set_action_target_value)     (GtkActionable *actionable,
-                                                 GVariant      *target_value);
+                                                 GVariant      *action_target_value);
 };
 
 GDK_AVAILABLE_IN_3_4

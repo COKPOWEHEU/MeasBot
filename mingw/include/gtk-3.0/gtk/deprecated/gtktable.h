@@ -22,12 +22,12 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_TABLE_H__
-#define __GTK_TABLE_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_TABLE_H__
+#define __GTK_TABLE_H__
 
 #include <gtk/gtkcontainer.h>
 
@@ -95,25 +95,7 @@ struct _GtkTableRowCol
   guint empty : 1;
 };
 
-/**
- * GtkAttachOptions:
- * @GTK_EXPAND: the widget should expand to take up any extra space in its
- * container that has been allocated.
- * @GTK_SHRINK: the widget should shrink as and when possible.
- * @GTK_FILL: the widget should fill the space allocated to it.
- *
- * Denotes the expansion properties that a widget will have when it (or its
- * parent) is resized.
- */
-typedef enum
-{
-  GTK_EXPAND = 1 << 0,
-  GTK_SHRINK = 1 << 1,
-  GTK_FILL   = 1 << 2
-} GtkAttachOptions;
 
-
-GDK_DEPRECATED_IN_3_4
 GType	   gtk_table_get_type	      (void) G_GNUC_CONST;
 GDK_DEPRECATED_IN_3_4_FOR(GtkGrid)
 GtkWidget* gtk_table_new	      (guint		rows,

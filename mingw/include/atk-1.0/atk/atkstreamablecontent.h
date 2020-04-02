@@ -17,12 +17,12 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef __ATK_STREAMABLE_CONTENT_H__
-#define __ATK_STREAMABLE_CONTENT_H__
-
 #if defined(ATK_DISABLE_SINGLE_INCLUDES) && !defined (__ATK_H_INSIDE__) && !defined (ATK_COMPILATION)
 #error "Only <atk/atk.h> can be included directly."
 #endif
+
+#ifndef __ATK_STREAMABLE_CONTENT_H__
+#define __ATK_STREAMABLE_CONTENT_H__
 
 #include <atk/atkobject.h>
 
@@ -88,20 +88,15 @@ struct _AtkStreamableContentIface
   AtkFunction               pad2;
   AtkFunction               pad3;
 };
-ATK_AVAILABLE_IN_ALL
 GType                  atk_streamable_content_get_type (void);
 
-ATK_AVAILABLE_IN_ALL
 gint                   atk_streamable_content_get_n_mime_types (AtkStreamableContent     *streamable);
-
-ATK_AVAILABLE_IN_ALL
+                                                       
 const gchar*           atk_streamable_content_get_mime_type    (AtkStreamableContent     *streamable,
                                                                 gint                     i);
-ATK_AVAILABLE_IN_ALL
 GIOChannel*             atk_streamable_content_get_stream       (AtkStreamableContent     *streamable,
                                                                  const gchar              *mime_type);
 
-ATK_AVAILABLE_IN_ALL
 const gchar*           atk_streamable_content_get_uri          (AtkStreamableContent     *streamable,
                                                                 const gchar              *mime_type);
 

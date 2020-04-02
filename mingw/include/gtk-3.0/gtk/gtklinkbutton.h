@@ -21,12 +21,12 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GTK_LINK_BUTTON_H__
-#define __GTK_LINK_BUTTON_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_LINK_BUTTON_H__
+#define __GTK_LINK_BUTTON_H__
 
 #include <gtk/gtkbutton.h>
 
@@ -46,7 +46,7 @@ typedef struct _GtkLinkButtonPrivate	GtkLinkButtonPrivate;
 /**
  * GtkLinkButton:
  *
- * The #GtkLinkButton-struct contains only
+ * The <structname>GtkLinkButton</structname> structure contains only
  * private data and should be accessed using the provided API.
  */
 struct _GtkLinkButton
@@ -61,7 +61,7 @@ struct _GtkLinkButton
  * GtkLinkButtonClass:
  * @activate_link: class handler for the #GtkLinkButton::activate-link signal
  *
- * The #GtkLinkButtonClass contains only
+ * The <structname>GtkLinkButtonClass</structname> structure contains only
  * private data.
  */
 struct _GtkLinkButtonClass
@@ -80,24 +80,17 @@ struct _GtkLinkButtonClass
   void (*_gtk_padding4) (void);
 };
 
-GDK_AVAILABLE_IN_ALL
 GType                 gtk_link_button_get_type          (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_ALL
 GtkWidget *           gtk_link_button_new               (const gchar   *uri);
-GDK_AVAILABLE_IN_ALL
 GtkWidget *           gtk_link_button_new_with_label    (const gchar   *uri,
 						         const gchar   *label);
 
-GDK_AVAILABLE_IN_ALL
 const gchar *         gtk_link_button_get_uri           (GtkLinkButton *link_button);
-GDK_AVAILABLE_IN_ALL
 void                  gtk_link_button_set_uri           (GtkLinkButton *link_button,
 						         const gchar   *uri);
 
-GDK_AVAILABLE_IN_ALL
 gboolean              gtk_link_button_get_visited       (GtkLinkButton *link_button);
-GDK_AVAILABLE_IN_ALL
 void                  gtk_link_button_set_visited       (GtkLinkButton *link_button,
                                                          gboolean       visited);
 

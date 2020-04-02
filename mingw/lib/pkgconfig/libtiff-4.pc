@@ -1,11 +1,11 @@
-prefix=/mingw32
+prefix=/MinGW
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
 Name: libtiff
 Description:  Tag Image File Format (TIFF) library.
-Version: 4.1.0
+Version: 4.0.2
 Libs: -L${libdir} -ltiff
-Libs.private: -lzstd -llzma -ljpeg -lz 
+Libs.private: -ljbig -ljpeg -lz 
 Cflags: -I${includedir}

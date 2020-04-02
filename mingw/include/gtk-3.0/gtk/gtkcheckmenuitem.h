@@ -22,13 +22,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_CHECK_MENU_ITEM_H__
-#define __GTK_CHECK_MENU_ITEM_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_CHECK_MENU_ITEM_H__
+#define __GTK_CHECK_MENU_ITEM_H__
+
 
 #include <gtk/gtkmenuitem.h>
 
@@ -55,23 +55,13 @@ struct _GtkCheckMenuItem
   GtkCheckMenuItemPrivate *priv;
 };
 
-/**
- * GtkCheckMenuItemClass:
- * @parent_class: The parent class.
- * @toggled: Signal emitted when the state of the check box is changed.
- * @draw_indicator: Called to draw the check indicator.
- */
 struct _GtkCheckMenuItemClass
 {
   GtkMenuItemClass parent_class;
 
-  /*< public >*/
-
   void (* toggled)	  (GtkCheckMenuItem *check_menu_item);
   void (* draw_indicator) (GtkCheckMenuItem *check_menu_item,
 			   cairo_t          *cr);
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -81,32 +71,27 @@ struct _GtkCheckMenuItemClass
 };
 
 
-GDK_AVAILABLE_IN_ALL
 GType	   gtk_check_menu_item_get_type	         (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_ALL
 GtkWidget* gtk_check_menu_item_new               (void);
-GDK_AVAILABLE_IN_ALL
 GtkWidget* gtk_check_menu_item_new_with_label    (const gchar      *label);
-GDK_AVAILABLE_IN_ALL
 GtkWidget* gtk_check_menu_item_new_with_mnemonic (const gchar      *label);
-GDK_AVAILABLE_IN_ALL
 void       gtk_check_menu_item_set_active        (GtkCheckMenuItem *check_menu_item,
 						  gboolean          is_active);
-GDK_AVAILABLE_IN_ALL
 gboolean   gtk_check_menu_item_get_active        (GtkCheckMenuItem *check_menu_item);
-GDK_AVAILABLE_IN_ALL
 void       gtk_check_menu_item_toggled           (GtkCheckMenuItem *check_menu_item);
-GDK_AVAILABLE_IN_ALL
 void       gtk_check_menu_item_set_inconsistent  (GtkCheckMenuItem *check_menu_item,
 						  gboolean          setting);
-GDK_AVAILABLE_IN_ALL
 gboolean   gtk_check_menu_item_get_inconsistent  (GtkCheckMenuItem *check_menu_item);
-GDK_AVAILABLE_IN_ALL
 void       gtk_check_menu_item_set_draw_as_radio (GtkCheckMenuItem *check_menu_item,
 						  gboolean          draw_as_radio);
-GDK_AVAILABLE_IN_ALL
 gboolean   gtk_check_menu_item_get_draw_as_radio (GtkCheckMenuItem *check_menu_item);
+
+
+/* private */
+void       _gtk_check_menu_item_set_active       (GtkCheckMenuItem *check_menu_item,
+                                                  gboolean          is_active);
+
 
 G_END_DECLS
 

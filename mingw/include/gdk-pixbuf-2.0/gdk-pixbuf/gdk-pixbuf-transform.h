@@ -18,15 +18,17 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
  */
-
-#ifndef GDK_PIXBUF_TRANSFORM_H
-#define GDK_PIXBUF_TRANSFORM_H
 
 #if defined(GDK_PIXBUF_DISABLE_SINGLE_INCLUDES) && !defined (GDK_PIXBUF_H_INSIDE) && !defined (GDK_PIXBUF_COMPILATION)
 #error "Only <gdk-pixbuf/gdk-pixbuf.h> can be included directly."
 #endif
+
+#ifndef GDK_PIXBUF_TRANSFORM_H
+#define GDK_PIXBUF_TRANSFORM_H
 
 #include <glib.h>
 #include <gdk-pixbuf/gdk-pixbuf-core.h>
@@ -56,18 +58,17 @@ G_BEGIN_DECLS
  *  Wolberg's "Digital Image Warping", and is formally defined as the
  *  hyperbolic-filter sampling the ideal hyperbolic-filter interpolated
  *  image (the filter is designed to be idempotent for 1:1 pixel mapping).
- *  **Deprecated**: this interpolation filter is deprecated, as in reality
- *  it has a lower quality than the @GDK_INTERP_BILINEAR filter
- *  (Since: 2.38)
  * 
- * This enumeration describes the different interpolation modes that
- * can be used with the scaling functions. @GDK_INTERP_NEAREST is
- * the fastest scaling method, but has horrible quality when
- * scaling down. @GDK_INTERP_BILINEAR is the best choice if you
- * aren't sure what to choose, it has a good speed/quality balance.
+ *  This enumeration describes the different interpolation modes that
+ *  can be used with the scaling functions. @GDK_INTERP_NEAREST is 
+ *  the fastest scaling method, but has horrible quality when 
+ *  scaling down. @GDK_INTERP_BILINEAR is the best choice if you 
+ *  aren't sure what to choose, it has a good speed/quality balance.
  * 
- * **Note**: Cubic filtering is missing from the list; hyperbolic
- * interpolation is just as fast and results in higher quality.
+ *  <note>
+ * 	Cubic filtering is missing from the list; hyperbolic
+ * 	interpolation is just as fast and results in higher quality.
+ *  </note>
  */
 typedef enum {
 	GDK_INTERP_NEAREST,
@@ -93,7 +94,6 @@ typedef enum {
 	GDK_PIXBUF_ROTATE_CLOCKWISE        = 270
 } GdkPixbufRotation;
 
-GDK_PIXBUF_AVAILABLE_IN_ALL
 void gdk_pixbuf_scale           (const GdkPixbuf *src,
 				 GdkPixbuf       *dest,
 				 int              dest_x,
@@ -105,7 +105,6 @@ void gdk_pixbuf_scale           (const GdkPixbuf *src,
 				 double           scale_x,
 				 double           scale_y,
 				 GdkInterpType    interp_type);
-GDK_PIXBUF_AVAILABLE_IN_ALL
 void gdk_pixbuf_composite       (const GdkPixbuf *src,
 				 GdkPixbuf       *dest,
 				 int              dest_x,
@@ -118,7 +117,6 @@ void gdk_pixbuf_composite       (const GdkPixbuf *src,
 				 double           scale_y,
 				 GdkInterpType    interp_type,
 				 int              overall_alpha);
-GDK_PIXBUF_AVAILABLE_IN_ALL
 void gdk_pixbuf_composite_color (const GdkPixbuf *src,
 				 GdkPixbuf       *dest,
 				 int              dest_x,
@@ -137,13 +135,11 @@ void gdk_pixbuf_composite_color (const GdkPixbuf *src,
 				 guint32          color1,
 				 guint32          color2);
 
-GDK_PIXBUF_AVAILABLE_IN_ALL
 GdkPixbuf *gdk_pixbuf_scale_simple           (const GdkPixbuf *src,
 					      int              dest_width,
 					      int              dest_height,
 					      GdkInterpType    interp_type);
 
-GDK_PIXBUF_AVAILABLE_IN_ALL
 GdkPixbuf *gdk_pixbuf_composite_color_simple (const GdkPixbuf *src,
 					      int              dest_width,
 					      int              dest_height,
@@ -153,10 +149,8 @@ GdkPixbuf *gdk_pixbuf_composite_color_simple (const GdkPixbuf *src,
 					      guint32          color1,
 					      guint32          color2);
 
-GDK_PIXBUF_AVAILABLE_IN_2_6
 GdkPixbuf *gdk_pixbuf_rotate_simple          (const GdkPixbuf   *src,
 				              GdkPixbufRotation  angle);
-GDK_PIXBUF_AVAILABLE_IN_2_6
 GdkPixbuf *gdk_pixbuf_flip                   (const GdkPixbuf   *src,
 				              gboolean           horizontal);
 				     

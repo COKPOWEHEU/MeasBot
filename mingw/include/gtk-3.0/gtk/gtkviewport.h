@@ -22,13 +22,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_VIEWPORT_H__
-#define __GTK_VIEWPORT_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_VIEWPORT_H__
+#define __GTK_VIEWPORT_H__
+
 
 #include <gtk/gtkbin.h>
 
@@ -56,15 +56,9 @@ struct _GtkViewport
   GtkViewportPrivate *priv;
 };
 
-/**
- * GtkViewportClass:
- * @parent_class: The parent class.
- */
 struct _GtkViewportClass
 {
   GtkBinClass parent_class;
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -74,9 +68,7 @@ struct _GtkViewportClass
 };
 
 
-GDK_AVAILABLE_IN_ALL
 GType          gtk_viewport_get_type        (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
 GtkWidget*     gtk_viewport_new             (GtkAdjustment *hadjustment,
 					     GtkAdjustment *vadjustment);
 
@@ -91,14 +83,10 @@ GDK_DEPRECATED_IN_3_0_FOR(gtk_scrollable_set_vadjustment)
 void           gtk_viewport_set_vadjustment (GtkViewport   *viewport,
                                              GtkAdjustment *adjustment);
 
-GDK_AVAILABLE_IN_ALL
 void           gtk_viewport_set_shadow_type (GtkViewport   *viewport,
 					     GtkShadowType  type);
-GDK_AVAILABLE_IN_ALL
 GtkShadowType  gtk_viewport_get_shadow_type (GtkViewport   *viewport);
-GDK_AVAILABLE_IN_ALL
 GdkWindow*     gtk_viewport_get_bin_window  (GtkViewport   *viewport);
-GDK_AVAILABLE_IN_ALL
 GdkWindow*     gtk_viewport_get_view_window (GtkViewport   *viewport);
 
 

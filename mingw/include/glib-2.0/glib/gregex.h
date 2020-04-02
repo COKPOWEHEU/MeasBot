@@ -14,16 +14,17 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-#ifndef __G_REGEX_H__
-#define __G_REGEX_H__
 
 #if !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
 #error "Only <glib.h> can be included directly."
 #endif
+
+#ifndef __G_REGEX_H__
+#define __G_REGEX_H__
 
 #include <glib/gerror.h>
 #include <glib/gstring.h>
@@ -55,7 +56,7 @@ G_BEGIN_DECLS
  *     Since 2.16
  * @G_REGEX_ERROR_NOTHING_TO_REPEAT: Nothing to repeat. Since 2.16
  * @G_REGEX_ERROR_UNRECOGNIZED_CHARACTER: Unrecognized character after "(?",
- *     "(?<" or "(?P". Since 2.16
+ *     "(?&lt;" or "(?P". Since 2.16
  * @G_REGEX_ERROR_POSIX_NAMED_CLASS_OUTSIDE_CLASS: POSIX named classes are
  *     supported only within a class. Since 2.16
  * @G_REGEX_ERROR_UNMATCHED_PARENTHESIS: Missing terminating ")" or ")"
@@ -115,7 +116,6 @@ G_BEGIN_DECLS
  *     control verb. Since: 2.34
  * @G_REGEX_ERROR_NUMBER_TOO_BIG: number is too big in escape sequence. Since: 2.34
  * @G_REGEX_ERROR_MISSING_SUBPATTERN_NAME: Missing subpattern name. Since: 2.34
- * @G_REGEX_ERROR_MISSING_DIGIT: Missing digit. Since 2.34
  * @G_REGEX_ERROR_INVALID_DATA_CHARACTER: In JavaScript compatibility mode,
  *     "[" is an invalid data character. Since: 2.34
  * @G_REGEX_ERROR_EXTRA_SUBPATTERN_NAME: different names for subpatterns of the 
@@ -211,7 +211,6 @@ typedef enum
  */
 #define G_REGEX_ERROR g_regex_error_quark ()
 
-GLIB_AVAILABLE_IN_ALL
 GQuark g_regex_error_quark (void);
 
 /**
@@ -230,7 +229,7 @@ GQuark g_regex_error_quark (void);
  *     newline in the string, respectively, as well as at the very start
  *     and end. This can be changed within a pattern by a "(?m)" option
  *     setting.
- * @G_REGEX_DOTALL: A dot metacharacter (".") in the pattern matches all
+ * @G_REGEX_DOTALL: A dot metacharater (".") in the pattern matches all
  *     characters, including newlines. Without it, newlines are excluded.
  *     This option can be changed within a pattern by a ("?s") option setting.
  * @G_REGEX_EXTENDED: Whitespace data characters in the pattern are
@@ -243,7 +242,7 @@ GQuark g_regex_error_quark (void);
  *     it is constrained to match only at the first matching point in the
  *     string that is being searched. This effect can also be achieved by
  *     appropriate constructs in the pattern itself such as the "^"
- *     metacharacter.
+ *     metacharater.
  * @G_REGEX_DOLLAR_ENDONLY: A dollar metacharacter ("$") in the pattern
  *     matches only at the end of the string. Without this option, a
  *     dollar also matches immediately before the final character if
@@ -280,19 +279,17 @@ GQuark g_regex_error_quark (void);
  * @G_REGEX_NEWLINE_ANYCRLF: Usually any newline character or character sequence
  *     is recognized. If this option is set, the only recognized newline character
  *     sequences are '\r', '\n', and '\r\n'. Since: 2.34
- * @G_REGEX_BSR_ANYCRLF: Usually any newline character or character sequence
+ * G_REGEX_BSR_ANYCRLF: Usually any newline character or character sequence
  *     is recognised. If this option is set, then "\R" only recognizes the newline
  *    characters '\r', '\n' and '\r\n'. Since: 2.34
- * @G_REGEX_JAVASCRIPT_COMPAT: Changes behaviour so that it is compatible with
- *     JavaScript rather than PCRE. Since: 2.34
+ * 
  *
  * Flags specifying compile-time options.
  *
  * Since: 2.14
  */
 /* Remember to update G_REGEX_COMPILE_MASK in gregex.c after
- * adding a new flag.
- */
+ * adding a new flag. */
 typedef enum
 {
   G_REGEX_CASELESS          = 1 << 0,
@@ -321,7 +318,7 @@ typedef enum
  *     it is constrained to match only at the first matching point in the
  *     string that is being searched. This effect can also be achieved by
  *     appropriate constructs in the pattern itself such as the "^"
- *     metacharacter.
+ *     metacharater.
  * @G_REGEX_MATCH_NOTBOL: Specifies that first character of the string is
  *     not the beginning of a line, so the circumflex metacharacter should
  *     not match before it. Setting this without #G_REGEX_MULTILINE (at
@@ -368,11 +365,13 @@ typedef enum
  *     single characters U+000B LINE TABULATION, U+000C FORM FEED (FF),
  *     U+0085 NEXT LINE (NEL), U+2028 LINE SEPARATOR and
  *     U+2029 PARAGRAPH SEPARATOR. Since: 2.34
+ * @G_REGEX_JAVASCRIPT_COMPAT: Changes behaviour so that it is compatible with
+ *     JavaScript rather than PCRE. Since: 2.34
  * @G_REGEX_MATCH_PARTIAL_SOFT: An alias for #G_REGEX_MATCH_PARTIAL. Since: 2.34
  * @G_REGEX_MATCH_PARTIAL_HARD: Turns on the partial matching feature. In contrast to
  *     to #G_REGEX_MATCH_PARTIAL_SOFT, this stops matching as soon as a partial match
  *     is found, without continuing to search for a possible complete match. See
- *     g_match_info_is_partial_match() for more information. Since: 2.34
+ *     see g_match_info_is_partial_match() for more information. Since: 2.34
  * @G_REGEX_MATCH_NOTEMPTY_ATSTART: Like #G_REGEX_MATCH_NOTEMPTY, but only applied to
  *     the start of the matched string. For anchored
  *     patterns this can only happen for pattern containing "\K". Since: 2.34
@@ -405,20 +404,14 @@ typedef enum
 /**
  * GRegex:
  *
- * A GRegex is the "compiled" form of a regular expression pattern.
- * This structure is opaque and its fields cannot be accessed directly.
+ * A GRegex is the "compiled" form of a regular expression pattern. This
+ * structure is opaque and its fields cannot be accessed directly.
  *
  * Since: 2.14
  */
 typedef struct _GRegex		GRegex;
 
 
-/**
- * GMatchInfo:
- *
- * A GMatchInfo is an opaque struct used to return information about
- * matches.
- */
 typedef struct _GMatchInfo	GMatchInfo;
 
 /**
@@ -443,52 +436,35 @@ typedef gboolean (*GRegexEvalCallback)		(const GMatchInfo *match_info,
 						 gpointer          user_data);
 
 
-GLIB_AVAILABLE_IN_ALL
 GRegex		 *g_regex_new			(const gchar         *pattern,
 						 GRegexCompileFlags   compile_options,
 						 GRegexMatchFlags     match_options,
 						 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 GRegex           *g_regex_ref			(GRegex              *regex);
-GLIB_AVAILABLE_IN_ALL
 void		  g_regex_unref			(GRegex              *regex);
-GLIB_AVAILABLE_IN_ALL
 const gchar	 *g_regex_get_pattern		(const GRegex        *regex);
-GLIB_AVAILABLE_IN_ALL
 gint		  g_regex_get_max_backref	(const GRegex        *regex);
-GLIB_AVAILABLE_IN_ALL
 gint		  g_regex_get_capture_count	(const GRegex        *regex);
-GLIB_AVAILABLE_IN_ALL
 gboolean          g_regex_get_has_cr_or_lf      (const GRegex        *regex);
-GLIB_AVAILABLE_IN_2_38
-gint              g_regex_get_max_lookbehind    (const GRegex        *regex);
-GLIB_AVAILABLE_IN_ALL
 gint		  g_regex_get_string_number	(const GRegex        *regex, 
 						 const gchar         *name);
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_regex_escape_string		(const gchar         *string,
 						 gint                 length);
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_regex_escape_nul		(const gchar         *string,
 						 gint                 length);
 
-GLIB_AVAILABLE_IN_ALL
 GRegexCompileFlags g_regex_get_compile_flags    (const GRegex        *regex);
-GLIB_AVAILABLE_IN_ALL
 GRegexMatchFlags   g_regex_get_match_flags      (const GRegex        *regex);
 
 /* Matching. */
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_regex_match_simple		(const gchar         *pattern,
 						 const gchar         *string,
 						 GRegexCompileFlags   compile_options,
 						 GRegexMatchFlags     match_options);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_regex_match			(const GRegex        *regex,
 						 const gchar         *string,
 						 GRegexMatchFlags     match_options,
 						 GMatchInfo         **match_info);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_regex_match_full		(const GRegex        *regex,
 						 const gchar         *string,
 						 gssize               string_len,
@@ -496,12 +472,10 @@ gboolean	  g_regex_match_full		(const GRegex        *regex,
 						 GRegexMatchFlags     match_options,
 						 GMatchInfo         **match_info,
 						 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_regex_match_all		(const GRegex        *regex,
 						 const gchar         *string,
 						 GRegexMatchFlags     match_options,
 						 GMatchInfo         **match_info);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_regex_match_all_full	(const GRegex        *regex,
 						 const gchar         *string,
 						 gssize               string_len,
@@ -511,16 +485,13 @@ gboolean	  g_regex_match_all_full	(const GRegex        *regex,
 						 GError             **error);
 
 /* String splitting. */
-GLIB_AVAILABLE_IN_ALL
 gchar		**g_regex_split_simple		(const gchar         *pattern,
 						 const gchar         *string,
 						 GRegexCompileFlags   compile_options,
 						 GRegexMatchFlags     match_options);
-GLIB_AVAILABLE_IN_ALL
 gchar		**g_regex_split			(const GRegex        *regex,
 						 const gchar         *string,
 						 GRegexMatchFlags     match_options);
-GLIB_AVAILABLE_IN_ALL
 gchar		**g_regex_split_full		(const GRegex        *regex,
 						 const gchar         *string,
 						 gssize               string_len,
@@ -530,7 +501,6 @@ gchar		**g_regex_split_full		(const GRegex        *regex,
 						 GError             **error);
 
 /* String replacement. */
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_regex_replace		(const GRegex        *regex,
 						 const gchar         *string,
 						 gssize               string_len,
@@ -538,7 +508,6 @@ gchar		 *g_regex_replace		(const GRegex        *regex,
 						 const gchar         *replacement,
 						 GRegexMatchFlags     match_options,
 						 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_regex_replace_literal	(const GRegex        *regex,
 						 const gchar         *string,
 						 gssize               string_len,
@@ -546,7 +515,6 @@ gchar		 *g_regex_replace_literal	(const GRegex        *regex,
 						 const gchar         *replacement,
 						 GRegexMatchFlags     match_options,
 						 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_regex_replace_eval		(const GRegex        *regex,
 						 const gchar         *string,
 						 gssize               string_len,
@@ -555,53 +523,37 @@ gchar		 *g_regex_replace_eval		(const GRegex        *regex,
 						 GRegexEvalCallback   eval,
 						 gpointer             user_data,
 						 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_regex_check_replacement	(const gchar         *replacement,
 						 gboolean            *has_references,
 						 GError             **error);
 
 /* Match info */
-GLIB_AVAILABLE_IN_ALL
 GRegex		 *g_match_info_get_regex	(const GMatchInfo    *match_info);
-GLIB_AVAILABLE_IN_ALL
 const gchar      *g_match_info_get_string       (const GMatchInfo    *match_info);
 
-GLIB_AVAILABLE_IN_ALL
 GMatchInfo       *g_match_info_ref              (GMatchInfo          *match_info);
-GLIB_AVAILABLE_IN_ALL
 void              g_match_info_unref            (GMatchInfo          *match_info);
-GLIB_AVAILABLE_IN_ALL
 void		  g_match_info_free		(GMatchInfo          *match_info);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_match_info_next		(GMatchInfo          *match_info,
 						 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_match_info_matches		(const GMatchInfo    *match_info);
-GLIB_AVAILABLE_IN_ALL
 gint		  g_match_info_get_match_count	(const GMatchInfo    *match_info);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_match_info_is_partial_match	(const GMatchInfo    *match_info);
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_match_info_expand_references(const GMatchInfo    *match_info,
 						 const gchar         *string_to_expand,
 						 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_match_info_fetch		(const GMatchInfo    *match_info,
 						 gint                 match_num);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_match_info_fetch_pos	(const GMatchInfo    *match_info,
 						 gint                 match_num,
 						 gint                *start_pos,
 						 gint                *end_pos);
-GLIB_AVAILABLE_IN_ALL
 gchar		 *g_match_info_fetch_named	(const GMatchInfo    *match_info,
 						 const gchar         *name);
-GLIB_AVAILABLE_IN_ALL
 gboolean	  g_match_info_fetch_named_pos	(const GMatchInfo    *match_info,
 						 const gchar         *name,
 						 gint                *start_pos,
 						 gint                *end_pos);
-GLIB_AVAILABLE_IN_ALL
 gchar		**g_match_info_fetch_all	(const GMatchInfo    *match_info);
 
 G_END_DECLS

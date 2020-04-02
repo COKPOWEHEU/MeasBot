@@ -16,15 +16,14 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GTK_RECENT_FILTER_H__
-#define __GTK_RECENT_FILTER_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
 
+#ifndef __GTK_RECENT_FILTER_H__
+#define __GTK_RECENT_FILTER_H__
+
 #include <glib-object.h>
-#include <gdk/gdk.h>
 
 G_BEGIN_DECLS
 
@@ -68,7 +67,7 @@ typedef enum {
  * The type of function that is used with custom filters,
  * see gtk_recent_filter_add_custom().
  *
- * Returns: %TRUE if the file should be displayed
+ * Return value: %TRUE if the file should be displayed
  */
 typedef gboolean (*GtkRecentFilterFunc) (const GtkRecentFilterInfo *filter_info,
 					 gpointer                   user_data);
@@ -76,17 +75,6 @@ typedef gboolean (*GtkRecentFilterFunc) (const GtkRecentFilterInfo *filter_info,
 
 /**
  * GtkRecentFilterInfo:
- * @contains: #GtkRecentFilterFlags to indicate which fields are set.
- * @uri: (nullable): The URI of the file being tested.
- * @display_name: (nullable): The string that will be used to display
- *    the file in the recent chooser.
- * @mime_type: (nullable): MIME type of the file.
- * @applications: (nullable) (array zero-terminated=1): The list of
- *    applications that have registered the file.
- * @groups: (nullable) (array zero-terminated=1): The groups to which
- *    the file belongs to.
- * @age: The number of days elapsed since the file has been
- *    registered.
  *
  * A GtkRecentFilterInfo struct is used
  * to pass information about the tested file to gtk_recent_filter_filter().
@@ -104,44 +92,31 @@ struct _GtkRecentFilterInfo
   gint age;
 };
 
-GDK_AVAILABLE_IN_ALL
 GType                 gtk_recent_filter_get_type (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_ALL
 GtkRecentFilter *     gtk_recent_filter_new      (void);
-GDK_AVAILABLE_IN_ALL
 void                  gtk_recent_filter_set_name (GtkRecentFilter *filter,
 						  const gchar     *name);
-GDK_AVAILABLE_IN_ALL
 const gchar *         gtk_recent_filter_get_name (GtkRecentFilter *filter);
 
-GDK_AVAILABLE_IN_ALL
 void gtk_recent_filter_add_mime_type      (GtkRecentFilter      *filter,
 					   const gchar          *mime_type);
-GDK_AVAILABLE_IN_ALL
 void gtk_recent_filter_add_pattern        (GtkRecentFilter      *filter,
 					   const gchar          *pattern);
-GDK_AVAILABLE_IN_ALL
 void gtk_recent_filter_add_pixbuf_formats (GtkRecentFilter      *filter);
-GDK_AVAILABLE_IN_ALL
 void gtk_recent_filter_add_application    (GtkRecentFilter      *filter,
 					   const gchar          *application);
-GDK_AVAILABLE_IN_ALL
 void gtk_recent_filter_add_group          (GtkRecentFilter      *filter,
 					   const gchar          *group);
-GDK_AVAILABLE_IN_ALL
 void gtk_recent_filter_add_age            (GtkRecentFilter      *filter,
 					   gint                  days);
-GDK_AVAILABLE_IN_ALL
 void gtk_recent_filter_add_custom         (GtkRecentFilter      *filter,
 					   GtkRecentFilterFlags  needed,
 					   GtkRecentFilterFunc   func,
 					   gpointer              data,
 					   GDestroyNotify        data_destroy);
 
-GDK_AVAILABLE_IN_ALL
 GtkRecentFilterFlags gtk_recent_filter_get_needed (GtkRecentFilter           *filter);
-GDK_AVAILABLE_IN_ALL
 gboolean             gtk_recent_filter_filter     (GtkRecentFilter           *filter,
 						   const GtkRecentFilterInfo *filter_info);
 

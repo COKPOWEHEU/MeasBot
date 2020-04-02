@@ -22,18 +22,18 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_ENUMS_H__
-#define __GTK_ENUMS_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_ENUMS_H__
+#define __GTK_ENUMS_H__
 
 #include <glib-object.h>
 
 
 /**
- * SECTION:gtkenums
+ * SECTION:gtkenum
  * @Short_description: Public enumerated types used throughout GTK+
  * @Title: Standard Enumerations
  */
@@ -51,12 +51,11 @@ G_BEGIN_DECLS
  *     or top
  * @GTK_ALIGN_CENTER: center natural width of widget inside the
  *     allocation
- * @GTK_ALIGN_BASELINE: align the widget according to the baseline. Since 3.10.
  *
  * Controls how a widget deals with extra space in a single (x or y)
  * dimension.
  *
- * Alignment only matters if the widget receives a “too large” allocation,
+ * Alignment only matters if the widget receives a "too large" allocation,
  * for example if you packed the widget with the #GtkWidget:expand
  * flag inside a #GtkBox, then the widget might get extra space.  If
  * you have for example a 16x16 icon inside a 32x32 space, the icon
@@ -65,19 +64,30 @@ G_BEGIN_DECLS
  *
  * Note that in horizontal context @GTK_ALIGN_START and @GTK_ALIGN_END
  * are interpreted relative to text direction.
- *
- * GTK_ALIGN_BASELINE support for it is optional for containers and widgets, and
- * it is only supported for vertical alignment.  When its not supported by
- * a child or a container it is treated as @GTK_ALIGN_FILL.
  */
 typedef enum
 {
   GTK_ALIGN_FILL,
   GTK_ALIGN_START,
   GTK_ALIGN_END,
-  GTK_ALIGN_CENTER,
-  GTK_ALIGN_BASELINE
+  GTK_ALIGN_CENTER
 } GtkAlign;
+
+
+/**
+ * GtkArrowPlacement:
+ * @GTK_ARROWS_BOTH: Place one arrow on each end of the menu.
+ * @GTK_ARROWS_START: Place both arrows at the top of the menu.
+ * @GTK_ARROWS_END: Place both arrows at the bottom of the menu.
+ *
+ * Used to specify the placement of scroll arrows in scrolling menus.
+ */
+typedef enum
+{
+  GTK_ARROWS_BOTH,
+  GTK_ARROWS_START,
+  GTK_ARROWS_END
+} GtkArrowPlacement;
 
 /**
  * GtkArrowType:
@@ -87,7 +97,7 @@ typedef enum
  * @GTK_ARROW_RIGHT: Represents a right pointing arrow.
  * @GTK_ARROW_NONE: No arrow. Since 2.10.
  *
- * Used to indicate the direction in which an arrow should point.
+ * Used to indicate the direction in which a #GtkArrow should point.
  */
 typedef enum
 {
@@ -99,70 +109,61 @@ typedef enum
 } GtkArrowType;
 
 /**
- * GtkBaselinePosition:
- * @GTK_BASELINE_POSITION_TOP: Align the baseline at the top
- * @GTK_BASELINE_POSITION_CENTER: Center the baseline
- * @GTK_BASELINE_POSITION_BOTTOM: Align the baseline at the bottom
+ * GtkAttachOptions:
+ * @GTK_EXPAND: the widget should expand to take up any extra space in its
+ * container that has been allocated.
+ * @GTK_SHRINK: the widget should shrink as and when possible.
+ * @GTK_FILL: the widget should fill the space allocated to it.
  *
- * Whenever a container has some form of natural row it may align
- * children in that row along a common typographical baseline. If
- * the amount of verical space in the row is taller than the total
- * requested height of the baseline-aligned children then it can use a
- * #GtkBaselinePosition to select where to put the baseline inside the
- * extra availible space.
- *
- * Since: 3.10
+ * Denotes the expansion properties that a widget will have when it (or its
+ * parent) is resized.
  */
 typedef enum
 {
-  GTK_BASELINE_POSITION_TOP,
-  GTK_BASELINE_POSITION_CENTER,
-  GTK_BASELINE_POSITION_BOTTOM
-} GtkBaselinePosition;
+  GTK_EXPAND = 1 << 0,
+  GTK_SHRINK = 1 << 1,
+  GTK_FILL   = 1 << 2
+} GtkAttachOptions;
 
 /**
- * GtkDeleteType:
- * @GTK_DELETE_CHARS: Delete characters.
- * @GTK_DELETE_WORD_ENDS: Delete only the portion of the word to the
- *   left/right of cursor if we’re in the middle of a word.
- * @GTK_DELETE_WORDS: Delete words.
- * @GTK_DELETE_DISPLAY_LINES: Delete display-lines. Display-lines
- *   refers to the visible lines, with respect to to the current line
- *   breaks. As opposed to paragraphs, which are defined by line
- *   breaks in the input.
- * @GTK_DELETE_DISPLAY_LINE_ENDS: Delete only the portion of the
- *   display-line to the left/right of cursor.
- * @GTK_DELETE_PARAGRAPH_ENDS: Delete to the end of the
- *   paragraph. Like C-k in Emacs (or its reverse).
- * @GTK_DELETE_PARAGRAPHS: Delete entire line. Like C-k in pico.
- * @GTK_DELETE_WHITESPACE: Delete only whitespace. Like M-\ in Emacs.
+ * GtkButtonBoxStyle:
+ * @GTK_BUTTONBOX_DEFAULT_STYLE: Default packing.
+ * @GTK_BUTTONBOX_SPREAD: Buttons are evenly spread across the box.
+ * @GTK_BUTTONBOX_EDGE: Buttons are placed at the edges of the box.
+ * @GTK_BUTTONBOX_START: Buttons are grouped towards the start of the box,
+ *   (on the left for a HBox, or the top for a VBox).
+ * @GTK_BUTTONBOX_END: Buttons are grouped towards the end of the box,
+ *   (on the right for a HBox, or the bottom for a VBox).
+ * @GTK_BUTTONBOX_CENTER: Buttons are centered in the box. Since 2.12.
  *
- * See also: #GtkEntry::delete-from-cursor.
+ * Used to dictate the style that a #GtkButtonBox uses to layout the buttons it
+ * contains. (See also: #GtkVButtonBox and #GtkHButtonBox).
  */
+typedef enum
+{
+  GTK_BUTTONBOX_SPREAD = 1,
+  GTK_BUTTONBOX_EDGE,
+  GTK_BUTTONBOX_START,
+  GTK_BUTTONBOX_END,
+  GTK_BUTTONBOX_CENTER
+} GtkButtonBoxStyle;
+
+
 typedef enum
 {
   GTK_DELETE_CHARS,
-  GTK_DELETE_WORD_ENDS,
+  GTK_DELETE_WORD_ENDS,           /* delete only the portion of the word to the
+                                   * left/right of cursor if we're in the middle
+                                   * of a word */
   GTK_DELETE_WORDS,
   GTK_DELETE_DISPLAY_LINES,
   GTK_DELETE_DISPLAY_LINE_ENDS,
-  GTK_DELETE_PARAGRAPH_ENDS,
-  GTK_DELETE_PARAGRAPHS,
-  GTK_DELETE_WHITESPACE
+  GTK_DELETE_PARAGRAPH_ENDS,      /* like C-k in Emacs (or its reverse) */
+  GTK_DELETE_PARAGRAPHS,          /* C-k in pico, kill whole line */
+  GTK_DELETE_WHITESPACE           /* M-\ in Emacs */
 } GtkDeleteType;
 
 /* Focus movement types */
-/**
- * GtkDirectionType:
- * @GTK_DIR_TAB_FORWARD: Move forward.
- * @GTK_DIR_TAB_BACKWARD: Move backward.
- * @GTK_DIR_UP: Move up.
- * @GTK_DIR_DOWN: Move down.
- * @GTK_DIR_LEFT: Move left.
- * @GTK_DIR_RIGHT: Move right.
- *
- * Focus movement types.
- */
 typedef enum
 {
   GTK_DIR_TAB_FORWARD,
@@ -174,17 +175,23 @@ typedef enum
 } GtkDirectionType;
 
 /**
- * GtkIconSize:
- * @GTK_ICON_SIZE_INVALID: Invalid size.
- * @GTK_ICON_SIZE_MENU: Size appropriate for menus (16px).
- * @GTK_ICON_SIZE_SMALL_TOOLBAR: Size appropriate for small toolbars (16px).
- * @GTK_ICON_SIZE_LARGE_TOOLBAR: Size appropriate for large toolbars (24px)
- * @GTK_ICON_SIZE_BUTTON: Size appropriate for buttons (16px)
- * @GTK_ICON_SIZE_DND: Size appropriate for drag and drop (32px)
- * @GTK_ICON_SIZE_DIALOG: Size appropriate for dialogs (48px)
+ * GtkExpanderStyle:
+ * @GTK_EXPANDER_COLLAPSED: The style used for a collapsed subtree.
+ * @GTK_EXPANDER_SEMI_COLLAPSED: Intermediate style used during animation.
+ * @GTK_EXPANDER_SEMI_EXPANDED: Intermediate style used during animation.
+ * @GTK_EXPANDER_EXPANDED: The style used for an expanded subtree.
  *
- * Built-in stock icon sizes.
+ * Used to specify the style of the expanders drawn by a #GtkTreeView.
  */
+typedef enum
+{
+  GTK_EXPANDER_COLLAPSED,
+  GTK_EXPANDER_SEMI_COLLAPSED,
+  GTK_EXPANDER_SEMI_EXPANDED,
+  GTK_EXPANDER_EXPANDED
+} GtkExpanderStyle;
+
+/* Built-in stock icon sizes */
 typedef enum
 {
   GTK_ICON_SIZE_INVALID,
@@ -214,14 +221,6 @@ typedef enum
 } GtkSensitivityType;
 
 /* Reading directions for text */
-/**
- * GtkTextDirection:
- * @GTK_TEXT_DIR_NONE: No direction.
- * @GTK_TEXT_DIR_LTR: Left to right text direction.
- * @GTK_TEXT_DIR_RTL: Right to left text direction.
- *
- * Reading directions for text.
- */
 typedef enum
 {
   GTK_TEXT_DIR_NONE,
@@ -267,10 +266,10 @@ typedef enum
 /**
  * GtkMessageType:
  * @GTK_MESSAGE_INFO: Informational message
- * @GTK_MESSAGE_WARNING: Non-fatal warning message
+ * @GTK_MESSAGE_WARNING: Nonfatal warning message
  * @GTK_MESSAGE_QUESTION: Question requiring a choice
  * @GTK_MESSAGE_ERROR: Fatal error message
- * @GTK_MESSAGE_OTHER: None of the above
+ * @GTK_MESSAGE_OTHER: None of the above, doesn't get an icon
  *
  * The type of message being displayed in the dialog.
  */
@@ -310,15 +309,6 @@ typedef enum
   GTK_MOVEMENT_HORIZONTAL_PAGES
 } GtkMovementStep;
 
-/**
- * GtkScrollStep:
- * @GTK_SCROLL_STEPS: Scroll in steps.
- * @GTK_SCROLL_PAGES: Scroll by pages.
- * @GTK_SCROLL_ENDS: Scroll to ends.
- * @GTK_SCROLL_HORIZONTAL_STEPS: Scroll in horizontal steps.
- * @GTK_SCROLL_HORIZONTAL_PAGES: Scroll by horizontal pages.
- * @GTK_SCROLL_HORIZONTAL_ENDS: Scroll to the horizontal ends.
- */
 typedef enum
 {
   GTK_SCROLL_STEPS,
@@ -331,18 +321,40 @@ typedef enum
 
 /**
  * GtkOrientation:
- * @GTK_ORIENTATION_HORIZONTAL: The element is in horizontal orientation.
- * @GTK_ORIENTATION_VERTICAL: The element is in vertical orientation.
+ * @GTK_ORIENTATION_HORIZONTAL: The widget is in horizontal orientation.
+ * @GTK_ORIENTATION_VERTICAL: The widget is in vertical orientation.
  *
- * Represents the orientation of widgets and other objects which can be switched
- * between horizontal and vertical orientation on the fly, like #GtkToolbar or
- * #GtkGesturePan.
+ * Represents the orientation of widgets which can be switched between horizontal
+ * and vertical orientation on the fly, like #GtkToolbar.
  */
 typedef enum
 {
   GTK_ORIENTATION_HORIZONTAL,
   GTK_ORIENTATION_VERTICAL
 } GtkOrientation;
+
+/**
+ * GtkCornerType:
+ * @GTK_CORNER_TOP_LEFT: Place the scrollbars on the right and bottom of the
+ *  widget (default behaviour).
+ * @GTK_CORNER_BOTTOM_LEFT: Place the scrollbars on the top and right of the
+ *  widget.
+ * @GTK_CORNER_TOP_RIGHT: Place the scrollbars on the left and bottom of the
+ *  widget.
+ * @GTK_CORNER_BOTTOM_RIGHT: Place the scrollbars on the top and left of the
+ *  widget.
+ *
+ * Specifies which corner a child widget should be placed in when packed into
+ * a #GtkScrolledWindow. This is effectively the opposite of where the scroll
+ * bars are placed.
+ */
+typedef enum
+{
+  GTK_CORNER_TOP_LEFT,
+  GTK_CORNER_BOTTOM_LEFT,
+  GTK_CORNER_TOP_RIGHT,
+  GTK_CORNER_BOTTOM_RIGHT
+} GtkCornerType;
 
 /**
  * GtkPackType:
@@ -357,6 +369,42 @@ typedef enum
   GTK_PACK_START,
   GTK_PACK_END
 } GtkPackType;
+
+/* priorities for path lookups */
+typedef enum
+{
+  GTK_PATH_PRIO_LOWEST      = 0,
+  GTK_PATH_PRIO_GTK	    = 4,
+  GTK_PATH_PRIO_APPLICATION = 8,
+  GTK_PATH_PRIO_THEME       = 10,
+  GTK_PATH_PRIO_RC          = 12,
+  GTK_PATH_PRIO_HIGHEST     = 15
+} GtkPathPriorityType;
+#define GTK_PATH_PRIO_MASK 0x0f
+
+/* widget path types */
+typedef enum
+{
+  GTK_PATH_WIDGET,
+  GTK_PATH_WIDGET_CLASS,
+  GTK_PATH_CLASS
+} GtkPathType;
+
+/**
+ * GtkPolicyType:
+ * @GTK_POLICY_ALWAYS: The scrollbar is always visible.
+ * @GTK_POLICY_AUTOMATIC: The scrollbar will appear and disappear as necessary. For example,
+ *  when all of a #GtkCList can not be seen.
+ * @GTK_POLICY_NEVER: The scrollbar will never appear.
+ *
+ * Determines when a scroll bar will be visible.
+ */
+typedef enum
+{
+  GTK_POLICY_ALWAYS,
+  GTK_POLICY_AUTOMATIC,
+  GTK_POLICY_NEVER
+} GtkPolicyType;
 
 /**
  * GtkPositionType:
@@ -380,7 +428,7 @@ typedef enum
 /**
  * GtkReliefStyle:
  * @GTK_RELIEF_NORMAL: Draw a normal relief.
- * @GTK_RELIEF_HALF: A half relief. Deprecated in 3.14, does the same as @GTK_RELIEF_NORMAL
+ * @GTK_RELIEF_HALF: A half relief.
  * @GTK_RELIEF_NONE: No relief.
  *
  * Indicated the relief to be drawn around a #GtkButton.
@@ -393,26 +441,19 @@ typedef enum
 } GtkReliefStyle;
 
 /**
- * GtkScrollType:
- * @GTK_SCROLL_NONE: No scrolling.
- * @GTK_SCROLL_JUMP: Jump to new location.
- * @GTK_SCROLL_STEP_BACKWARD: Step backward.
- * @GTK_SCROLL_STEP_FORWARD: Step forward.
- * @GTK_SCROLL_PAGE_BACKWARD: Page backward.
- * @GTK_SCROLL_PAGE_FORWARD: Page forward.
- * @GTK_SCROLL_STEP_UP: Step up.
- * @GTK_SCROLL_STEP_DOWN: Step down.
- * @GTK_SCROLL_PAGE_UP: Page up.
- * @GTK_SCROLL_PAGE_DOWN: Page down.
- * @GTK_SCROLL_STEP_LEFT: Step to the left.
- * @GTK_SCROLL_STEP_RIGHT: Step to the right.
- * @GTK_SCROLL_PAGE_LEFT: Page to the left.
- * @GTK_SCROLL_PAGE_RIGHT: Page to the right.
- * @GTK_SCROLL_START: Scroll to start.
- * @GTK_SCROLL_END: Scroll to end.
- *
- * Scrolling types.
+ * GtkResizeMode:
+ * @GTK_RESIZE_PARENT: Pass resize request to the parent
+ * @GTK_RESIZE_QUEUE: Queue resizes on this widget
+ * @GTK_RESIZE_IMMEDIATE: Resize immediately. Deprecated.
  */
+typedef enum
+{
+  GTK_RESIZE_PARENT,
+  GTK_RESIZE_QUEUE,
+  GTK_RESIZE_IMMEDIATE
+} GtkResizeMode;
+
+/* scrolling types */
 typedef enum
 {
   GTK_SCROLL_NONE,
@@ -439,14 +480,15 @@ typedef enum
  * @GTK_SELECTION_SINGLE: Zero or one element may be selected.
  * @GTK_SELECTION_BROWSE: Exactly one element is selected.
  *     In some circumstances, such as initially or during a search
- *     operation, it’s possible for no element to be selected with
+ *     operation, it's possible for no element to be selected with
  *     %GTK_SELECTION_BROWSE. What is really enforced is that the user
- *     can’t deselect a currently selected element except by selecting
+ *     can't deselect a currently selected element except by selecting
  *     another element.
  * @GTK_SELECTION_MULTIPLE: Any number of elements may be selected.
  *      The Ctrl key may be used to enlarge the selection, and Shift
  *      key to select between the focus and the child pointed to.
  *      Some widgets may also allow Click-drag to select a range of elements.
+ * @GTK_SELECTION_EXTENDED: Deprecated, behaves identical to %GTK_SELECTION_MULTIPLE.
  *
  * Used to control what selections users are allowed to make.
  */
@@ -467,10 +509,6 @@ typedef enum
  * @GTK_SHADOW_ETCHED_OUT: The outline has a raised 3d appearance.
  *
  * Used to change the appearance of an outline typically provided by a #GtkFrame.
- *
- * Note that many themes do not differentiate the appearance of the
- * various shadow types: Either their is no visible shadow (@GTK_SHADOW_NONE),
- * or there is (any other value).
  */
 typedef enum
 {
@@ -493,7 +531,7 @@ typedef enum
  * @GTK_STATE_INSENSITIVE: State indicating that the widget is
  *                         unresponsive to user actions.
  * @GTK_STATE_INCONSISTENT: The widget is inconsistent, such as checkbuttons
- *                          or radiobuttons that aren’t either set to %TRUE nor %FALSE,
+ *                          or radiobuttons that aren't either set to %TRUE nor %FALSE,
  *                          or buttons requiring the user attention.
  * @GTK_STATE_FOCUSED: The widget has the keyboard focus.
  *
@@ -501,9 +539,6 @@ typedef enum
  * the widget is drawn. The #GtkStateType enumeration is also used to
  * identify different colors in a #GtkStyle for drawing, so states can be
  * used for subparts of a widget as well as entire widgets.
- *
- * Deprecated: 3.14: All APIs that are using this enumeration have been deprecated
- *     in favor of alternatives using #GtkStateFlags.
  */
 typedef enum
 {
@@ -525,7 +560,7 @@ typedef enum
  *  other, rather than vertically stacked
  *
  * Used to customize the appearance of a #GtkToolbar. Note that
- * setting the toolbar style overrides the user’s preferences
+ * setting the toolbar style overrides the user's preferences
  * for the default toolbar style.  Note that if the button has only
  * a label set and GTK_TOOLBAR_ICONS is used, the label will be
  * visible, and vice versa.
@@ -537,6 +572,53 @@ typedef enum
   GTK_TOOLBAR_BOTH,
   GTK_TOOLBAR_BOTH_HORIZ
 } GtkToolbarStyle;
+
+/**
+ * GtkWindowPosition:
+ * @GTK_WIN_POS_NONE: No influence is made on placement.
+ * @GTK_WIN_POS_CENTER: Windows should be placed in the center of the screen.
+ * @GTK_WIN_POS_MOUSE: Windows should be placed at the current mouse position.
+ * @GTK_WIN_POS_CENTER_ALWAYS: Keep window centered as it changes size, etc.
+ * @GTK_WIN_POS_CENTER_ON_PARENT: Center the window on its transient
+ *  parent (see gtk_window_set_transient_for()).
+ *
+ * Window placement can be influenced using this enumeration. Note that
+ * using #GTK_WIN_POS_CENTER_ALWAYS is almost always a bad idea.
+ * It won't necessarily work well with all window managers or on all windowing systems.
+ */
+typedef enum
+{
+  GTK_WIN_POS_NONE,
+  GTK_WIN_POS_CENTER,
+  GTK_WIN_POS_MOUSE,
+  GTK_WIN_POS_CENTER_ALWAYS,
+  GTK_WIN_POS_CENTER_ON_PARENT
+} GtkWindowPosition;
+
+/**
+ * GtkWindowType:
+ * @GTK_WINDOW_TOPLEVEL: A regular window, such as a dialog.
+ * @GTK_WINDOW_POPUP: A special window such as a tooltip.
+ *
+ * A #GtkWindow can be one of these types. Most things you'd consider a
+ * "window" should have type #GTK_WINDOW_TOPLEVEL; windows with this type
+ * are managed by the window manager and have a frame by default (call
+ * gtk_window_set_decorated() to toggle the frame).  Windows with type
+ * #GTK_WINDOW_POPUP are ignored by the window manager; window manager
+ * keybindings won't work on them, the window manager won't decorate the
+ * window with a frame, many GTK+ features that rely on the window
+ * manager will not work (e.g. resize grips and
+ * maximization/minimization). #GTK_WINDOW_POPUP is used to implement
+ * widgets such as #GtkMenu or tooltips that you normally don't think of
+ * as windows per se. Nearly all windows should be #GTK_WINDOW_TOPLEVEL.
+ * In particular, do not use #GTK_WINDOW_POPUP just to turn off
+ * the window borders; use gtk_window_set_decorated() for that.
+ */
+typedef enum
+{
+  GTK_WINDOW_TOPLEVEL,
+  GTK_WINDOW_POPUP
+} GtkWindowType;
 
 /**
  * GtkWrapMode:
@@ -572,17 +654,6 @@ typedef enum
 } GtkSortType;
 
 /* Style for gtk input method preedit/status */
-/**
- * GtkIMPreeditStyle:
- * @GTK_IM_PREEDIT_NOTHING: Deprecated
- * @GTK_IM_PREEDIT_CALLBACK: Deprecated
- * @GTK_IM_PREEDIT_NONE: Deprecated
- *
- * Style for input method preedit. See also
- * #GtkSettings:gtk-im-preedit-style
- *
- * Deprecated: 3.10
- */
 typedef enum
 {
   GTK_IM_PREEDIT_NOTHING,
@@ -590,17 +661,6 @@ typedef enum
   GTK_IM_PREEDIT_NONE
 } GtkIMPreeditStyle;
 
-/**
- * GtkIMStatusStyle:
- * @GTK_IM_STATUS_NOTHING: Deprecated
- * @GTK_IM_STATUS_CALLBACK: Deprecated
- * @GTK_IM_STATUS_NONE: Deprecated
- *
- * Style for input method status. See also
- * #GtkSettings:gtk-im-status-style
- *
- * Deprecated: 3.10
- */
 typedef enum
 {
   GTK_IM_STATUS_NOTHING,
@@ -615,7 +675,7 @@ typedef enum
  * @GTK_PACK_DIRECTION_TTB: Widgets are packed top-to-bottom
  * @GTK_PACK_DIRECTION_BTT: Widgets are packed bottom-to-top
  *
- * Determines how widgets should be packed inside menubars
+ * Determines how widgets should be packed insided menubars
  * and menuitems contained in menubars.
  */
 typedef enum
@@ -626,15 +686,6 @@ typedef enum
   GTK_PACK_DIRECTION_BTT
 } GtkPackDirection;
 
-/**
- * GtkPrintPages:
- * @GTK_PRINT_PAGES_ALL: All pages.
- * @GTK_PRINT_PAGES_CURRENT: Current page.
- * @GTK_PRINT_PAGES_RANGES: Range of pages.
- * @GTK_PRINT_PAGES_SELECTION: Selected pages.
- *
- * See also gtk_print_job_set_pages()
- */
 typedef enum
 {
   GTK_PRINT_PAGES_ALL,
@@ -643,14 +694,6 @@ typedef enum
   GTK_PRINT_PAGES_SELECTION
 } GtkPrintPages;
 
-/**
- * GtkPageSet:
- * @GTK_PAGE_SET_ALL: All pages.
- * @GTK_PAGE_SET_EVEN: Even pages.
- * @GTK_PAGE_SET_ODD: Odd pages.
- *
- * See also gtk_print_job_set_page_set().
- */
 typedef enum
 {
   GTK_PAGE_SET_ALL,
@@ -660,14 +703,14 @@ typedef enum
 
 /**
  * GtkNumberUpLayout:
- * @GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_TOP_TO_BOTTOM: ![](layout-lrtb.png)
- * @GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_BOTTOM_TO_TOP: ![](layout-lrbt.png)
- * @GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_TOP_TO_BOTTOM: ![](layout-rltb.png)
- * @GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_BOTTOM_TO_TOP: ![](layout-rlbt.png)
- * @GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_LEFT_TO_RIGHT: ![](layout-tblr.png)
- * @GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_RIGHT_TO_LEFT: ![](layout-tbrl.png)
- * @GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_LEFT_TO_RIGHT: ![](layout-btlr.png)
- * @GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_RIGHT_TO_LEFT: ![](layout-btrl.png)
+ * @GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_TOP_TO_BOTTOM: <inlinegraphic valign="middle" fileref="layout-lrtb.png" format="PNG"></inlinegraphic>
+ * @GTK_NUMBER_UP_LAYOUT_LEFT_TO_RIGHT_BOTTOM_TO_TOP: <inlinegraphic valign="middle" fileref="layout-lrbt.png" format="PNG"></inlinegraphic>
+ * @GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_TOP_TO_BOTTOM: <inlinegraphic valign="middle" fileref="layout-rltb.png" format="PNG"></inlinegraphic>
+ * @GTK_NUMBER_UP_LAYOUT_RIGHT_TO_LEFT_BOTTOM_TO_TOP: <inlinegraphic valign="middle" fileref="layout-rlbt.png" format="PNG"></inlinegraphic>
+ * @GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_LEFT_TO_RIGHT: <inlinegraphic valign="middle" fileref="layout-tblr.png" format="PNG"></inlinegraphic>
+ * @GTK_NUMBER_UP_LAYOUT_TOP_TO_BOTTOM_RIGHT_TO_LEFT: <inlinegraphic valign="middle" fileref="layout-tbrl.png" format="PNG"></inlinegraphic>
+ * @GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_LEFT_TO_RIGHT: <inlinegraphic valign="middle" fileref="layout-btlr.png" format="PNG"></inlinegraphic>
+ * @GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_RIGHT_TO_LEFT: <inlinegraphic valign="middle" fileref="layout-btrl.png" format="PNG"></inlinegraphic>
  *
  * Used to determine the layout of pages on a sheet when printing
  * multiple pages per sheet.
@@ -684,15 +727,6 @@ typedef enum
   GTK_NUMBER_UP_LAYOUT_BOTTOM_TO_TOP_RIGHT_TO_LEFT  /*< nick=btrl >*/
 } GtkNumberUpLayout;
 
-/**
- * GtkPageOrientation:
- * @GTK_PAGE_ORIENTATION_PORTRAIT: Portrait mode.
- * @GTK_PAGE_ORIENTATION_LANDSCAPE: Landscape mode.
- * @GTK_PAGE_ORIENTATION_REVERSE_PORTRAIT: Reverse portrait mode.
- * @GTK_PAGE_ORIENTATION_REVERSE_LANDSCAPE: Reverse landscape mode.
- *
- * See also gtk_print_settings_set_orientation().
- */
 typedef enum
 {
   GTK_PAGE_ORIENTATION_PORTRAIT,
@@ -701,15 +735,6 @@ typedef enum
   GTK_PAGE_ORIENTATION_REVERSE_LANDSCAPE
 } GtkPageOrientation;
 
-/**
- * GtkPrintQuality:
- * @GTK_PRINT_QUALITY_LOW: Low quality.
- * @GTK_PRINT_QUALITY_NORMAL: Normal quality.
- * @GTK_PRINT_QUALITY_HIGH: High quality.
- * @GTK_PRINT_QUALITY_DRAFT: Draft quality.
- *
- * See also gtk_print_settings_set_quality().
- */
 typedef enum
 {
   GTK_PRINT_QUALITY_LOW,
@@ -718,14 +743,6 @@ typedef enum
   GTK_PRINT_QUALITY_DRAFT
 } GtkPrintQuality;
 
-/**
- * GtkPrintDuplex:
- * @GTK_PRINT_DUPLEX_SIMPLEX: No duplex.
- * @GTK_PRINT_DUPLEX_HORIZONTAL: Horizontal duplex.
- * @GTK_PRINT_DUPLEX_VERTICAL: Vertical duplex.
- *
- * See also gtk_print_settings_set_duplex().
- */
 typedef enum
 {
   GTK_PRINT_DUPLEX_SIMPLEX,
@@ -734,15 +751,6 @@ typedef enum
 } GtkPrintDuplex;
 
 
-/**
- * GtkUnit:
- * @GTK_UNIT_NONE: No units.
- * @GTK_UNIT_POINTS: Dimensions in points.
- * @GTK_UNIT_INCH: Dimensions in inches.
- * @GTK_UNIT_MM: Dimensions in millimeters
- *
- * See also gtk_print_settings_set_paper_width().
- */
 typedef enum
 {
   GTK_UNIT_NONE,
@@ -796,27 +804,10 @@ typedef enum
 } GtkDragResult;
 
 /**
- * GtkSizeGroupMode:
- * @GTK_SIZE_GROUP_NONE: group has no effect
- * @GTK_SIZE_GROUP_HORIZONTAL: group affects horizontal requisition
- * @GTK_SIZE_GROUP_VERTICAL: group affects vertical requisition
- * @GTK_SIZE_GROUP_BOTH: group affects both horizontal and vertical requisition
- *
- * The mode of the size group determines the directions in which the size
- * group affects the requested sizes of its component widgets.
- **/
-typedef enum {
-  GTK_SIZE_GROUP_NONE,
-  GTK_SIZE_GROUP_HORIZONTAL,
-  GTK_SIZE_GROUP_VERTICAL,
-  GTK_SIZE_GROUP_BOTH
-} GtkSizeGroupMode;
-
-/**
  * GtkSizeRequestMode:
  * @GTK_SIZE_REQUEST_HEIGHT_FOR_WIDTH: Prefer height-for-width geometry management
  * @GTK_SIZE_REQUEST_WIDTH_FOR_HEIGHT: Prefer width-for-height geometry management
- * @GTK_SIZE_REQUEST_CONSTANT_SIZE: Don’t trade height-for-width or width-for-height
+ * @GTK_SIZE_REQUEST_CONSTANT_SIZE: Dont trade height-for-width or width-for-height
  * 
  * Specifies a preference for height-for-width or
  * width-for-height geometry management.
@@ -852,16 +843,8 @@ typedef enum
  * @GTK_STATE_FLAG_INCONSISTENT: Widget is inconsistent.
  * @GTK_STATE_FLAG_FOCUSED: Widget has the keyboard focus.
  * @GTK_STATE_FLAG_BACKDROP: Widget is in a background toplevel window.
- * @GTK_STATE_FLAG_DIR_LTR: Widget is in left-to-right text direction. Since 3.8
- * @GTK_STATE_FLAG_DIR_RTL: Widget is in right-to-left text direction. Since 3.8
- * @GTK_STATE_FLAG_LINK: Widget is a link. Since 3.12
- * @GTK_STATE_FLAG_VISITED: The location the widget points to has already been visited. Since 3.12
- * @GTK_STATE_FLAG_CHECKED: Widget is checked. Since 3.14
- * @GTK_STATE_FLAG_DROP_ACTIVE: Widget is highlighted as a drop target for DND. Since 3.20
  *
- * Describes a widget state. Widget states are used to match the widget
- * against CSS pseudo-classes. Note that GTK extends the regular CSS
- * classes and sometimes uses different names.
+ * Describes a widget state.
  */
 typedef enum
 {
@@ -872,13 +855,7 @@ typedef enum
   GTK_STATE_FLAG_INSENSITIVE  = 1 << 3,
   GTK_STATE_FLAG_INCONSISTENT = 1 << 4,
   GTK_STATE_FLAG_FOCUSED      = 1 << 5,
-  GTK_STATE_FLAG_BACKDROP     = 1 << 6,
-  GTK_STATE_FLAG_DIR_LTR      = 1 << 7,
-  GTK_STATE_FLAG_DIR_RTL      = 1 << 8,
-  GTK_STATE_FLAG_LINK         = 1 << 9,
-  GTK_STATE_FLAG_VISITED      = 1 << 10,
-  GTK_STATE_FLAG_CHECKED      = 1 << 11,
-  GTK_STATE_FLAG_DROP_ACTIVE  = 1 << 12
+  GTK_STATE_FLAG_BACKDROP     = 1 << 6
 } GtkStateFlags;
 
 /**
@@ -936,7 +913,7 @@ typedef enum {
  * @GTK_BORDER_STYLE_HIDDEN: Same as @GTK_BORDER_STYLE_NONE
  * @GTK_BORDER_STYLE_DOTTED: A series of round dots
  * @GTK_BORDER_STYLE_DASHED: A series of square-ended dashes
- * @GTK_BORDER_STYLE_DOUBLE: Two parallel lines with some space between them
+ * @GTK_BORDER_STYLE_DOUBLE: Two parrallel lines with some space between them
  * @GTK_BORDER_STYLE_GROOVE: Looks as if it were carved in the canvas
  * @GTK_BORDER_STYLE_RIDGE: Looks as if it were coming out of the canvas
  *
@@ -955,202 +932,7 @@ typedef enum {
   GTK_BORDER_STYLE_RIDGE
 } GtkBorderStyle;
 
-/**
- * GtkLevelBarMode:
- * @GTK_LEVEL_BAR_MODE_CONTINUOUS: the bar has a continuous mode
- * @GTK_LEVEL_BAR_MODE_DISCRETE: the bar has a discrete mode
- *
- * Describes how #GtkLevelBar contents should be rendered.
- * Note that this enumeration could be extended with additional modes
- * in the future.
- *
- * Since: 3.6
- */
-typedef enum {
-  GTK_LEVEL_BAR_MODE_CONTINUOUS,
-  GTK_LEVEL_BAR_MODE_DISCRETE
-} GtkLevelBarMode;
-
 G_END_DECLS
-
-/**
- * GtkInputPurpose:
- * @GTK_INPUT_PURPOSE_FREE_FORM: Allow any character
- * @GTK_INPUT_PURPOSE_ALPHA: Allow only alphabetic characters
- * @GTK_INPUT_PURPOSE_DIGITS: Allow only digits
- * @GTK_INPUT_PURPOSE_NUMBER: Edited field expects numbers
- * @GTK_INPUT_PURPOSE_PHONE: Edited field expects phone number
- * @GTK_INPUT_PURPOSE_URL: Edited field expects URL
- * @GTK_INPUT_PURPOSE_EMAIL: Edited field expects email address
- * @GTK_INPUT_PURPOSE_NAME: Edited field expects the name of a person
- * @GTK_INPUT_PURPOSE_PASSWORD: Like @GTK_INPUT_PURPOSE_FREE_FORM, but characters are hidden
- * @GTK_INPUT_PURPOSE_PIN: Like @GTK_INPUT_PURPOSE_DIGITS, but characters are hidden
- * @GTK_INPUT_PURPOSE_TERMINAL: Allow any character, in addition to control codes
- *
- * Describes primary purpose of the input widget. This information is
- * useful for on-screen keyboards and similar input methods to decide
- * which keys should be presented to the user.
- *
- * Note that the purpose is not meant to impose a totally strict rule
- * about allowed characters, and does not replace input validation.
- * It is fine for an on-screen keyboard to let the user override the
- * character set restriction that is expressed by the purpose. The
- * application is expected to validate the entry contents, even if
- * it specified a purpose.
- *
- * The difference between @GTK_INPUT_PURPOSE_DIGITS and
- * @GTK_INPUT_PURPOSE_NUMBER is that the former accepts only digits
- * while the latter also some punctuation (like commas or points, plus,
- * minus) and “e” or “E” as in 3.14E+000.
- *
- * This enumeration may be extended in the future; input methods should
- * interpret unknown values as “free form”.
- *
- * Since: 3.6
- */
-typedef enum
-{
-  GTK_INPUT_PURPOSE_FREE_FORM,
-  GTK_INPUT_PURPOSE_ALPHA,
-  GTK_INPUT_PURPOSE_DIGITS,
-  GTK_INPUT_PURPOSE_NUMBER,
-  GTK_INPUT_PURPOSE_PHONE,
-  GTK_INPUT_PURPOSE_URL,
-  GTK_INPUT_PURPOSE_EMAIL,
-  GTK_INPUT_PURPOSE_NAME,
-  GTK_INPUT_PURPOSE_PASSWORD,
-  GTK_INPUT_PURPOSE_PIN,
-  GTK_INPUT_PURPOSE_TERMINAL,
-} GtkInputPurpose;
-
-/**
- * GtkInputHints:
- * @GTK_INPUT_HINT_NONE: No special behaviour suggested
- * @GTK_INPUT_HINT_SPELLCHECK: Suggest checking for typos
- * @GTK_INPUT_HINT_NO_SPELLCHECK: Suggest not checking for typos
- * @GTK_INPUT_HINT_WORD_COMPLETION: Suggest word completion
- * @GTK_INPUT_HINT_LOWERCASE: Suggest to convert all text to lowercase
- * @GTK_INPUT_HINT_UPPERCASE_CHARS: Suggest to capitalize all text
- * @GTK_INPUT_HINT_UPPERCASE_WORDS: Suggest to capitalize the first
- *     character of each word
- * @GTK_INPUT_HINT_UPPERCASE_SENTENCES: Suggest to capitalize the
- *     first word of each sentence
- * @GTK_INPUT_HINT_INHIBIT_OSK: Suggest to not show an onscreen keyboard
- *     (e.g for a calculator that already has all the keys).
- * @GTK_INPUT_HINT_VERTICAL_WRITING: The text is vertical. Since 3.18
- * @GTK_INPUT_HINT_EMOJI: Suggest offering Emoji support. Since 3.22.20
- * @GTK_INPUT_HINT_NO_EMOJI: Suggest not offering Emoji support. Since 3.22.20
- *
- * Describes hints that might be taken into account by input methods
- * or applications. Note that input methods may already tailor their
- * behaviour according to the #GtkInputPurpose of the entry.
- *
- * Some common sense is expected when using these flags - mixing
- * @GTK_INPUT_HINT_LOWERCASE with any of the uppercase hints makes no sense.
- *
- * This enumeration may be extended in the future; input methods should
- * ignore unknown values.
- *
- * Since: 3.6
- */
-typedef enum
-{
-  GTK_INPUT_HINT_NONE                = 0,
-  GTK_INPUT_HINT_SPELLCHECK          = 1 << 0,
-  GTK_INPUT_HINT_NO_SPELLCHECK       = 1 << 1,
-  GTK_INPUT_HINT_WORD_COMPLETION     = 1 << 2,
-  GTK_INPUT_HINT_LOWERCASE           = 1 << 3,
-  GTK_INPUT_HINT_UPPERCASE_CHARS     = 1 << 4,
-  GTK_INPUT_HINT_UPPERCASE_WORDS     = 1 << 5,
-  GTK_INPUT_HINT_UPPERCASE_SENTENCES = 1 << 6,
-  GTK_INPUT_HINT_INHIBIT_OSK         = 1 << 7,
-  GTK_INPUT_HINT_VERTICAL_WRITING    = 1 << 8,
-  GTK_INPUT_HINT_EMOJI               = 1 << 9,
-  GTK_INPUT_HINT_NO_EMOJI            = 1 << 10
-} GtkInputHints;
-
-/**
- * GtkPropagationPhase:
- * @GTK_PHASE_NONE: Events are not delivered automatically. Those can be
- *   manually fed through gtk_event_controller_handle_event(). This should
- *   only be used when full control about when, or whether the controller
- *   handles the event is needed.
- * @GTK_PHASE_CAPTURE: Events are delivered in the capture phase. The
- *   capture phase happens before the bubble phase, runs from the toplevel down
- *   to the event widget. This option should only be used on containers that
- *   might possibly handle events before their children do.
- * @GTK_PHASE_BUBBLE: Events are delivered in the bubble phase. The bubble
- *   phase happens after the capture phase, and before the default handlers
- *   are run. This phase runs from the event widget, up to the toplevel.
- * @GTK_PHASE_TARGET: Events are delivered in the default widget event handlers,
- *   note that widget implementations must chain up on button, motion, touch and
- *   grab broken handlers for controllers in this phase to be run.
- *
- * Describes the stage at which events are fed into a #GtkEventController.
- *
- * Since: 3.14
- */
-typedef enum
-{
-  GTK_PHASE_NONE,
-  GTK_PHASE_CAPTURE,
-  GTK_PHASE_BUBBLE,
-  GTK_PHASE_TARGET
-} GtkPropagationPhase;
-
-/**
- * GtkEventSequenceState:
- * @GTK_EVENT_SEQUENCE_NONE: The sequence is handled, but not grabbed.
- * @GTK_EVENT_SEQUENCE_CLAIMED: The sequence is handled and grabbed.
- * @GTK_EVENT_SEQUENCE_DENIED: The sequence is denied.
- *
- * Describes the state of a #GdkEventSequence in a #GtkGesture.
- *
- * Since: 3.14
- */
-typedef enum
-{
-  GTK_EVENT_SEQUENCE_NONE,
-  GTK_EVENT_SEQUENCE_CLAIMED,
-  GTK_EVENT_SEQUENCE_DENIED
-} GtkEventSequenceState;
-
-/**
- * GtkPanDirection:
- * @GTK_PAN_DIRECTION_LEFT: panned towards the left
- * @GTK_PAN_DIRECTION_RIGHT: panned towards the right
- * @GTK_PAN_DIRECTION_UP: panned upwards
- * @GTK_PAN_DIRECTION_DOWN: panned downwards
- *
- * Describes the panning direction of a #GtkGesturePan
- *
- * Since: 3.14
- */
-typedef enum
-{
-  GTK_PAN_DIRECTION_LEFT,
-  GTK_PAN_DIRECTION_RIGHT,
-  GTK_PAN_DIRECTION_UP,
-  GTK_PAN_DIRECTION_DOWN
-} GtkPanDirection;
-
-/**
- * GtkPopoverConstraint:
- * @GTK_POPOVER_CONSTRAINT_NONE: Don't constrain the popover position
- *   beyond what is imposed by the implementation
- * @GTK_POPOVER_CONSTRAINT_WINDOW: Constrain the popover to the boundaries
- *   of the window that it is attached to
- *
- * Describes constraints to positioning of popovers. More values
- * may be added to this enumeration in the future.
- *
- * Since: 3.20
- */
-typedef enum
-{
-  GTK_POPOVER_CONSTRAINT_NONE,
-  GTK_POPOVER_CONSTRAINT_WINDOW
-} GtkPopoverConstraint;
 
 
 #endif /* __GTK_ENUMS_H__ */

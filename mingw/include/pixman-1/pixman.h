@@ -226,9 +226,6 @@ pixman_bool_t pixman_transform_is_inverse       (const struct pixman_transform *
 /*
  * Floating point matrices
  */
-typedef struct pixman_f_transform pixman_f_transform_t;
-typedef struct pixman_f_vector pixman_f_vector_t;
-
 struct pixman_f_vector
 {
     double  v[3];
@@ -292,28 +289,7 @@ typedef enum
     PIXMAN_FILTER_BEST,
     PIXMAN_FILTER_NEAREST,
     PIXMAN_FILTER_BILINEAR,
-    PIXMAN_FILTER_CONVOLUTION,
-
-    /* The SEPARABLE_CONVOLUTION filter takes the following parameters:
-     *
-     *         width:           integer given as 16.16 fixpoint number
-     *         height:          integer given as 16.16 fixpoint number
-     *         x_phase_bits:	integer given as 16.16 fixpoint
-     *         y_phase_bits:	integer given as 16.16 fixpoint
-     *         xtables:         (1 << x_phase_bits) tables of size width
-     *         ytables:         (1 << y_phase_bits) tables of size height
-     *
-     * When sampling at (x, y), the location is first rounded to one of
-     * n_x_phases * n_y_phases subpixel positions. These subpixel positions
-     * determine an xtable and a ytable to use.
-     *
-     * Conceptually a width x height matrix is then formed in which each entry
-     * is the product of the corresponding entries in the x and y tables.
-     * This matrix is then aligned with the image pixels such that its center
-     * is as close as possible to the subpixel location chosen earlier. Then
-     * the image is convolved with the matrix and the resulting pixel returned.
-     */
-    PIXMAN_FILTER_SEPARABLE_CONVOLUTION
+    PIXMAN_FILTER_CONVOLUTION
 } pixman_filter_t;
 
 typedef enum
@@ -654,24 +630,12 @@ struct pixman_indexed
 					 ((g) << 4) |	  \
 					 ((b)))
 
-#define PIXMAN_FORMAT_BYTE(bpp,type,a,r,g,b) \
-	(((bpp >> 3) << 24) | \
-	(3 << 22) | ((type) << 16) | \
-	((a >> 3) << 12) | \
-	((r >> 3) << 8) | \
-	((g >> 3) << 4) | \
-	((b >> 3)))
-
-#define PIXMAN_FORMAT_RESHIFT(val, ofs, num) \
-	(((val >> (ofs)) & ((1 << (num)) - 1)) << ((val >> 22) & 3))
-
-#define PIXMAN_FORMAT_BPP(f)	PIXMAN_FORMAT_RESHIFT(f, 24, 8)
-#define PIXMAN_FORMAT_SHIFT(f)	((uint32_t)((f >> 22) & 3))
-#define PIXMAN_FORMAT_TYPE(f)	(((f) >> 16) & 0x3f)
-#define PIXMAN_FORMAT_A(f)	PIXMAN_FORMAT_RESHIFT(f, 12, 4)
-#define PIXMAN_FORMAT_R(f)	PIXMAN_FORMAT_RESHIFT(f, 8, 4)
-#define PIXMAN_FORMAT_G(f)	PIXMAN_FORMAT_RESHIFT(f, 4, 4)
-#define PIXMAN_FORMAT_B(f)	PIXMAN_FORMAT_RESHIFT(f, 0, 4)
+#define PIXMAN_FORMAT_BPP(f)	(((f) >> 24)       )
+#define PIXMAN_FORMAT_TYPE(f)	(((f) >> 16) & 0xff)
+#define PIXMAN_FORMAT_A(f)	(((f) >> 12) & 0x0f)
+#define PIXMAN_FORMAT_R(f)	(((f) >>  8) & 0x0f)
+#define PIXMAN_FORMAT_G(f)	(((f) >>  4) & 0x0f)
+#define PIXMAN_FORMAT_B(f)	(((f)      ) & 0x0f)
 #define PIXMAN_FORMAT_RGB(f)	(((f)      ) & 0xfff)
 #define PIXMAN_FORMAT_VIS(f)	(((f)      ) & 0xffff)
 #define PIXMAN_FORMAT_DEPTH(f)	(PIXMAN_FORMAT_A(f) +	\
@@ -689,23 +653,15 @@ struct pixman_indexed
 #define PIXMAN_TYPE_YV12	7
 #define PIXMAN_TYPE_BGRA	8
 #define PIXMAN_TYPE_RGBA	9
-#define PIXMAN_TYPE_ARGB_SRGB	10
-#define PIXMAN_TYPE_RGBA_FLOAT	11
 
 #define PIXMAN_FORMAT_COLOR(f)				\
 	(PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_ARGB ||	\
 	 PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_ABGR ||	\
 	 PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_BGRA ||	\
-	 PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_RGBA ||	\
-	 PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_RGBA_FLOAT)
-
-typedef enum {
-/* 128bpp formats */
-    PIXMAN_rgba_float =	PIXMAN_FORMAT_BYTE(128,PIXMAN_TYPE_RGBA_FLOAT,32,32,32,32),
-/* 96bpp formats */
-    PIXMAN_rgb_float =	PIXMAN_FORMAT_BYTE(96,PIXMAN_TYPE_RGBA_FLOAT,0,32,32,32),
+	 PIXMAN_FORMAT_TYPE(f) == PIXMAN_TYPE_RGBA)
 
 /* 32bpp formats */
+typedef enum {
     PIXMAN_a8r8g8b8 =	 PIXMAN_FORMAT(32,PIXMAN_TYPE_ARGB,8,8,8,8),
     PIXMAN_x8r8g8b8 =	 PIXMAN_FORMAT(32,PIXMAN_TYPE_ARGB,0,8,8,8),
     PIXMAN_a8b8g8r8 =	 PIXMAN_FORMAT(32,PIXMAN_TYPE_ABGR,8,8,8,8),
@@ -719,9 +675,6 @@ typedef enum {
     PIXMAN_a2r10g10b10 = PIXMAN_FORMAT(32,PIXMAN_TYPE_ARGB,2,10,10,10),
     PIXMAN_x2b10g10r10 = PIXMAN_FORMAT(32,PIXMAN_TYPE_ABGR,0,10,10,10),
     PIXMAN_a2b10g10r10 = PIXMAN_FORMAT(32,PIXMAN_TYPE_ABGR,2,10,10,10),
-
-/* sRGB formats */
-    PIXMAN_a8r8g8b8_sRGB = PIXMAN_FORMAT(32,PIXMAN_TYPE_ARGB_SRGB,8,8,8,8),
 
 /* 24bpp formats */
     PIXMAN_r8g8b8 =	 PIXMAN_FORMAT(24,PIXMAN_TYPE_ARGB,0,8,8,8),
@@ -780,18 +733,18 @@ pixman_bool_t pixman_format_supported_destination (pixman_format_code_t format);
 pixman_bool_t pixman_format_supported_source      (pixman_format_code_t format);
 
 /* Constructors */
-pixman_image_t *pixman_image_create_solid_fill       (const pixman_color_t         *color);
-pixman_image_t *pixman_image_create_linear_gradient  (const pixman_point_fixed_t   *p1,
-						      const pixman_point_fixed_t   *p2,
+pixman_image_t *pixman_image_create_solid_fill       (pixman_color_t               *color);
+pixman_image_t *pixman_image_create_linear_gradient  (pixman_point_fixed_t         *p1,
+						      pixman_point_fixed_t         *p2,
 						      const pixman_gradient_stop_t *stops,
 						      int                           n_stops);
-pixman_image_t *pixman_image_create_radial_gradient  (const pixman_point_fixed_t   *inner,
-						      const pixman_point_fixed_t   *outer,
+pixman_image_t *pixman_image_create_radial_gradient  (pixman_point_fixed_t         *inner,
+						      pixman_point_fixed_t         *outer,
 						      pixman_fixed_t                inner_radius,
 						      pixman_fixed_t                outer_radius,
 						      const pixman_gradient_stop_t *stops,
 						      int                           n_stops);
-pixman_image_t *pixman_image_create_conical_gradient (const pixman_point_fixed_t   *center,
+pixman_image_t *pixman_image_create_conical_gradient (pixman_point_fixed_t         *center,
 						      pixman_fixed_t                angle,
 						      const pixman_gradient_stop_t *stops,
 						      int                           n_stops);
@@ -800,11 +753,6 @@ pixman_image_t *pixman_image_create_bits             (pixman_format_code_t      
 						      int                           height,
 						      uint32_t                     *bits,
 						      int                           rowstride_bytes);
-pixman_image_t *pixman_image_create_bits_no_clear    (pixman_format_code_t format,
-						      int                  width,
-						      int                  height,
-						      uint32_t *           bits,
-						      int                  rowstride_bytes);
 
 /* Destructor */
 pixman_image_t *pixman_image_ref                     (pixman_image_t               *image);
@@ -850,41 +798,14 @@ int             pixman_image_get_height              (pixman_image_t            
 int		pixman_image_get_stride              (pixman_image_t               *image); /* in bytes */
 int		pixman_image_get_depth               (pixman_image_t		   *image);
 pixman_format_code_t pixman_image_get_format	     (pixman_image_t		   *image);
-
-typedef enum
-{
-    PIXMAN_KERNEL_IMPULSE,
-    PIXMAN_KERNEL_BOX,
-    PIXMAN_KERNEL_LINEAR,
-    PIXMAN_KERNEL_CUBIC,
-    PIXMAN_KERNEL_GAUSSIAN,
-    PIXMAN_KERNEL_LANCZOS2,
-    PIXMAN_KERNEL_LANCZOS3,
-    PIXMAN_KERNEL_LANCZOS3_STRETCHED       /* Jim Blinn's 'nice' filter */
-} pixman_kernel_t;
-
-/* Create the parameter list for a SEPARABLE_CONVOLUTION filter
- * with the given kernels and scale parameters.
- */
-pixman_fixed_t *
-pixman_filter_create_separable_convolution (int             *n_values,
-					    pixman_fixed_t   scale_x,
-					    pixman_fixed_t   scale_y,
-					    pixman_kernel_t  reconstruct_x,
-					    pixman_kernel_t  reconstruct_y,
-					    pixman_kernel_t  sample_x,
-					    pixman_kernel_t  sample_y,
-					    int              subsample_bits_x,
-					    int              subsample_bits_y);
-
 pixman_bool_t	pixman_image_fill_rectangles	     (pixman_op_t		    op,
 						      pixman_image_t		   *image,
-						      const pixman_color_t	   *color,
+						      pixman_color_t		   *color,
 						      int			    n_rects,
 						      const pixman_rectangle16_t   *rects);
 pixman_bool_t   pixman_image_fill_boxes              (pixman_op_t                   op,
                                                       pixman_image_t               *dest,
-                                                      const pixman_color_t         *color,
+                                                      pixman_color_t               *color,
                                                       int                           n_boxes,
                                                       const pixman_box32_t         *boxes);
 
@@ -947,65 +868,6 @@ void          pixman_image_composite32        (pixman_op_t        op,
 void pixman_disable_out_of_bounds_workaround (void);
 
 /*
- * Glyphs
- */
-typedef struct pixman_glyph_cache_t pixman_glyph_cache_t;
-typedef struct
-{
-    int		x, y;
-    const void *glyph;
-} pixman_glyph_t;
-
-pixman_glyph_cache_t *pixman_glyph_cache_create       (void);
-void                  pixman_glyph_cache_destroy      (pixman_glyph_cache_t *cache);
-void                  pixman_glyph_cache_freeze       (pixman_glyph_cache_t *cache);
-void                  pixman_glyph_cache_thaw         (pixman_glyph_cache_t *cache);
-const void *          pixman_glyph_cache_lookup       (pixman_glyph_cache_t *cache,
-						       void                 *font_key,
-						       void                 *glyph_key);
-const void *          pixman_glyph_cache_insert       (pixman_glyph_cache_t *cache,
-						       void                 *font_key,
-						       void                 *glyph_key,
-						       int		     origin_x,
-						       int                   origin_y,
-						       pixman_image_t       *glyph_image);
-void                  pixman_glyph_cache_remove       (pixman_glyph_cache_t *cache,
-						       void                 *font_key,
-						       void                 *glyph_key);
-void                  pixman_glyph_get_extents        (pixman_glyph_cache_t *cache,
-						       int                   n_glyphs,
-						       pixman_glyph_t       *glyphs,
-						       pixman_box32_t       *extents);
-pixman_format_code_t  pixman_glyph_get_mask_format    (pixman_glyph_cache_t *cache,
-						       int		     n_glyphs,
-						       const pixman_glyph_t *glyphs);
-void                  pixman_composite_glyphs         (pixman_op_t           op,
-						       pixman_image_t       *src,
-						       pixman_image_t       *dest,
-						       pixman_format_code_t  mask_format,
-						       int32_t               src_x,
-						       int32_t               src_y,
-						       int32_t		     mask_x,
-						       int32_t		     mask_y,
-						       int32_t               dest_x,
-						       int32_t               dest_y,
-						       int32_t		     width,
-						       int32_t		     height,
-						       pixman_glyph_cache_t *cache,
-						       int		     n_glyphs,
-						       const pixman_glyph_t *glyphs);
-void                  pixman_composite_glyphs_no_mask (pixman_op_t           op,
-						       pixman_image_t       *src,
-						       pixman_image_t       *dest,
-						       int32_t               src_x,
-						       int32_t               src_y,
-						       int32_t               dest_x,
-						       int32_t               dest_y,
-						       pixman_glyph_cache_t *cache,
-						       int		     n_glyphs,
-						       const pixman_glyph_t *glyphs);
-
-/*
  * Trapezoids
  */
 typedef struct pixman_edge pixman_edge_t;
@@ -1049,7 +911,7 @@ struct pixman_triangle
 #define pixman_trapezoid_valid(t)				   \
     ((t)->left.p1.y != (t)->left.p2.y &&			   \
      (t)->right.p1.y != (t)->right.p2.y &&			   \
-     ((t)->bottom > (t)->top))
+     (int) ((t)->bottom - (t)->top) > 0)
 
 struct pixman_span_fix
 {
@@ -1089,7 +951,7 @@ void           pixman_add_traps            (pixman_image_t            *image,
 					    int16_t                    x_off,
 					    int16_t                    y_off,
 					    int                        ntrap,
-					    const pixman_trap_t       *traps);
+					    pixman_trap_t             *traps);
 void           pixman_add_trapezoids       (pixman_image_t            *image,
 					    int16_t                    x_off,
 					    int                        y_off,

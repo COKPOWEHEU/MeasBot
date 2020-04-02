@@ -22,15 +22,16 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_BIN_H__
-#define __GTK_BIN_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
 
+#ifndef __GTK_BIN_H__
+#define __GTK_BIN_H__
+
+
 #include <gtk/gtkcontainer.h>
+
 
 G_BEGIN_DECLS
 
@@ -54,15 +55,9 @@ struct _GtkBin
   GtkBinPrivate *priv;
 };
 
-/**
- * GtkBinClass:
- * @parent_class: The parent class.
- */
 struct _GtkBinClass
 {
   GtkContainerClass parent_class;
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -72,16 +67,12 @@ struct _GtkBinClass
 };
 
 
-GDK_AVAILABLE_IN_ALL
 GType      gtk_bin_get_type  (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_ALL
 GtkWidget *gtk_bin_get_child (GtkBin *bin);
 
 void       _gtk_bin_set_child (GtkBin    *bin,
                                GtkWidget *widget);
-
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GtkBin, g_object_unref)
 
 G_END_DECLS
 

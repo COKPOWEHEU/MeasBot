@@ -22,15 +22,14 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_DEBUG_H__
-#define __GTK_DEBUG_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
 
+#ifndef __GTK_DEBUG_H__
+#define __GTK_DEBUG_H__
+
 #include <glib.h>
-#include <gdk/gdk.h>
 
 G_BEGIN_DECLS
 
@@ -48,35 +47,22 @@ typedef enum {
   GTK_DEBUG_PRINTING        = 1 << 10,
   GTK_DEBUG_BUILDER         = 1 << 11,
   GTK_DEBUG_SIZE_REQUEST    = 1 << 12,
-  GTK_DEBUG_NO_CSS_CACHE    = 1 << 13,
-  GTK_DEBUG_BASELINES       = 1 << 14,
-  GTK_DEBUG_PIXEL_CACHE     = 1 << 15,
-  GTK_DEBUG_NO_PIXEL_CACHE  = 1 << 16,
-  GTK_DEBUG_INTERACTIVE     = 1 << 17,
-  GTK_DEBUG_TOUCHSCREEN     = 1 << 18,
-  GTK_DEBUG_ACTIONS         = 1 << 19,
-  GTK_DEBUG_RESIZE          = 1 << 20,
-  GTK_DEBUG_LAYOUT          = 1 << 21
+  GTK_DEBUG_NO_CSS_CACHE    = 1 << 13
 } GtkDebugFlag;
 
 #ifdef G_ENABLE_DEBUG
 
-#define GTK_DEBUG_CHECK(type) G_UNLIKELY (gtk_get_debug_flags () & GTK_DEBUG_##type)
-
-#define GTK_NOTE(type,action)                G_STMT_START {     \
-    if (GTK_DEBUG_CHECK (type))		                        \
+#define GTK_NOTE(type,action)                G_STMT_START { \
+    if (gtk_get_debug_flags () & GTK_DEBUG_##type)		    \
        { action; };                          } G_STMT_END
 
 #else /* !G_ENABLE_DEBUG */
 
-#define GTK_DEBUG_CHECK(type) 0
 #define GTK_NOTE(type, action)
 
 #endif /* G_ENABLE_DEBUG */
 
-GDK_AVAILABLE_IN_ALL
 guint gtk_get_debug_flags (void);
-GDK_AVAILABLE_IN_ALL
 void  gtk_set_debug_flags  (guint flags);
 
 G_END_DECLS

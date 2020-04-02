@@ -22,13 +22,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_SEPARATOR_MENU_ITEM_H__
-#define __GTK_SEPARATOR_MENU_ITEM_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_SEPARATOR_MENU_ITEM_H__
+#define __GTK_SEPARATOR_MENU_ITEM_H__
+
 
 #include <gtk/gtkmenuitem.h>
 
@@ -51,15 +51,9 @@ struct _GtkSeparatorMenuItem
   GtkMenuItem menu_item;
 };
 
-/**
- * GtkSeparatorMenuItemClass:
- * @parent_class: The parent class.
- */
 struct _GtkSeparatorMenuItemClass
 {
   GtkMenuItemClass parent_class;
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -69,9 +63,7 @@ struct _GtkSeparatorMenuItemClass
 };
 
 
-GDK_AVAILABLE_IN_ALL
 GType	   gtk_separator_menu_item_get_type	   (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
 GtkWidget* gtk_separator_menu_item_new	           (void);
 
 

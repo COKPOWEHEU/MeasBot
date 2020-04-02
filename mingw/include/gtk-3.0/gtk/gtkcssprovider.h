@@ -30,24 +30,8 @@ G_BEGIN_DECLS
 #define GTK_IS_CSS_PROVIDER_CLASS(c)  (G_TYPE_CHECK_CLASS_TYPE    ((c), GTK_TYPE_CSS_PROVIDER))
 #define GTK_CSS_PROVIDER_GET_CLASS(o) (G_TYPE_INSTANCE_GET_CLASS  ((o), GTK_TYPE_CSS_PROVIDER, GtkCssProviderClass))
 
-/**
- * GTK_CSS_PROVIDER_ERROR:
- *
- * Domain for #GtkCssProvider errors.
- */
 #define GTK_CSS_PROVIDER_ERROR (gtk_css_provider_error_quark ())
 
-/**
- * GtkCssProviderError:
- * @GTK_CSS_PROVIDER_ERROR_FAILED: Failed.
- * @GTK_CSS_PROVIDER_ERROR_SYNTAX: Syntax error.
- * @GTK_CSS_PROVIDER_ERROR_IMPORT: Import error.
- * @GTK_CSS_PROVIDER_ERROR_NAME: Name error.
- * @GTK_CSS_PROVIDER_ERROR_DEPRECATED: Deprecation error.
- * @GTK_CSS_PROVIDER_ERROR_UNKNOWN_VALUE: Unknown value.
- *
- * Error codes for %GTK_CSS_PROVIDER_ERROR.
- */
 typedef enum
 {
   GTK_CSS_PROVIDER_ERROR_FAILED,
@@ -58,7 +42,6 @@ typedef enum
   GTK_CSS_PROVIDER_ERROR_UNKNOWN_VALUE
 } GtkCssProviderError;
 
-GDK_AVAILABLE_IN_ALL
 GQuark gtk_css_provider_error_quark (void);
 
 typedef struct _GtkCssProvider GtkCssProvider;
@@ -85,37 +68,26 @@ struct _GtkCssProviderClass
   void (*_gtk_reserved4) (void);
 };
 
-GDK_AVAILABLE_IN_ALL
 GType gtk_css_provider_get_type (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_ALL
 GtkCssProvider * gtk_css_provider_new (void);
 
 GDK_AVAILABLE_IN_3_2
 char *           gtk_css_provider_to_string      (GtkCssProvider  *provider);
 
-GDK_AVAILABLE_IN_ALL
 gboolean         gtk_css_provider_load_from_data (GtkCssProvider  *css_provider,
                                                   const gchar     *data,
                                                   gssize           length,
                                                   GError         **error);
-GDK_AVAILABLE_IN_ALL
 gboolean         gtk_css_provider_load_from_file (GtkCssProvider  *css_provider,
                                                   GFile           *file,
                                                   GError         **error);
-GDK_AVAILABLE_IN_ALL
 gboolean         gtk_css_provider_load_from_path (GtkCssProvider  *css_provider,
                                                   const gchar     *path,
                                                   GError         **error);
 
-GDK_AVAILABLE_IN_3_16
-void             gtk_css_provider_load_from_resource (GtkCssProvider *css_provider,
-                                                      const gchar    *resource_path);
-
-GDK_DEPRECATED_FOR(gtk_css_provider_new)
 GtkCssProvider * gtk_css_provider_get_default (void);
 
-GDK_AVAILABLE_IN_ALL
 GtkCssProvider * gtk_css_provider_get_named (const gchar *name,
                                              const gchar *variant);
 

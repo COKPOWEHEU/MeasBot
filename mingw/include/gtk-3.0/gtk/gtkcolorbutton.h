@@ -27,13 +27,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_COLOR_BUTTON_H__
-#define __GTK_COLOR_BUTTON_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_COLOR_BUTTON_H__
+#define __GTK_COLOR_BUTTON_H__
+
 
 #include <gtk/gtkbutton.h>
 
@@ -71,30 +71,25 @@ struct _GtkColorButtonClass {
 };
 
 
-GDK_AVAILABLE_IN_ALL
 GType        gtk_color_button_get_type      (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
 GtkWidget *  gtk_color_button_new           (void);
-GDK_AVAILABLE_IN_ALL
 GtkWidget *  gtk_color_button_new_with_rgba (const GdkRGBA  *rgba);
-GDK_AVAILABLE_IN_ALL
 void         gtk_color_button_set_title     (GtkColorButton *button,
                                              const gchar    *title);
-GDK_AVAILABLE_IN_ALL
 const gchar *gtk_color_button_get_title     (GtkColorButton *button);
 
 GDK_DEPRECATED_IN_3_4_FOR(gtk_color_button_new_with_rgba)
 GtkWidget *gtk_color_button_new_with_color (const GdkColor *color);
-GDK_DEPRECATED_IN_3_4_FOR(gtk_color_chooser_set_rgba)
+GDK_DEPRECATED_IN_3_4_FOR(gtk_color_button_set_rgba)
 void       gtk_color_button_set_color      (GtkColorButton *button,
                                             const GdkColor *color);
-GDK_DEPRECATED_IN_3_4_FOR(gtk_color_chooser_get_rgba)
+GDK_DEPRECATED_IN_3_4_FOR(gtk_color_button_get_rgba)
 void       gtk_color_button_get_color      (GtkColorButton *button,
                                             GdkColor       *color);
-GDK_DEPRECATED_IN_3_4_FOR(gtk_color_chooser_set_rgba)
+GDK_DEPRECATED_IN_3_4_FOR(gtk_color_button_set_rgba)
 void       gtk_color_button_set_alpha      (GtkColorButton *button,
                                             guint16         alpha);
-GDK_DEPRECATED_IN_3_4_FOR(gtk_color_chooser_get_rgba)
+GDK_DEPRECATED_IN_3_4_FOR(gtk_color_button_get_rgba)
 guint16    gtk_color_button_get_alpha      (GtkColorButton *button);
 GDK_DEPRECATED_IN_3_4_FOR(gtk_color_chooser_set_use_alpha)
 void         gtk_color_button_set_use_alpha (GtkColorButton *button,

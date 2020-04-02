@@ -1,11 +1,10 @@
-prefix=/mingw32
+prefix=/MinGW
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
-toolexeclibdir=${exec_prefix}/lib/../lib
-includedir=${libdir}/libffi-3.2.1/include
+includedir=${libdir}/libffi-3.0.11/include
 
 Name: libffi
 Description: Library supporting Foreign Function Interfaces
-Version: 3.2.1
-Libs: -L${toolexeclibdir} -lffi
+Version: 3.0.11
+Libs: -L${libdir} -lffi
 Cflags: -I${includedir}

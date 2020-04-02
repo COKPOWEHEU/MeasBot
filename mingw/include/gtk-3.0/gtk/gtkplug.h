@@ -22,12 +22,12 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_PLUG_H__
-#define __GTK_PLUG_H__
-
 #if !defined (__GTKX_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtkx.h> can be included directly."
 #endif
+
+#ifndef __GTK_PLUG_H__
+#define __GTK_PLUG_H__
 
 #include <gdk/gdk.h>
 
@@ -36,7 +36,7 @@
 #include <gdk/gdkx.h>
 
 #include <gtk/gtksocket.h>
-#include <gtk/gtkwindow.h>
+
 
 G_BEGIN_DECLS
 
@@ -73,27 +73,21 @@ struct _GtkPlugClass
   void (*_gtk_reserved4) (void);
 };
 
-GDK_AVAILABLE_IN_ALL
 GType      gtk_plug_get_type              (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_ALL
+#ifndef GDK_MULTIHEAD_SAFE
 void       gtk_plug_construct             (GtkPlug    *plug,
                                            Window      socket_id);
-GDK_AVAILABLE_IN_ALL
 GtkWidget *gtk_plug_new                   (Window      socket_id);
+#endif
 
-GDK_AVAILABLE_IN_ALL
 void       gtk_plug_construct_for_display (GtkPlug    *plug,
                                            GdkDisplay *display,
                                            Window      socket_id);
-GDK_AVAILABLE_IN_ALL
 GtkWidget *gtk_plug_new_for_display       (GdkDisplay *display,
                                            Window      socket_id);
-GDK_AVAILABLE_IN_ALL
 Window     gtk_plug_get_id                (GtkPlug    *plug);
-GDK_AVAILABLE_IN_ALL
 gboolean   gtk_plug_get_embedded          (GtkPlug    *plug);
-GDK_AVAILABLE_IN_ALL
 GdkWindow *gtk_plug_get_socket_window     (GtkPlug    *plug);
 
 G_END_DECLS

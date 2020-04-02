@@ -1,12 +1,11 @@
-prefix=/mingw32
+prefix=/MinGW
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
-includedir=${prefix}/include/libpng16
+includedir=${prefix}/include/libpng15
 
 Name: libpng
 Description: Loads and saves PNG files
-Version: 1.6.37
-Requires: zlib
-Libs: -L${libdir} -lpng16
+Version: 1.5.12
+Libs: -L${libdir} -lpng15
 Libs.private: -lz 
 Cflags: -I${includedir}

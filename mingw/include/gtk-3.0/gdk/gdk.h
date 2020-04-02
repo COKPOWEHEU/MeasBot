@@ -31,43 +31,30 @@
 #include <gdk/gdkversionmacros.h>
 #include <gdk/gdkapplaunchcontext.h>
 #include <gdk/gdkcairo.h>
+#include <gdk/gdkcolor.h>
 #include <gdk/gdkcursor.h>
 #include <gdk/gdkdevice.h>
-#include <gdk/gdkdevicepad.h>
-#include <gdk/gdkdevicetool.h>
 #include <gdk/gdkdevicemanager.h>
 #include <gdk/gdkdisplay.h>
 #include <gdk/gdkdisplaymanager.h>
 #include <gdk/gdkdnd.h>
-#include <gdk/gdkdrawingcontext.h>
 #include <gdk/gdkenumtypes.h>
 #include <gdk/gdkevents.h>
-#include <gdk/gdkframeclock.h>
-#include <gdk/gdkframetimings.h>
-#include <gdk/gdkglcontext.h>
 #include <gdk/gdkkeys.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkmain.h>
-#include <gdk/gdkmonitor.h>
 #include <gdk/gdkpango.h>
 #include <gdk/gdkpixbuf.h>
 #include <gdk/gdkproperty.h>
 #include <gdk/gdkrectangle.h>
 #include <gdk/gdkrgba.h>
 #include <gdk/gdkscreen.h>
-#include <gdk/gdkseat.h>
 #include <gdk/gdkselection.h>
 #include <gdk/gdktestutils.h>
 #include <gdk/gdkthreads.h>
 #include <gdk/gdktypes.h>
 #include <gdk/gdkvisual.h>
 #include <gdk/gdkwindow.h>
-
-#ifndef GDK_DISABLE_DEPRECATED
-#include <gdk/deprecated/gdkcolor.h>
-#endif
-
-#include <gdk/gdk-autocleanup.h>
 
 #undef __GDK_H_INSIDE__
 

@@ -5,7 +5,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,17 +13,19 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General
- * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
  *
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_ASYNC_INITABLE_H__
-#define __G_ASYNC_INITABLE_H__
-
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
 #endif
+
+#ifndef __G_ASYNC_INITABLE_H__
+#define __G_ASYNC_INITABLE_H__
 
 #include <gio/giotypes.h>
 #include <gio/ginitable.h>
@@ -72,22 +74,18 @@ struct _GAsyncInitableIface
 			    GError             **error);
 };
 
-GLIB_AVAILABLE_IN_ALL
 GType    g_async_initable_get_type    (void) G_GNUC_CONST;
 
 
-GLIB_AVAILABLE_IN_ALL
 void     g_async_initable_init_async       (GAsyncInitable       *initable,
 					    int                   io_priority,
 					    GCancellable         *cancellable,
 					    GAsyncReadyCallback   callback,
 					    gpointer              user_data);
-GLIB_AVAILABLE_IN_ALL
 gboolean g_async_initable_init_finish      (GAsyncInitable       *initable,
 					    GAsyncResult         *res,
 					    GError              **error);
 
-GLIB_AVAILABLE_IN_ALL
 void     g_async_initable_new_async        (GType                 object_type,
 					    int                   io_priority,
 					    GCancellable         *cancellable,
@@ -95,10 +93,6 @@ void     g_async_initable_new_async        (GType                 object_type,
 					    gpointer              user_data,
 					    const gchar          *first_property_name,
 					    ...);
-
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-
-GLIB_DEPRECATED_IN_2_54_FOR(g_object_new_with_properties and g_async_initable_init_async)
 void     g_async_initable_newv_async       (GType                 object_type,
 					    guint                 n_parameters,
 					    GParameter           *parameters,
@@ -106,10 +100,6 @@ void     g_async_initable_newv_async       (GType                 object_type,
 					    GCancellable         *cancellable,
 					    GAsyncReadyCallback   callback,
 					    gpointer              user_data);
-
-G_GNUC_END_IGNORE_DEPRECATIONS
-
-GLIB_AVAILABLE_IN_ALL
 void     g_async_initable_new_valist_async (GType                 object_type,
 					    const gchar          *first_property_name,
 					    va_list               var_args,
@@ -117,7 +107,6 @@ void     g_async_initable_new_valist_async (GType                 object_type,
 					    GCancellable         *cancellable,
 					    GAsyncReadyCallback   callback,
 					    gpointer              user_data);
-GLIB_AVAILABLE_IN_ALL
 GObject *g_async_initable_new_finish       (GAsyncInitable       *initable,
 					    GAsyncResult         *res,
 					    GError              **error);

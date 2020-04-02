@@ -4,7 +4,7 @@
 #include <lua5.2/lauxlib.h>
 #include <stdlib.h>
 #include "common.h"
-
+/*
 typedef struct{
   GtkWidget *obj;
   int pool_idx;
@@ -247,4 +247,8 @@ void progressbar_reg(lua_State *L){
 #ifdef DEBUG
   printf("Progress registred\n");
 #endif
+}
+*/
+void progressbar_reg(lua_State *L){
+#warning PROGRESSBAR DOESNT WORK
 }

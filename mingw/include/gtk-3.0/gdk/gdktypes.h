@@ -22,12 +22,12 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GDK_TYPES_H__
-#define __GDK_TYPES_H__
-
 #if !defined (__GDK_H_INSIDE__) && !defined (GDK_COMPILATION)
 #error "Only <gdk/gdk.h> can be included directly."
 #endif
+
+#ifndef __GDK_TYPES_H__
+#define __GDK_TYPES_H__
 
 /* GDK uses "glib". (And so does GTK).
  */
@@ -75,23 +75,7 @@ typedef struct _GdkPoint              GdkPoint;
  * Defines the position and size of a rectangle. It is identical to
  * #cairo_rectangle_int_t.
  */
-#ifdef __GI_SCANNER__
-/* The introspection scanner is currently unable to lookup how
- * cairo_rectangle_int_t is actually defined. This prevents
- * introspection data for the GdkRectangle type to include fields
- * descriptions. To workaround this issue, we define it with the same
- * content as cairo_rectangle_int_t, but only under the introspection
- * define.
- */
-struct _GdkRectangle
-{
-    int x, y;
-    int width, height;
-};
-typedef struct _GdkRectangle          GdkRectangle;
-#else
 typedef cairo_rectangle_int_t         GdkRectangle;
-#endif
 
 /**
  * GdkAtom:
@@ -124,7 +108,7 @@ typedef struct _GdkAtom            *GdkAtom;
  * GDK_NONE:
  *
  * A null value for #GdkAtom, used in a similar way as
- * `None` in the Xlib API.
+ * <literal>None</literal> in the Xlib API.
  */
 #define GDK_NONE            _GDK_MAKE_ATOM (0)
 
@@ -143,9 +127,6 @@ typedef struct _GdkScreen             GdkScreen;
 typedef struct _GdkWindow             GdkWindow;
 typedef struct _GdkKeymap             GdkKeymap;
 typedef struct _GdkAppLaunchContext   GdkAppLaunchContext;
-typedef struct _GdkSeat               GdkSeat;
-
-typedef struct _GdkGLContext          GdkGLContext;
 
 /**
  * GdkByteOrder:
@@ -190,22 +171,9 @@ typedef enum
  * @GDK_BUTTON4_MASK: the fourth mouse button.
  * @GDK_BUTTON5_MASK: the fifth mouse button.
  * @GDK_MODIFIER_RESERVED_13_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_14_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_15_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_16_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_17_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_18_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_19_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_20_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_21_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_22_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_23_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_24_MASK: A reserved bit flag; do not use in your own code
- * @GDK_MODIFIER_RESERVED_25_MASK: A reserved bit flag; do not use in your own code
  * @GDK_SUPER_MASK: the Super modifier. Since 2.10
  * @GDK_HYPER_MASK: the Hyper modifier. Since 2.10
  * @GDK_META_MASK: the Meta modifier. Since 2.10
- * @GDK_MODIFIER_RESERVED_29_MASK: A reserved bit flag; do not use in your own code
  * @GDK_RELEASE_MASK: not used in GDK itself. GTK+ uses it to differentiate
  *  between (keyval, modifiers) pairs from key press and release events.
  * @GDK_MODIFIER_MASK: a mask covering all modifier types.
@@ -224,10 +192,6 @@ typedef enum
  * reserved values such as %GDK_MODIFIER_RESERVED_13_MASK.  Your code
  * should preserve and ignore them.  You can use %GDK_MODIFIER_MASK to
  * remove all reserved values.
- *
- * Also note that the GDK X backend interprets button press events for button
- * 4-7 as scroll events, so %GDK_BUTTON4_MASK and %GDK_BUTTON5_MASK will never
- * be set.
  */
 typedef enum
 {
@@ -282,9 +246,10 @@ typedef enum
  *  menu accelerators.
  * @GDK_MODIFIER_INTENT_CONTEXT_MENU: the modifier used to invoke context menus.
  *  Note that mouse button 3 always triggers context menus. When this modifier
- *  is not 0, it additionally triggers context menus when used with mouse button 1.
+ *  is not 0, it <strong>additionally</strong> triggers context menus when used
+ *  with mouse button 1.
  * @GDK_MODIFIER_INTENT_EXTEND_SELECTION: the modifier used to extend selections
- *  using `modifier`-click or `modifier`-cursor-key
+ *  using &lt;modifier&gt;-click or &lt;modifier&gt;-cursor-key
  * @GDK_MODIFIER_INTENT_MODIFY_SELECTION: the modifier used to modify selections,
  *  which in most cases means toggling the clicked item into or out of the selection.
  * @GDK_MODIFIER_INTENT_NO_TEXT_INPUT: when any of these modifiers is pressed, the
@@ -292,18 +257,13 @@ typedef enum
  *  input methods, and for use cases like typeahead search.
  * @GDK_MODIFIER_INTENT_SHIFT_GROUP: the modifier that switches between keyboard
  *  groups (AltGr on X11/Windows and Option/Alt on OS X).
- * @GDK_MODIFIER_INTENT_DEFAULT_MOD_MASK: The set of modifier masks accepted
- * as modifiers in accelerators. Needed because Command is mapped to MOD2 on
- * OSX, which is widely used, but on X11 MOD2 is NumLock and using that for a
- * mod key is problematic at best.
- * Ref: https://bugzilla.gnome.org/show_bug.cgi?id=736125.
  *
- * This enum is used with gdk_keymap_get_modifier_mask()
- * in order to determine what modifiers the
+ * This enum is used with gdk_keymap_get_modifier_mask() and
+ * gdk_get_modifier_mask() in order to determine what modifiers the
  * currently used windowing system backend uses for particular
  * purposes. For example, on X11/Windows, the Control key is used for
  * invoking menu shortcuts (accelerators), whereas on Apple computers
- * it’s the Command key (which correspond to %GDK_CONTROL_MASK and
+ * it's the Command key (which correspond to %GDK_CONTROL_MASK and
  * %GDK_MOD2_MASK, respectively).
  *
  * Since: 3.4
@@ -315,8 +275,7 @@ typedef enum
   GDK_MODIFIER_INTENT_EXTEND_SELECTION,
   GDK_MODIFIER_INTENT_MODIFY_SELECTION,
   GDK_MODIFIER_INTENT_NO_TEXT_INPUT,
-  GDK_MODIFIER_INTENT_SHIFT_GROUP,
-  GDK_MODIFIER_INTENT_DEFAULT_MOD_MASK,
+  GDK_MODIFIER_INTENT_SHIFT_GROUP
 } GdkModifierIntent;
 
 typedef enum
@@ -337,10 +296,9 @@ typedef enum
  * @GDK_GRAB_NOT_VIEWABLE: the grab window or the @confine_to window are not
  *  viewable.
  * @GDK_GRAB_FROZEN: the resource is frozen by an active grab of another client.
- * @GDK_GRAB_FAILED: the grab failed for some other reason. Since 3.16
  *
- * Returned by gdk_device_grab(), gdk_pointer_grab() and gdk_keyboard_grab() to
- * indicate success or the reason for the failure of the grab attempt.
+ * Returned by gdk_pointer_grab() and gdk_keyboard_grab() to indicate
+ * success or the reason for the failure of the grab attempt.
  */
 typedef enum
 {
@@ -348,15 +306,14 @@ typedef enum
   GDK_GRAB_ALREADY_GRABBED = 1,
   GDK_GRAB_INVALID_TIME    = 2,
   GDK_GRAB_NOT_VIEWABLE    = 3,
-  GDK_GRAB_FROZEN          = 4,
-  GDK_GRAB_FAILED          = 5
+  GDK_GRAB_FROZEN          = 4
 } GdkGrabStatus;
 
 /**
  * GdkGrabOwnership:
- * @GDK_OWNERSHIP_NONE: All other devices’ events are allowed.
- * @GDK_OWNERSHIP_WINDOW: Other devices’ events are blocked for the grab window.
- * @GDK_OWNERSHIP_APPLICATION: Other devices’ events are blocked for the whole application.
+ * @GDK_OWNERSHIP_NONE: All other devices' events are allowed.
+ * @GDK_OWNERSHIP_WINDOW: Other devices' events are blocked for the grab window.
+ * @GDK_OWNERSHIP_APPLICATION: Other devices' events are blocked for the whole application.
  *
  * Defines how device grabs interact with other devices.
  */
@@ -371,7 +328,7 @@ typedef enum
  * GdkEventMask:
  * @GDK_EXPOSURE_MASK: receive expose events
  * @GDK_POINTER_MOTION_MASK: receive all pointer motion events
- * @GDK_POINTER_MOTION_HINT_MASK: deprecated. see the explanation above
+ * @GDK_POINTER_MOTION_HINT_MASK: see the explanation above
  * @GDK_BUTTON_MOTION_MASK: receive pointer motion events while any button is pressed
  * @GDK_BUTTON1_MOTION_MASK: receive pointer motion events while 1 button is pressed
  * @GDK_BUTTON2_MOTION_MASK: receive pointer motion events while 2 button is pressed
@@ -393,29 +350,21 @@ typedef enum
  * @GDK_SCROLL_MASK: receive scroll events
  * @GDK_TOUCH_MASK: receive touch events. Since 3.4
  * @GDK_SMOOTH_SCROLL_MASK: receive smooth scrolling events. Since 3.4
-   @GDK_TOUCHPAD_GESTURE_MASK: receive touchpad gesture events. Since 3.18
- * @GDK_TABLET_PAD_MASK: receive tablet pad events. Since 3.22
  * @GDK_ALL_EVENTS_MASK: the combination of all the above event masks.
  *
  * A set of bit-flags to indicate which events a window is to receive.
  * Most of these masks map onto one or more of the #GdkEventType event types
  * above.
  *
- * See the [input handling overview][chap-input-handling] for details of
- * [event masks][event-masks] and [event propagation][event-propagation].
- *
- * %GDK_POINTER_MOTION_HINT_MASK is deprecated. It is a special mask
- * to reduce the number of %GDK_MOTION_NOTIFY events received. When using
- * %GDK_POINTER_MOTION_HINT_MASK, fewer %GDK_MOTION_NOTIFY events will
- * be sent, some of which are marked as a hint (the is_hint member is
- * %TRUE). To receive more motion events after a motion hint event,
- * the application needs to asks for more, by calling
- * gdk_event_request_motions().
- * 
- * Since GTK 3.8, motion events are already compressed by default, independent
- * of this mechanism. This compression can be disabled with
- * gdk_window_set_event_compression(). See the documentation of that function
- * for details.
+ * %GDK_POINTER_MOTION_HINT_MASK is a special mask which is used to reduce the
+ * number of %GDK_MOTION_NOTIFY events received. Normally a %GDK_MOTION_NOTIFY
+ * event is received each time the mouse moves. However, if the application
+ * spends a lot of time processing the event (updating the display, for example),
+ * it can lag behind the position of the mouse. When using
+ * %GDK_POINTER_MOTION_HINT_MASK, fewer %GDK_MOTION_NOTIFY events will be sent,
+ * some of which are marked as a hint (the is_hint member is %TRUE).
+ * To receive more motion events after a motion hint event, the application
+ * needs to asks for more, by calling gdk_event_request_motions().
  *
  * If %GDK_TOUCH_MASK is enabled, the window will receive touch events
  * from touch-enabled devices. Those will come as sequences of #GdkEventTouch
@@ -449,9 +398,7 @@ typedef enum
   GDK_SCROLL_MASK               = 1 << 21,
   GDK_TOUCH_MASK                = 1 << 22,
   GDK_SMOOTH_SCROLL_MASK        = 1 << 23,
-  GDK_TOUCHPAD_GESTURE_MASK     = 1 << 24,
-  GDK_TABLET_PAD_MASK           = 1 << 25,
-  GDK_ALL_EVENTS_MASK           = 0x3FFFFFE
+  GDK_ALL_EVENTS_MASK           = 0xFFFFFE
 } GdkEventMask;
 
 /**
@@ -467,136 +414,8 @@ struct _GdkPoint
   gint y;
 };
 
-/**
- * GdkGLError:
- * @GDK_GL_ERROR_NOT_AVAILABLE: OpenGL support is not available
- * @GDK_GL_ERROR_UNSUPPORTED_FORMAT: The requested visual format is not supported
- * @GDK_GL_ERROR_UNSUPPORTED_PROFILE: The requested profile is not supported
- *
- * Error enumeration for #GdkGLContext.
- *
- * Since: 3.16
- */
-typedef enum {
-  GDK_GL_ERROR_NOT_AVAILABLE,
-  GDK_GL_ERROR_UNSUPPORTED_FORMAT,
-  GDK_GL_ERROR_UNSUPPORTED_PROFILE
-} GdkGLError;
-
-/**
- * GdkWindowTypeHint:
- * @GDK_WINDOW_TYPE_HINT_NORMAL: Normal toplevel window.
- * @GDK_WINDOW_TYPE_HINT_DIALOG: Dialog window.
- * @GDK_WINDOW_TYPE_HINT_MENU: Window used to implement a menu; GTK+ uses
- *  this hint only for torn-off menus, see #GtkTearoffMenuItem.
- * @GDK_WINDOW_TYPE_HINT_TOOLBAR: Window used to implement toolbars.
- * @GDK_WINDOW_TYPE_HINT_SPLASHSCREEN: Window used to display a splash
- *  screen during application startup.
- * @GDK_WINDOW_TYPE_HINT_UTILITY: Utility windows which are not detached
- *  toolbars or dialogs.
- * @GDK_WINDOW_TYPE_HINT_DOCK: Used for creating dock or panel windows.
- * @GDK_WINDOW_TYPE_HINT_DESKTOP: Used for creating the desktop background
- *  window.
- * @GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU: A menu that belongs to a menubar.
- * @GDK_WINDOW_TYPE_HINT_POPUP_MENU: A menu that does not belong to a menubar,
- *  e.g. a context menu.
- * @GDK_WINDOW_TYPE_HINT_TOOLTIP: A tooltip.
- * @GDK_WINDOW_TYPE_HINT_NOTIFICATION: A notification - typically a “bubble”
- *  that belongs to a status icon.
- * @GDK_WINDOW_TYPE_HINT_COMBO: A popup from a combo box.
- * @GDK_WINDOW_TYPE_HINT_DND: A window that is used to implement a DND cursor.
- *
- * These are hints for the window manager that indicate what type of function
- * the window has. The window manager can use this when determining decoration
- * and behaviour of the window. The hint must be set before mapping the window.
- *
- * See the [Extended Window Manager Hints](http://www.freedesktop.org/Standards/wm-spec)
- * specification for more details about window types.
- */
-typedef enum
-{
-  GDK_WINDOW_TYPE_HINT_NORMAL,
-  GDK_WINDOW_TYPE_HINT_DIALOG,
-  GDK_WINDOW_TYPE_HINT_MENU,		/* Torn off menu */
-  GDK_WINDOW_TYPE_HINT_TOOLBAR,
-  GDK_WINDOW_TYPE_HINT_SPLASHSCREEN,
-  GDK_WINDOW_TYPE_HINT_UTILITY,
-  GDK_WINDOW_TYPE_HINT_DOCK,
-  GDK_WINDOW_TYPE_HINT_DESKTOP,
-  GDK_WINDOW_TYPE_HINT_DROPDOWN_MENU,	/* A drop down menu (from a menubar) */
-  GDK_WINDOW_TYPE_HINT_POPUP_MENU,	/* A popup menu (from right-click) */
-  GDK_WINDOW_TYPE_HINT_TOOLTIP,
-  GDK_WINDOW_TYPE_HINT_NOTIFICATION,
-  GDK_WINDOW_TYPE_HINT_COMBO,
-  GDK_WINDOW_TYPE_HINT_DND
-} GdkWindowTypeHint;
-
-/**
- * GdkAxisUse:
- * @GDK_AXIS_IGNORE: the axis is ignored.
- * @GDK_AXIS_X: the axis is used as the x axis.
- * @GDK_AXIS_Y: the axis is used as the y axis.
- * @GDK_AXIS_PRESSURE: the axis is used for pressure information.
- * @GDK_AXIS_XTILT: the axis is used for x tilt information.
- * @GDK_AXIS_YTILT: the axis is used for y tilt information.
- * @GDK_AXIS_WHEEL: the axis is used for wheel information.
- * @GDK_AXIS_DISTANCE: the axis is used for pen/tablet distance information. (Since: 3.22)
- * @GDK_AXIS_ROTATION: the axis is used for pen rotation information. (Since: 3.22)
- * @GDK_AXIS_SLIDER: the axis is used for pen slider information. (Since: 3.22)
- * @GDK_AXIS_LAST: a constant equal to the numerically highest axis value.
- *
- * An enumeration describing the way in which a device
- * axis (valuator) maps onto the predefined valuator
- * types that GTK+ understands.
- *
- * Note that the X and Y axes are not really needed; pointer devices
- * report their location via the x/y members of events regardless. Whether
- * X and Y are present as axes depends on the GDK backend.
- */
-typedef enum
-{
-  GDK_AXIS_IGNORE,
-  GDK_AXIS_X,
-  GDK_AXIS_Y,
-  GDK_AXIS_PRESSURE,
-  GDK_AXIS_XTILT,
-  GDK_AXIS_YTILT,
-  GDK_AXIS_WHEEL,
-  GDK_AXIS_DISTANCE,
-  GDK_AXIS_ROTATION,
-  GDK_AXIS_SLIDER,
-  GDK_AXIS_LAST
-} GdkAxisUse;
-
-/**
- * GdkAxisFlags:
- * @GDK_AXIS_FLAG_X: X axis is present
- * @GDK_AXIS_FLAG_Y: Y axis is present
- * @GDK_AXIS_FLAG_PRESSURE: Pressure axis is present
- * @GDK_AXIS_FLAG_XTILT: X tilt axis is present
- * @GDK_AXIS_FLAG_YTILT: Y tilt axis is present
- * @GDK_AXIS_FLAG_WHEEL: Wheel axis is present
- * @GDK_AXIS_FLAG_DISTANCE: Distance axis is present
- * @GDK_AXIS_FLAG_ROTATION: Z-axis rotation is present
- * @GDK_AXIS_FLAG_SLIDER: Slider axis is present
- *
- * Flags describing the current capabilities of a device/tool.
- *
- * Since: 3.22
- */
-typedef enum
-{
-  GDK_AXIS_FLAG_X        = 1 << GDK_AXIS_X,
-  GDK_AXIS_FLAG_Y        = 1 << GDK_AXIS_Y,
-  GDK_AXIS_FLAG_PRESSURE = 1 << GDK_AXIS_PRESSURE,
-  GDK_AXIS_FLAG_XTILT    = 1 << GDK_AXIS_XTILT,
-  GDK_AXIS_FLAG_YTILT    = 1 << GDK_AXIS_YTILT,
-  GDK_AXIS_FLAG_WHEEL    = 1 << GDK_AXIS_WHEEL,
-  GDK_AXIS_FLAG_DISTANCE = 1 << GDK_AXIS_DISTANCE,
-  GDK_AXIS_FLAG_ROTATION = 1 << GDK_AXIS_ROTATION,
-  GDK_AXIS_FLAG_SLIDER   = 1 << GDK_AXIS_SLIDER,
-} GdkAxisFlags;
 
 G_END_DECLS
+
 
 #endif /* __GDK_TYPES_H__ */

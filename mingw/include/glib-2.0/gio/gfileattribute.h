@@ -5,7 +5,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,17 +13,19 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General
- * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
  *
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#ifndef __G_FILE_ATTRIBUTE_H__
-#define __G_FILE_ATTRIBUTE_H__
-
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
 #endif
+
+#ifndef __G_FILE_ATTRIBUTE_H__
+#define __G_FILE_ATTRIBUTE_H__
 
 #include <gio/giotypes.h>
 
@@ -46,11 +48,11 @@ struct _GFileAttributeInfo
 
 /**
  * GFileAttributeInfoList:
- * @infos: an array of #GFileAttributeInfos.
+ * @infos: an array of #GFileAttributeInfo<!-- -->s.
  * @n_infos: the number of values in the array.
  *
  * Acts as a lightweight registry for possible valid file attributes.
- * The registry stores Key-Value pair formats as #GFileAttributeInfos.
+ * The registry stores Key-Value pair formats as #GFileAttributeInfo<!-- -->s.
  **/
 struct _GFileAttributeInfoList
 {
@@ -59,21 +61,14 @@ struct _GFileAttributeInfoList
 };
 
 #define G_TYPE_FILE_ATTRIBUTE_INFO_LIST (g_file_attribute_info_list_get_type ())
-GLIB_AVAILABLE_IN_ALL
 GType g_file_attribute_info_list_get_type (void);
 
-GLIB_AVAILABLE_IN_ALL
 GFileAttributeInfoList *  g_file_attribute_info_list_new    (void);
-GLIB_AVAILABLE_IN_ALL
 GFileAttributeInfoList *  g_file_attribute_info_list_ref    (GFileAttributeInfoList *list);
-GLIB_AVAILABLE_IN_ALL
 void                      g_file_attribute_info_list_unref  (GFileAttributeInfoList *list);
-GLIB_AVAILABLE_IN_ALL
 GFileAttributeInfoList *  g_file_attribute_info_list_dup    (GFileAttributeInfoList *list);
-GLIB_AVAILABLE_IN_ALL
 const GFileAttributeInfo *g_file_attribute_info_list_lookup (GFileAttributeInfoList *list,
 							     const char             *name);
-GLIB_AVAILABLE_IN_ALL
 void                      g_file_attribute_info_list_add    (GFileAttributeInfoList *list,
 							     const char             *name,
 							     GFileAttributeType      type,

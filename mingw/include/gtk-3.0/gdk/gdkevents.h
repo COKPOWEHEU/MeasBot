@@ -22,18 +22,18 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GDK_EVENTS_H__
-#define __GDK_EVENTS_H__
-
 #if !defined (__GDK_H_INSIDE__) && !defined (GDK_COMPILATION)
 #error "Only <gdk/gdk.h> can be included directly."
 #endif
 
+#ifndef __GDK_EVENTS_H__
+#define __GDK_EVENTS_H__
+
 #include <gdk/gdkversionmacros.h>
+#include <gdk/gdkcolor.h>
 #include <gdk/gdktypes.h>
 #include <gdk/gdkdnd.h>
 #include <gdk/gdkdevice.h>
-#include <gdk/gdkdevicetool.h>
 
 G_BEGIN_DECLS
 
@@ -43,30 +43,33 @@ G_BEGIN_DECLS
  * @Short_description: Data structures specific to each type of event
  * @Title: Event Structures
  *
- * The event structures contain data specific to each type of event in GDK.
+ * The event structs contain data specific to each type of event in GDK.
  *
- * > A common mistake is to forget to set the event mask of a widget so that
- * > the required events are received. See gtk_widget_set_events().
+ * <note>
+ * <para>
+ * A common mistake is to forget to set the event mask of a widget so that
+ * the required events are received. See gtk_widget_set_events().
+ * </para>
+ * </note>
  */
 
 
 #define GDK_TYPE_EVENT          (gdk_event_get_type ())
-#define GDK_TYPE_EVENT_SEQUENCE (gdk_event_sequence_get_type ())
 
 /**
  * GDK_PRIORITY_EVENTS:
  *
  * This is the priority that events from the X server are given in the
- * [GLib Main Loop][glib-The-Main-Event-Loop].
+ * <link linkend="glib-The-Main-Event-Loop">GLib Main Loop</link>.
  */
 #define GDK_PRIORITY_EVENTS	(G_PRIORITY_DEFAULT)
 
 /**
- * GDK_PRIORITY_REDRAW: (value 120)
+ * GDK_PRIORITY_REDRAW:
  *
  * This is the priority that the idle handler processing window updates
  * is given in the
- * [GLib Main Loop][glib-The-Main-Event-Loop].
+ * <link linkend="glib-The-Main-Event-Loop">GLib Main Loop</link>.
  */
 #define GDK_PRIORITY_REDRAW     (G_PRIORITY_HIGH_IDLE + 20)
 
@@ -140,11 +143,6 @@ typedef struct _GdkEventDND         GdkEventDND;
 typedef struct _GdkEventWindowState GdkEventWindowState;
 typedef struct _GdkEventSetting     GdkEventSetting;
 typedef struct _GdkEventGrabBroken  GdkEventGrabBroken;
-typedef struct _GdkEventTouchpadSwipe GdkEventTouchpadSwipe;
-typedef struct _GdkEventTouchpadPinch GdkEventTouchpadPinch;
-typedef struct _GdkEventPadButton   GdkEventPadButton;
-typedef struct _GdkEventPadAxis     GdkEventPadAxis;
-typedef struct _GdkEventPadGroupMode GdkEventPadGroupMode;
 
 typedef struct _GdkEventSequence    GdkEventSequence;
 
@@ -167,8 +165,8 @@ typedef void (*GdkEventFunc) (GdkEvent *event,
 /**
  * GdkXEvent:
  *
- * Used to represent native events (XEvents for the X11
- * backend, MSGs for Win32).
+ * Used to represent native events (<type>XEvent</type>s for the X11
+ * backend, <type>MSG</type>s for Win32).
  */
 typedef void GdkXEvent;	  /* Can be cast to window system specific
 			   * even type, XEvent on X11, MSG on Win32.
@@ -178,7 +176,7 @@ typedef void GdkXEvent;	  /* Can be cast to window system specific
  * GdkFilterReturn:
  * @GDK_FILTER_CONTINUE: event not handled, continue processing.
  * @GDK_FILTER_TRANSLATE: native event translated into a GDK event and stored
- *  in the `event` structure that was passed in.
+ *  in the <literal>event</literal> structure that was passed in.
  * @GDK_FILTER_REMOVE: event handled, terminate processing.
  *
  * Specifies the result of applying a #GdkFilterFunc to a native event.
@@ -195,13 +193,13 @@ typedef enum {
  * GdkFilterFunc:
  * @xevent: the native event to filter.
  * @event: the GDK event to which the X event will be translated.
- * @data: (closure): user data set when the filter was installed.
+ * @data: user data set when the filter was installed.
  *
  * Specifies the type of function used to filter native events before they are
  * converted to GDK events.
  *
  * When a filter is called, @event is unpopulated, except for
- * `event->window`. The filter may translate the native
+ * <literal>event->window</literal>. The filter may translate the native
  * event to a GDK event and store the result in @event, or handle it without
  * translation. If the filter translates the event and processing should
  * continue, it should return %GDK_FILTER_TRANSLATE.
@@ -277,20 +275,6 @@ typedef GdkFilterReturn (*GdkFilterFunc) (GdkXEvent *xevent,
  *   was added in 3.4.
  * @GDK_TOUCH_CANCEL: A touch event sequence has been canceled. This event type
  *   was added in 3.4.
- * @GDK_TOUCHPAD_SWIPE: A touchpad swipe gesture event, the current state
- *   is determined by its phase field. This event type was added in 3.18.
- * @GDK_TOUCHPAD_PINCH: A touchpad pinch gesture event, the current state
- *   is determined by its phase field. This event type was added in 3.18.
- * @GDK_PAD_BUTTON_PRESS: A tablet pad button press event. This event type
- *   was added in 3.22.
- * @GDK_PAD_BUTTON_RELEASE: A tablet pad button release event. This event type
- *   was added in 3.22.
- * @GDK_PAD_RING: A tablet pad axis event from a "ring". This event type was
- *   added in 3.22.
- * @GDK_PAD_STRIP: A tablet pad axis event from a "strip". This event type was
- *   added in 3.22.
- * @GDK_PAD_GROUP_MODE: A tablet pad group mode change. This event type was
- *   added in 3.22.
  * @GDK_EVENT_LAST: marks the end of the GdkEventType enumeration. Added in 2.18
  *
  * Specifies the type of the event.
@@ -301,7 +285,7 @@ typedef GdkFilterReturn (*GdkFilterFunc) (GdkXEvent *xevent,
  *
  * In some language bindings, the values %GDK_2BUTTON_PRESS and
  * %GDK_3BUTTON_PRESS would translate into something syntactically
- * invalid (eg `Gdk.EventType.2ButtonPress`, where a
+ * invalid (eg <literal>Gdk.EventType.2ButtonPress</literal>, where a
  * symbol is not allowed to start with a number). In that case, the
  * aliases %GDK_DOUBLE_BUTTON_PRESS and %GDK_TRIPLE_BUTTON_PRESS can
  * be used instead.
@@ -351,13 +335,6 @@ typedef enum
   GDK_TOUCH_UPDATE      = 38,
   GDK_TOUCH_END         = 39,
   GDK_TOUCH_CANCEL      = 40,
-  GDK_TOUCHPAD_SWIPE    = 41,
-  GDK_TOUCHPAD_PINCH    = 42,
-  GDK_PAD_BUTTON_PRESS  = 43,
-  GDK_PAD_BUTTON_RELEASE = 44,
-  GDK_PAD_RING          = 45,
-  GDK_PAD_STRIP         = 46,
-  GDK_PAD_GROUP_MODE    = 47,
   GDK_EVENT_LAST        /* helper variable for decls */
 } GdkEventType;
 
@@ -375,43 +352,6 @@ typedef enum
   GDK_VISIBILITY_PARTIAL,
   GDK_VISIBILITY_FULLY_OBSCURED
 } GdkVisibilityState;
-
-/**
- * GdkTouchpadGesturePhase:
- * @GDK_TOUCHPAD_GESTURE_PHASE_BEGIN: The gesture has begun.
- * @GDK_TOUCHPAD_GESTURE_PHASE_UPDATE: The gesture has been updated.
- * @GDK_TOUCHPAD_GESTURE_PHASE_END: The gesture was finished, changes
- *   should be permanently applied.
- * @GDK_TOUCHPAD_GESTURE_PHASE_CANCEL: The gesture was cancelled, all
- *   changes should be undone.
- *
- * Specifies the current state of a touchpad gesture. All gestures are
- * guaranteed to begin with an event with phase %GDK_TOUCHPAD_GESTURE_PHASE_BEGIN,
- * followed by 0 or several events with phase %GDK_TOUCHPAD_GESTURE_PHASE_UPDATE.
- *
- * A finished gesture may have 2 possible outcomes, an event with phase
- * %GDK_TOUCHPAD_GESTURE_PHASE_END will be emitted when the gesture is
- * considered successful, this should be used as the hint to perform any
- * permanent changes.
-
- * Cancelled gestures may be so for a variety of reasons, due to hardware
- * or the compositor, or due to the gesture recognition layers hinting the
- * gesture did not finish resolutely (eg. a 3rd finger being added during
- * a pinch gesture). In these cases, the last event will report the phase
- * %GDK_TOUCHPAD_GESTURE_PHASE_CANCEL, this should be used as a hint
- * to undo any visible/permanent changes that were done throughout the
- * progress of the gesture.
- *
- * See also #GdkEventTouchpadSwipe and #GdkEventTouchpadPinch.
- *
- */
-typedef enum
-{
-  GDK_TOUCHPAD_GESTURE_PHASE_BEGIN,
-  GDK_TOUCHPAD_GESTURE_PHASE_UPDATE,
-  GDK_TOUCHPAD_GESTURE_PHASE_END,
-  GDK_TOUCHPAD_GESTURE_PHASE_CANCEL
-} GdkTouchpadGesturePhase;
 
 /**
  * GdkScrollDirection:
@@ -451,7 +391,7 @@ typedef enum
  *
  * Specifies the kind of crossing for #GdkEventCrossing.
  *
- * See the X11 protocol specification of LeaveNotify for
+ * See the X11 protocol specification of <type>LeaveNotify</type> for
  * full details of crossing event generation.
  */
 typedef enum
@@ -479,7 +419,7 @@ typedef enum
  *   this event is synthetic as the pointer might have not left the window.
  * @GDK_CROSSING_DEVICE_SWITCH: crossing because of a device switch (i.e.
  *   a mouse taking control of the pointer after a touch device), this event
- *   is synthetic as the pointer didn’t leave the window.
+ *   is synthetic as the pointer didn't leave the window.
  *
  * Specifies the crossing mode for #GdkEventCrossing.
  */
@@ -520,38 +460,19 @@ typedef enum
  * @GDK_WINDOW_STATE_ABOVE: the window is kept above other windows.
  * @GDK_WINDOW_STATE_BELOW: the window is kept below other windows.
  * @GDK_WINDOW_STATE_FOCUSED: the window is presented as focused (with active decorations).
- * @GDK_WINDOW_STATE_TILED: the window is in a tiled state, Since 3.10. Since 3.22.23, this
- *                          is deprecated in favor of per-edge information.
- * @GDK_WINDOW_STATE_TOP_TILED: whether the top edge is tiled, Since 3.22.23
- * @GDK_WINDOW_STATE_TOP_RESIZABLE: whether the top edge is resizable, Since 3.22.23
- * @GDK_WINDOW_STATE_RIGHT_TILED: whether the right edge is tiled, Since 3.22.23
- * @GDK_WINDOW_STATE_RIGHT_RESIZABLE: whether the right edge is resizable, Since 3.22.23
- * @GDK_WINDOW_STATE_BOTTOM_TILED: whether the bottom edge is tiled, Since 3.22.23
- * @GDK_WINDOW_STATE_BOTTOM_RESIZABLE: whether the bottom edge is resizable, Since 3.22.23
- * @GDK_WINDOW_STATE_LEFT_TILED: whether the left edge is tiled, Since 3.22.23
- * @GDK_WINDOW_STATE_LEFT_RESIZABLE: whether the left edge is resizable, Since 3.22.23
  *
  * Specifies the state of a toplevel window.
  */
 typedef enum
 {
-  GDK_WINDOW_STATE_WITHDRAWN        = 1 << 0,
-  GDK_WINDOW_STATE_ICONIFIED        = 1 << 1,
-  GDK_WINDOW_STATE_MAXIMIZED        = 1 << 2,
-  GDK_WINDOW_STATE_STICKY           = 1 << 3,
-  GDK_WINDOW_STATE_FULLSCREEN       = 1 << 4,
-  GDK_WINDOW_STATE_ABOVE            = 1 << 5,
-  GDK_WINDOW_STATE_BELOW            = 1 << 6,
-  GDK_WINDOW_STATE_FOCUSED          = 1 << 7,
-  GDK_WINDOW_STATE_TILED            = 1 << 8,
-  GDK_WINDOW_STATE_TOP_TILED        = 1 << 9,
-  GDK_WINDOW_STATE_TOP_RESIZABLE    = 1 << 10,
-  GDK_WINDOW_STATE_RIGHT_TILED      = 1 << 11,
-  GDK_WINDOW_STATE_RIGHT_RESIZABLE  = 1 << 12,
-  GDK_WINDOW_STATE_BOTTOM_TILED     = 1 << 13,
-  GDK_WINDOW_STATE_BOTTOM_RESIZABLE = 1 << 14,
-  GDK_WINDOW_STATE_LEFT_TILED       = 1 << 15,
-  GDK_WINDOW_STATE_LEFT_RESIZABLE   = 1 << 16
+  GDK_WINDOW_STATE_WITHDRAWN  = 1 << 0,
+  GDK_WINDOW_STATE_ICONIFIED  = 1 << 1,
+  GDK_WINDOW_STATE_MAXIMIZED  = 1 << 2,
+  GDK_WINDOW_STATE_STICKY     = 1 << 3,
+  GDK_WINDOW_STATE_FULLSCREEN = 1 << 4,
+  GDK_WINDOW_STATE_ABOVE      = 1 << 5,
+  GDK_WINDOW_STATE_BELOW      = 1 << 6,
+  GDK_WINDOW_STATE_FOCUSED    = 1 << 7
 } GdkWindowState;
 
 /**
@@ -589,7 +510,8 @@ typedef enum
  * GdkEventAny:
  * @type: the type of the event.
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  *
  * Contains the fields which are common to all event structs.
  * Any event pointer can safely be cast to a pointer to a #GdkEventAny to
@@ -606,11 +528,12 @@ struct _GdkEventAny
  * GdkEventExpose:
  * @type: the type of the event (%GDK_EXPOSE or %GDK_DAMAGE).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @area: bounding box of @region.
  * @region: the region that needs to be redrawn.
  * @count: the number of contiguous %GDK_EXPOSE events following this one.
- *   The only use for this is “exposure compression”, i.e. handling all
+ *   The only use for this is "exposure compression", i.e. handling all
  *   contiguous %GDK_EXPOSE events in one go, though GDK performs some
  *   exposure compression so this is not normally needed.
  *
@@ -631,16 +554,12 @@ struct _GdkEventExpose
  * GdkEventVisibility:
  * @type: the type of the event (%GDK_VISIBILITY_NOTIFY).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @state: the new visibility state (%GDK_VISIBILITY_FULLY_OBSCURED,
  *   %GDK_VISIBILITY_PARTIAL or %GDK_VISIBILITY_UNOBSCURED).
  *
  * Generated when the window visibility status has changed.
- *
- * Deprecated: 3.12: Modern composited windowing systems with pervasive
- *     transparency make it impossible to track the visibility of a window
- *     reliably, so this event can not be guaranteed to provide useful
- *     information.
  */
 struct _GdkEventVisibility
 {
@@ -654,7 +573,8 @@ struct _GdkEventVisibility
  * GdkEventMotion:
  * @type: the type of the event.
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @time: the time of the event in milliseconds.
  * @x: the x coordinate of the pointer relative to the window.
  * @y: the y coordinate of the pointer relative to the window.
@@ -665,8 +585,7 @@ struct _GdkEventVisibility
  *   buttons. See #GdkModifierType.
  * @is_hint: set to 1 if this event is just a hint, see the
  *   %GDK_POINTER_MOTION_HINT_MASK value of #GdkEventMask.
- * @device: the master device that the event originated from. Use
- * gdk_event_get_source_device() to get the slave device.
+ * @device: the device where the event originated.
  * @x_root: the x coordinate of the pointer relative to the root of the
  *   screen.
  * @y_root: the y coordinate of the pointer relative to the root of the
@@ -694,7 +613,8 @@ struct _GdkEventMotion
  * @type: the type of the event (%GDK_BUTTON_PRESS, %GDK_2BUTTON_PRESS,
  *   %GDK_3BUTTON_PRESS or %GDK_BUTTON_RELEASE).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @time: the time of the event in milliseconds.
  * @x: the x coordinate of the pointer relative to the window.
  * @y: the y coordinate of the pointer relative to the window.
@@ -707,8 +627,7 @@ struct _GdkEventMotion
  *   Normally button 1 is the left mouse button, 2 is the middle button,
  *   and 3 is the right button. On 2-button mice, the middle button can
  *   often be simulated by pressing both mouse buttons together.
- * @device: the master device that the event originated from. Use
- * gdk_event_get_source_device() to get the slave device.
+ * @device: the device where the event originated.
  * @x_root: the x coordinate of the pointer relative to the root of the
  *   screen.
  * @y_root: the y coordinate of the pointer relative to the root of the
@@ -720,13 +639,13 @@ struct _GdkEventMotion
  *
  * Double and triple-clicks result in a sequence of events being received.
  * For double-clicks the order of events will be:
- *
- * - %GDK_BUTTON_PRESS
- * - %GDK_BUTTON_RELEASE
- * - %GDK_BUTTON_PRESS
- * - %GDK_2BUTTON_PRESS
- * - %GDK_BUTTON_RELEASE
- *
+ * <orderedlist>
+ * <listitem><para>%GDK_BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_BUTTON_RELEASE</para></listitem>
+ * <listitem><para>%GDK_BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_2BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_BUTTON_RELEASE</para></listitem>
+ * </orderedlist>
  * Note that the first click is received just like a normal
  * button press, while the second click results in a %GDK_2BUTTON_PRESS
  * being received just after the %GDK_BUTTON_PRESS.
@@ -734,15 +653,16 @@ struct _GdkEventMotion
  * Triple-clicks are very similar to double-clicks, except that
  * %GDK_3BUTTON_PRESS is inserted after the third click. The order of the
  * events is:
- *
- * - %GDK_BUTTON_PRESS
- * - %GDK_BUTTON_RELEASE
- * - %GDK_BUTTON_PRESS
- * - %GDK_2BUTTON_PRESS
- * - %GDK_BUTTON_RELEASE
- * - %GDK_BUTTON_PRESS
- * - %GDK_3BUTTON_PRESS
- * - %GDK_BUTTON_RELEASE
+ * <orderedlist>
+ * <listitem><para>%GDK_BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_BUTTON_RELEASE</para></listitem>
+ * <listitem><para>%GDK_BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_2BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_BUTTON_RELEASE</para></listitem>
+ * <listitem><para>%GDK_BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_3BUTTON_PRESS</para></listitem>
+ * <listitem><para>%GDK_BUTTON_RELEASE</para></listitem>
+ * </orderedlist>
  *
  * For a double click to occur, the second button press must occur within
  * 1/4 of a second of the first. For a triple click to occur, the third
@@ -768,7 +688,8 @@ struct _GdkEventButton
  * @type: the type of the event (%GDK_TOUCH_BEGIN, %GDK_TOUCH_UPDATE,
  *   %GDK_TOUCH_END, %GDK_TOUCH_CANCEL)
  * @window: the window which received the event
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>)
  * @time: the time of the event in milliseconds.
  * @x: the x coordinate of the pointer relative to the window
  * @y: the y coordinate of the pointer relative to the window
@@ -780,8 +701,7 @@ struct _GdkEventButton
  * @sequence: the event sequence that the event belongs to
  * @emulating_pointer: whether the event should be used for emulating
  *   pointer event
- * @device: the master device that the event originated from. Use
- * gdk_event_get_source_device() to get the slave device.
+ * @device: the device where the event originated
  * @x_root: the x coordinate of the pointer relative to the root of the
  *   screen
  * @y_root: the y coordinate of the pointer relative to the root of the
@@ -818,7 +738,8 @@ struct _GdkEventTouch
  * GdkEventScroll:
  * @type: the type of the event (%GDK_SCROLL).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @time: the time of the event in milliseconds.
  * @x: the x coordinate of the pointer relative to the window.
  * @y: the y coordinate of the pointer relative to the window.
@@ -828,20 +749,17 @@ struct _GdkEventTouch
  * @direction: the direction to scroll to (one of %GDK_SCROLL_UP,
  *   %GDK_SCROLL_DOWN, %GDK_SCROLL_LEFT, %GDK_SCROLL_RIGHT or
  *   %GDK_SCROLL_SMOOTH).
- * @device: the master device that the event originated from. Use
- * gdk_event_get_source_device() to get the slave device.
+ * @device: the device where the event originated.
  * @x_root: the x coordinate of the pointer relative to the root of the
  *   screen.
  * @y_root: the y coordinate of the pointer relative to the root of the
  *   screen.
- * @delta_x: the x coordinate of the scroll delta
- * @delta_y: the y coordinate of the scroll delta
  *
  * Generated from button presses for the buttons 4 to 7. Wheel mice are
  * usually configured to generate button press events for buttons 4 and 5
  * when the wheel is turned.
  *
- * Some GDK backends can also generate “smooth” scroll events, which
+ * Some GDK backends can also generate 'smooth' scroll events, which
  * can be recognized by the %GDK_SCROLL_SMOOTH scroll direction. For
  * these, the scroll deltas can be obtained with
  * gdk_event_get_scroll_deltas().
@@ -860,23 +778,23 @@ struct _GdkEventScroll
   gdouble x_root, y_root;
   gdouble delta_x;
   gdouble delta_y;
-  guint is_stop : 1;
 };
 
 /**
  * GdkEventKey:
  * @type: the type of the event (%GDK_KEY_PRESS or %GDK_KEY_RELEASE).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @time: the time of the event in milliseconds.
  * @state: (type GdkModifierType): a bit-mask representing the state of
  *   the modifier keys (e.g. Control, Shift and Alt) and the pointer
  *   buttons. See #GdkModifierType.
  * @keyval: the key that was pressed or released. See the
- *   `gdk/gdkkeysyms.h` header file for a
+ *   <filename>&lt;gdk/gdkkeysyms.h&gt;</filename> header file for a
  *   complete list of GDK key codes.
  * @length: the length of @string.
- * @string: a string containing an approximation of the text that
+ * @string: a string containing the an approximation of the text that
  *   would result from this keypress. The only correct way to handle text
  *   input of text is using input methods (see #GtkIMContext), so this
  *   field is deprecated and should never be used.
@@ -913,7 +831,8 @@ struct _GdkEventKey
  * GdkEventCrossing:
  * @type: the type of the event (%GDK_ENTER_NOTIFY or %GDK_LEAVE_NOTIFY).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *  <function>XSendEvent</function>).
  * @subwindow: the window that was entered or left.
  * @time: the time of the event in milliseconds.
  * @x: the x coordinate of the pointer relative to the window.
@@ -956,7 +875,8 @@ struct _GdkEventCrossing
  * GdkEventFocus:
  * @type: the type of the event (%GDK_FOCUS_CHANGE).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @in: %TRUE if the window has gained the keyboard focus, %FALSE if
  *   it has lost the focus.
  *
@@ -974,7 +894,8 @@ struct _GdkEventFocus
  * GdkEventConfigure:
  * @type: the type of the event (%GDK_CONFIGURE).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @x: the new x coordinate of the window, relative to its parent.
  * @y: the new y coordinate of the window, relative to its parent.
  * @width: the new width of the window.
@@ -996,11 +917,12 @@ struct _GdkEventConfigure
  * GdkEventProperty:
  * @type: the type of the event (%GDK_PROPERTY_NOTIFY).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @atom: the property that was changed.
  * @time: the time of the event in milliseconds.
- * @state: (type GdkPropertyState): whether the property was changed
- *   (%GDK_PROPERTY_NEW_VALUE) or deleted (%GDK_PROPERTY_DELETE).
+ * @state: whether the property was changed (%GDK_PROPERTY_NEW_VALUE) or
+ *   deleted (%GDK_PROPERTY_DELETE).
  *
  * Describes a property change on a window.
  */
@@ -1019,7 +941,8 @@ struct _GdkEventProperty
  * @type: the type of the event (%GDK_SELECTION_CLEAR,
  *   %GDK_SELECTION_NOTIFY or %GDK_SELECTION_REQUEST).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @selection: the selection.
  * @target: the target to which the selection should be converted.
  * @property: the property in which to place the result of the conversion.
@@ -1045,7 +968,8 @@ struct _GdkEventSelection
  * GdkEventOwnerChange:
  * @type: the type of the event (%GDK_OWNER_CHANGE).
  * @window: the window which received the event
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>)
  * @owner: the new owner of the selection, or %NULL if there is none
  * @reason: the reason for the ownership change as a #GdkOwnerChange value
  * @selection: the atom identifying the selection
@@ -1075,16 +999,15 @@ struct _GdkEventOwnerChange
  * GdkEventProximity:
  * @type: the type of the event (%GDK_PROXIMITY_IN or %GDK_PROXIMITY_OUT).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using <function>XSendEvent</function>).
  * @time: the time of the event in milliseconds.
- * @device: the master device that the event originated from. Use
- * gdk_event_get_source_device() to get the slave device.
+ * @device: the device where the event originated.
  *
- * Proximity events are generated when using GDK’s wrapper for the
+ * Proximity events are generated when using GDK's wrapper for the
  * XInput extension. The XInput extension is an add-on for standard X
  * that allows you to use nonstandard devices such as graphics tablets.
  * A proximity event indicates that the stylus has moved in or out of
- * contact with the tablet, or perhaps that the user’s finger has moved
+ * contact with the tablet, or perhaps that the user's finger has moved
  * in or out of contact with a touch screen.
  *
  * This event type will be used pretty rarely. It only is important for
@@ -1103,7 +1026,8 @@ struct _GdkEventProximity
  * GdkEventSetting:
  * @type: the type of the event (%GDK_SETTING).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @action: what happened to the setting (%GDK_SETTING_ACTION_NEW,
  *   %GDK_SETTING_ACTION_CHANGED or %GDK_SETTING_ACTION_DELETED).
  * @name: the name of the setting.
@@ -1123,7 +1047,8 @@ struct _GdkEventSetting
  * GdkEventWindowState:
  * @type: the type of the event (%GDK_WINDOW_STATE).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @changed_mask: mask specifying what flags have changed.
  * @new_window_state: the new window state, a combination of
  *   #GdkWindowState bits.
@@ -1144,7 +1069,8 @@ struct _GdkEventWindowState
  * @type: the type of the event (%GDK_GRAB_BROKEN)
  * @window: the window which received the event, i.e. the window
  *   that previously owned the grab
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @keyboard: %TRUE if a keyboard grab was broken, %FALSE if a pointer
  *   grab was broken
  * @implicit: %TRUE if the broken grab was implicit
@@ -1175,7 +1101,8 @@ struct _GdkEventGrabBroken {
  *   %GDK_DRAG_MOTION, %GDK_DRAG_STATUS, %GDK_DROP_START or
  *   %GDK_DROP_FINISHED).
  * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
+ * @send_event: %TRUE if the event was sent explicitly (e.g. using
+ *   <function>XSendEvent</function>).
  * @context: the #GdkDragContext for the current DND operation.
  * @time: the time of the event in milliseconds.
  * @x_root: the x coordinate of the pointer relative to the root of the
@@ -1196,223 +1123,44 @@ struct _GdkEventDND {
 };
 
 /**
- * GdkEventTouchpadSwipe:
- * @type: the type of the event (%GDK_TOUCHPAD_SWIPE)
- * @window: the window which received the event
- * @send_event: %TRUE if the event was sent explicitly
- * @phase: the current phase of the gesture
- * @n_fingers: The number of fingers triggering the swipe
- * @time: the time of the event in milliseconds
- * @x: The X coordinate of the pointer
- * @y: The Y coordinate of the pointer
- * @dx: Movement delta in the X axis of the swipe focal point
- * @dy: Movement delta in the Y axis of the swipe focal point
- * @x_root: The X coordinate of the pointer, relative to the
- *   root of the screen.
- * @y_root: The Y coordinate of the pointer, relative to the
- *   root of the screen.
- * @state: (type GdkModifierType): a bit-mask representing the state of
- *   the modifier keys (e.g. Control, Shift and Alt) and the pointer
- *   buttons. See #GdkModifierType.
- *
- * Generated during touchpad swipe gestures.
- */
-struct _GdkEventTouchpadSwipe {
-  GdkEventType type;
-  GdkWindow *window;
-  gint8 send_event;
-  gint8 phase;
-  gint8 n_fingers;
-  guint32 time;
-  gdouble x;
-  gdouble y;
-  gdouble dx;
-  gdouble dy;
-  gdouble x_root, y_root;
-  guint state;
-};
-
-/**
- * GdkEventTouchpadPinch:
- * @type: the type of the event (%GDK_TOUCHPAD_PINCH)
- * @window: the window which received the event
- * @send_event: %TRUE if the event was sent explicitly
- * @phase: the current phase of the gesture
- * @n_fingers: The number of fingers triggering the pinch
- * @time: the time of the event in milliseconds
- * @x: The X coordinate of the pointer
- * @y: The Y coordinate of the pointer
- * @dx: Movement delta in the X axis of the swipe focal point
- * @dy: Movement delta in the Y axis of the swipe focal point
- * @angle_delta: The angle change in radians, negative angles
- *   denote counter-clockwise movements
- * @scale: The current scale, relative to that at the time of
- *   the corresponding %GDK_TOUCHPAD_GESTURE_PHASE_BEGIN event
- * @x_root: The X coordinate of the pointer, relative to the
- *   root of the screen.
- * @y_root: The Y coordinate of the pointer, relative to the
- *   root of the screen.
- * @state: (type GdkModifierType): a bit-mask representing the state of
- *   the modifier keys (e.g. Control, Shift and Alt) and the pointer
- *   buttons. See #GdkModifierType.
- *
- * Generated during touchpad swipe gestures.
- */
-struct _GdkEventTouchpadPinch {
-  GdkEventType type;
-  GdkWindow *window;
-  gint8 send_event;
-  gint8 phase;
-  gint8 n_fingers;
-  guint32 time;
-  gdouble x;
-  gdouble y;
-  gdouble dx;
-  gdouble dy;
-  gdouble angle_delta;
-  gdouble scale;
-  gdouble x_root, y_root;
-  guint state;
-};
-
-/**
- * GdkEventPadButton:
- * @type: the type of the event (%GDK_PAD_BUTTON_PRESS or %GDK_PAD_BUTTON_RELEASE).
- * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
- * @time: the time of the event in milliseconds.
- * @group: the pad group the button belongs to. A %GDK_SOURCE_TABLET_PAD device
- *   may have one or more groups containing a set of buttons/rings/strips each.
- * @button: The pad button that was pressed.
- * @mode: The current mode of @group. Different groups in a %GDK_SOURCE_TABLET_PAD
- *   device may have different current modes.
- *
- * Generated during %GDK_SOURCE_TABLET_PAD button presses and releases.
- *
- * Since: 3.22
- */
-struct _GdkEventPadButton {
-  GdkEventType type;
-  GdkWindow *window;
-  gint8 send_event;
-  guint32 time;
-  guint group;
-  guint button;
-  guint mode;
-};
-
-/**
- * GdkEventPadAxis:
- * @type: the type of the event (%GDK_PAD_RING or %GDK_PAD_STRIP).
- * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
- * @time: the time of the event in milliseconds.
- * @group: the pad group the ring/strip belongs to. A %GDK_SOURCE_TABLET_PAD
- *   device may have one or more groups containing a set of buttons/rings/strips
- *   each.
- * @index: number of strip/ring that was interacted. This number is 0-indexed.
- * @mode: The current mode of @group. Different groups in a %GDK_SOURCE_TABLET_PAD
- *   device may have different current modes.
- * @value: The current value for the given axis.
- *
- * Generated during %GDK_SOURCE_TABLET_PAD interaction with tactile sensors.
- *
- * Since: 3.22
- */
-struct _GdkEventPadAxis {
-  GdkEventType type;
-  GdkWindow *window;
-  gint8 send_event;
-  guint32 time;
-  guint group;
-  guint index;
-  guint mode;
-  gdouble value;
-};
-
-/**
- * GdkEventPadGroupMode:
- * @type: the type of the event (%GDK_PAD_GROUP_MODE).
- * @window: the window which received the event.
- * @send_event: %TRUE if the event was sent explicitly.
- * @time: the time of the event in milliseconds.
- * @group: the pad group that is switching mode. A %GDK_SOURCE_TABLET_PAD
- *   device may have one or more groups containing a set of buttons/rings/strips
- *   each.
- * @mode: The new mode of @group. Different groups in a %GDK_SOURCE_TABLET_PAD
- *   device may have different current modes.
- *
- * Generated during %GDK_SOURCE_TABLET_PAD mode switches in a group.
- *
- * Since: 3.22
- */
-struct _GdkEventPadGroupMode {
-  GdkEventType type;
-  GdkWindow *window;
-  gint8 send_event;
-  guint32 time;
-  guint group;
-  guint mode;
-};
-
-/**
  * GdkEvent:
- * @type: the #GdkEventType
- * @any: a #GdkEventAny
- * @expose: a #GdkEventExpose
- * @visibility: a #GdkEventVisibility
- * @motion: a #GdkEventMotion
- * @button: a #GdkEventButton
- * @touch: a #GdkEventTouch
- * @scroll: a #GdkEventScroll
- * @key: a #GdkEventKey
- * @crossing: a #GdkEventCrossing
- * @focus_change: a #GdkEventFocus
- * @configure: a #GdkEventConfigure
- * @property: a #GdkEventProperty
- * @selection: a #GdkEventSelection
- * @owner_change: a #GdkEventOwnerChange
- * @proximity: a #GdkEventProximity
- * @dnd: a #GdkEventDND
- * @window_state: a #GdkEventWindowState
- * @setting: a #GdkEventSetting
- * @grab_broken: a #GdkEventGrabBroken
- * @touchpad_swipe: a #GdkEventTouchpadSwipe
- * @touchpad_pinch: a #GdkEventTouchpadPinch
- * @pad_button: a #GdkEventPadButton
- * @pad_axis: a #GdkEventPadAxis
- * @pad_group_mode: a #GdkEventPadGroupMode
  *
- * A #GdkEvent contains a union of all of the event types,
+ * The #GdkEvent struct contains a union of all of the event structs,
  * and allows access to the data fields in a number of ways.
  *
- * The event type is always the first field in all of the event types, and
+ * The event type is always the first field in all of the event structs, and
  * can always be accessed with the following code, no matter what type of
  * event it is:
- * |[<!-- language="C" -->
+ * <informalexample>
+ * <programlisting>
  *   GdkEvent *event;
  *   GdkEventType type;
  *
  *   type = event->type;
- * ]|
+ * </programlisting>
+ * </informalexample>
  *
- * To access other fields of the event, the pointer to the event
- * can be cast to the appropriate event type, or the union member
+ * To access other fields of the event structs, the pointer to the event
+ * can be cast to the appropriate event struct pointer, or the union member
  * name can be used. For example if the event type is %GDK_BUTTON_PRESS
  * then the x coordinate of the button press can be accessed with:
- * |[<!-- language="C" -->
+ * <informalexample>
+ * <programlisting>
  *   GdkEvent *event;
  *   gdouble x;
  *
  *   x = ((GdkEventButton*)event)->x;
- * ]|
+ * </programlisting>
+ * </informalexample>
  * or:
- * |[<!-- language="C" -->
+ * <informalexample>
+ * <programlisting>
  *   GdkEvent *event;
  *   gdouble x;
  *
  *   x = event->button.x;
- * ]|
+ * </programlisting>
+ * </informalexample>
  */
 union _GdkEvent
 {
@@ -1436,49 +1184,26 @@ union _GdkEvent
   GdkEventWindowState       window_state;
   GdkEventSetting           setting;
   GdkEventGrabBroken        grab_broken;
-  GdkEventTouchpadSwipe     touchpad_swipe;
-  GdkEventTouchpadPinch     touchpad_pinch;
-  GdkEventPadButton         pad_button;
-  GdkEventPadAxis           pad_axis;
-  GdkEventPadGroupMode      pad_group_mode;
 };
 
-GDK_AVAILABLE_IN_ALL
 GType     gdk_event_get_type            (void) G_GNUC_CONST;
 
-GDK_AVAILABLE_IN_3_14
-GType     gdk_event_sequence_get_type   (void) G_GNUC_CONST;
-
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_events_pending	 	(void);
-GDK_AVAILABLE_IN_ALL
 GdkEvent* gdk_event_get			(void);
 
-GDK_AVAILABLE_IN_ALL
 GdkEvent* gdk_event_peek                (void);
-GDK_AVAILABLE_IN_ALL
 void      gdk_event_put	 		(const GdkEvent *event);
 
-GDK_AVAILABLE_IN_ALL
 GdkEvent* gdk_event_new                 (GdkEventType    type);
-GDK_AVAILABLE_IN_ALL
 GdkEvent* gdk_event_copy     		(const GdkEvent *event);
-GDK_AVAILABLE_IN_ALL
 void	  gdk_event_free     		(GdkEvent 	*event);
 
-GDK_AVAILABLE_IN_3_10
-GdkWindow *gdk_event_get_window         (const GdkEvent *event);
-
-GDK_AVAILABLE_IN_ALL
 guint32   gdk_event_get_time            (const GdkEvent  *event);
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_event_get_state           (const GdkEvent  *event,
                                          GdkModifierType *state);
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_event_get_coords		(const GdkEvent  *event,
 					 gdouble	 *x_win,
 					 gdouble	 *y_win);
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_event_get_root_coords	(const GdkEvent *event,
 					 gdouble	*x_root,
 					 gdouble	*y_root);
@@ -1502,83 +1227,50 @@ gboolean  gdk_event_get_scroll_deltas   (const GdkEvent *event,
                                          gdouble         *delta_x,
                                          gdouble         *delta_y);
 
-GDK_AVAILABLE_IN_3_20
-gboolean  gdk_event_is_scroll_stop_event (const GdkEvent *event);
-
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_event_get_axis            (const GdkEvent  *event,
                                          GdkAxisUse       axis_use,
                                          gdouble         *value);
-GDK_AVAILABLE_IN_ALL
 void       gdk_event_set_device         (GdkEvent        *event,
                                          GdkDevice       *device);
-GDK_AVAILABLE_IN_ALL
 GdkDevice* gdk_event_get_device         (const GdkEvent  *event);
-GDK_AVAILABLE_IN_ALL
 void       gdk_event_set_source_device  (GdkEvent        *event,
                                          GdkDevice       *device);
-GDK_AVAILABLE_IN_ALL
 GdkDevice* gdk_event_get_source_device  (const GdkEvent  *event);
-GDK_AVAILABLE_IN_ALL
 void       gdk_event_request_motions    (const GdkEventMotion *event);
 GDK_AVAILABLE_IN_3_4
 gboolean   gdk_event_triggers_context_menu (const GdkEvent *event);
 
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_events_get_distance       (GdkEvent        *event1,
                                          GdkEvent        *event2,
                                          gdouble         *distance);
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_events_get_angle          (GdkEvent        *event1,
                                          GdkEvent        *event2,
                                          gdouble         *angle);
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_events_get_center         (GdkEvent        *event1,
                                          GdkEvent        *event2,
                                          gdouble         *x,
                                          gdouble         *y);
 
-GDK_AVAILABLE_IN_ALL
 void	  gdk_event_handler_set 	(GdkEventFunc    func,
 					 gpointer        data,
 					 GDestroyNotify  notify);
 
-GDK_AVAILABLE_IN_ALL
 void       gdk_event_set_screen         (GdkEvent        *event,
                                          GdkScreen       *screen);
-GDK_AVAILABLE_IN_ALL
 GdkScreen *gdk_event_get_screen         (const GdkEvent  *event);
 
 GDK_AVAILABLE_IN_3_4
 GdkEventSequence *gdk_event_get_event_sequence (const GdkEvent *event);
 
-GDK_AVAILABLE_IN_3_10
-GdkEventType gdk_event_get_event_type   (const GdkEvent *event);
-
-GDK_AVAILABLE_IN_3_20
-GdkSeat  *gdk_event_get_seat            (const GdkEvent *event);
-
-GDK_AVAILABLE_IN_ALL
 void	  gdk_set_show_events		(gboolean	 show_events);
-GDK_AVAILABLE_IN_ALL
 gboolean  gdk_get_show_events		(void);
 
-GDK_AVAILABLE_IN_ALL
-gboolean gdk_setting_get                (const gchar    *name,
-                                         GValue         *value);
+#ifndef GDK_MULTIHEAD_SAFE
 
-GDK_AVAILABLE_IN_3_22
-GdkDeviceTool *gdk_event_get_device_tool (const GdkEvent *event);
+gboolean gdk_setting_get                           (const gchar *name,
+                                                    GValue          *value);
 
-GDK_AVAILABLE_IN_3_22
-void           gdk_event_set_device_tool (GdkEvent       *event,
-                                          GdkDeviceTool  *tool);
-
-GDK_AVAILABLE_IN_3_22
-int            gdk_event_get_scancode    (GdkEvent *event);
-
-GDK_AVAILABLE_IN_3_22
-gboolean       gdk_event_get_pointer_emulated (GdkEvent *event);
+#endif /* GDK_MULTIHEAD_SAFE */
 
 G_END_DECLS
 

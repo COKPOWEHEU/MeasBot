@@ -85,13 +85,13 @@ rb1.data = aaa
 rb2 = gui.wnd:NewRadioButton(10, 170, "Circular buffer", rb1)
 rb2.data = tblring
 lbl = gui.wnd:NewLabel(10, 200, "Label")
-pb = gui.wnd:NewProgressBar(0, 230, 100, 20)
-pb.min, pb.max = 0, tblring.size
+--pb = gui.wnd:NewProgressBar(0, 230, 100, 20)
+--pb.min, pb.max = 0, tblring.size
 tc = gui.wnd:NewTabControl(600, 0, 200, 200);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 
---name = gui.wnd:OpenFileDialog("TPATATA")
+name = gui.wnd:OpenFileDialog("TPATATA")
 --res = gui.wnd:QuestionDialog()
 
 check = tc[0]:NewCheckBox(10, 10, "BBB")
@@ -145,11 +145,11 @@ while gui:update() do
   plot:Refresh()
   x = x+1
   gui:delay_ms(10)
-  if check:IsChecked() then
+  --[[if check:IsChecked() then
     pb.val = tblring.st
   else
     pb.val = tblring.size - tblring.st
-  end
+  end--]]
 end
 
 --[[

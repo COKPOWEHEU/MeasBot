@@ -19,15 +19,15 @@
  * Modified by the GTK+ Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GTK+ Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
+ * GTK+ at ftp://ftp.gtk.org/pub/gtk/. 
  */
-
-#ifndef __GDK_WIN32_SCREEN_H__
-#define __GDK_WIN32_SCREEN_H__
 
 #if !defined (__GDKWIN32_H_INSIDE__) && !defined (GDK_COMPILATION)
 #error "Only <gdk/gdkwin32.h> can be included directly."
 #endif
+
+#ifndef __GDK_WIN32_SCREEN_H__
+#define __GDK_WIN32_SCREEN_H__
 
 #include <gdk/gdk.h>
 
@@ -47,7 +47,6 @@ typedef GdkScreen GdkWin32Screen;
 #endif
 typedef struct _GdkWin32ScreenClass GdkWin32ScreenClass;
 
-GDK_AVAILABLE_IN_ALL
 GType    gdk_win32_screen_get_type          (void);
 
 G_END_DECLS

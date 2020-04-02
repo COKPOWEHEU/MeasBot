@@ -15,12 +15,12 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GDK_WIN32_DND_H__
-#define __GDK_WIN32_DND_H__
-
 #if !defined (__GDKWIN32_H_INSIDE__) && !defined (GDK_COMPILATION)
 #error "Only <gdk/gdkwin32.h> can be included directly."
 #endif
+
+#ifndef __GDK_WIN32_DND_H__
+#define __GDK_WIN32_DND_H__
 
 #include <gdk/gdk.h>
 
@@ -40,7 +40,6 @@ typedef GdkDragContext GdkWin32DragContext;
 #endif
 typedef struct _GdkWin32DragContextClass GdkWin32DragContextClass;
 
-GDK_AVAILABLE_IN_ALL
 GType    gdk_win32_drag_context_get_type (void);
 
 G_END_DECLS

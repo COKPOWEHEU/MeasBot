@@ -1,4 +1,4 @@
-/* gtktextattributes.h - text attributes
+/* gtktexttag.c - text tag object
  *
  * Copyright (c) 1992-1994 The Regents of the University of California.
  * Copyright (c) 1994-1997 Sun Microsystems, Inc.
@@ -47,13 +47,13 @@
  *
  */
 
-#ifndef __GTK_TEXT_ATTRIBUTES_H__
-#define __GTK_TEXT_ATTRIBUTES_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_TEXT_ATTRIBUTES_H__
+#define __GTK_TEXT_ATTRIBUTES_H__
+
 
 #include <gdk/gdk.h>
 #include <gtk/gtkenums.h>
@@ -68,33 +68,23 @@ typedef struct _GtkTextAttributes GtkTextAttributes;
 typedef struct _GtkTextAppearance GtkTextAppearance;
 
 /**
- * GtkTextAppearance:
- * @bg_color: Background #GdkColor.
- * @fg_color: Foreground #GdkColor.
- * @rise: Super/subscript rise, can be negative.
- * @underline: #PangoUnderline
- * @strikethrough: Strikethrough style
- * @draw_bg: Whether to use background-related values; this is
- *   irrelevant for the values struct when in a tag, but is used for
- *   the composite values struct; it’s true if any of the tags being
- *   composited had background stuff set.
- * @inside_selection: This are only used when we are actually laying
- *   out and rendering a paragraph; not when a #GtkTextAppearance is
- *   part of a #GtkTextAttributes.
- * @is_text: This are only used when we are actually laying
- *   out and rendering a paragraph; not when a #GtkTextAppearance is
- *   part of a #GtkTextAttributes.
- * @rgba: #GdkRGBA
+ * GtkTextAttributes:
+ *
+ * Using #GtkTextAttributes directly should rarely be necessary.
+ * It's primarily useful with gtk_text_iter_get_attributes().
+ * As with most GTK+ structs, the fields in this struct should only
+ * be read, never modified directly.
  */
 struct _GtkTextAppearance
 {
   /*< public >*/
-  GdkColor bg_color; /* pixel is taken for underline color */
-  GdkColor fg_color; /* pixel is taken for strikethrough color */
+  GdkColor bg_color;
+  GdkColor fg_color;
 
   /* super/subscript rise, can be negative */
   gint rise;
 
+  /*< public >*/
   guint underline : 4;          /* PangoUnderline */
   guint strikethrough : 1;
 
@@ -112,57 +102,14 @@ struct _GtkTextAppearance
   guint inside_selection : 1;
   guint is_text : 1;
 
-  /* For the sad story of this bit of code, see
-   * https://bugzilla.gnome.org/show_bug.cgi?id=711158
-   */
-#ifdef __GI_SCANNER__
-  /* The scanner should only see the transparent union, so that its
-   * content does not vary across architectures.
-   */
-  union {
-    GdkRGBA *rgba[2];
-    /*< private >*/
-    guint padding[4];
-  };
-#else
   GdkRGBA *rgba[2];
+
 #if (defined(__SIZEOF_INT__) && defined(__SIZEOF_POINTER__)) && (__SIZEOF_INT__ == __SIZEOF_POINTER__)
   /* unusable, just for ABI compat */
-  /*< private >*/
   guint padding[2];
-#endif
 #endif
 };
 
-/**
- * GtkTextAttributes:
- * @appearance: #GtkTextAppearance for text.
- * @justification: #GtkJustification for text.
- * @direction: #GtkTextDirection for text.
- * @font: #PangoFontDescription for text.
- * @font_scale: Font scale factor.
- * @left_margin: Width of the left margin in pixels.
- * @right_margin: Width of the right margin in pixels.
- * @indent: Amount to indent the paragraph, in pixels.
- * @pixels_above_lines: Pixels of blank space above paragraphs.
- * @pixels_below_lines: Pixels of blank space below paragraphs.
- * @pixels_inside_wrap: Pixels of blank space between wrapped lines in
- *   a paragraph.
- * @tabs: Custom #PangoTabArray for this text.
- * @wrap_mode: #GtkWrapMode for text.
- * @language: #PangoLanguage for text.
- * @invisible: Hide the text.
- * @bg_full_height: Background is fit to full line height rather than
- *    baseline +/- ascent/descent (font height).
- * @editable: Can edit this text.
- * @no_fallback: Whether to disable font fallback.
- * @letter_spacing: Extra space to insert between graphemes, in Pango units
- *
- * Using #GtkTextAttributes directly should rarely be necessary.
- * It’s primarily useful with gtk_text_iter_get_attributes().
- * As with most GTK+ structs, the fields in this struct should only
- * be read, never modified directly.
- */
 struct _GtkTextAttributes
 {
   /*< private >*/
@@ -174,6 +121,7 @@ struct _GtkTextAttributes
   GtkJustification justification;
   GtkTextDirection direction;
 
+  /* Individual chunks of this can be set/unset as a group */
   PangoFontDescription *font;
 
   gdouble font_scale;
@@ -188,7 +136,10 @@ struct _GtkTextAttributes
 
   PangoTabArray *tabs;
 
-  GtkWrapMode wrap_mode;
+  GtkWrapMode wrap_mode;        /* How to handle wrap-around for this tag.
+                                 * Must be GTK_WRAPMODE_CHAR,
+                                 * GTK_WRAPMODE_NONE, GTK_WRAPMODE_WORD
+                                 */
 
   PangoLanguage *language;
 
@@ -196,49 +147,30 @@ struct _GtkTextAttributes
   GdkColor *pg_bg_color;
 
   /*< public >*/
+  /* hide the text  */
   guint invisible : 1;
+
+  /* Background is fit to full line height rather than
+   * baseline +/- ascent/descent (font height)
+   */
   guint bg_full_height : 1;
+
+  /* can edit this text */
   guint editable : 1;
-  guint no_fallback: 1;
 
   /*< private >*/
   GdkRGBA *pg_bg_rgba;
 
-  /*< public >*/
-  gint letter_spacing;
-
-#ifdef __GI_SCANNER__
-  /* The scanner should only see the transparent union, so that its
-   * content does not vary across architectures.
-   */
-  union {
-    gchar *font_features;
-    /*< private >*/
-    guint padding[2];
-  };
-#else
-  gchar *font_features;
-#if (defined(__SIZEOF_INT__) && defined(__SIZEOF_POINTER__)) && (__SIZEOF_INT__ == __SIZEOF_POINTER__)
-  /* unusable, just for ABI compat */
-  /*< private >*/
-  guint padding[1];
-#endif
-#endif
+  guint padding[3];
 };
 
-GDK_AVAILABLE_IN_ALL
 GtkTextAttributes* gtk_text_attributes_new         (void);
-GDK_AVAILABLE_IN_ALL
 GtkTextAttributes* gtk_text_attributes_copy        (GtkTextAttributes *src);
-GDK_AVAILABLE_IN_ALL
 void               gtk_text_attributes_copy_values (GtkTextAttributes *src,
                                                     GtkTextAttributes *dest);
-GDK_AVAILABLE_IN_ALL
 void               gtk_text_attributes_unref       (GtkTextAttributes *values);
-GDK_AVAILABLE_IN_ALL
 GtkTextAttributes *gtk_text_attributes_ref         (GtkTextAttributes *values);
 
-GDK_AVAILABLE_IN_ALL
 GType              gtk_text_attributes_get_type    (void) G_GNUC_CONST;
 
 

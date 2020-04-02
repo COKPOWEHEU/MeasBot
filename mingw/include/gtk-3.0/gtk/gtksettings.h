@@ -15,12 +15,12 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GTK_SETTINGS_H__
-#define __GTK_SETTINGS_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_SETTINGS_H__
+#define __GTK_SETTINGS_H__
 
 #include <gdk/gdk.h>
 #include <gtk/gtktypes.h>
@@ -63,13 +63,6 @@ struct _GtkSettingsClass
   void (*_gtk_reserved4) (void);
 };
 
-/**
- * GtkSettingsValue:
- * @origin: Origin should be something like “filename:linenumber” for
- *    rc files, or e.g. “XProperty” for other sources.
- * @value: Valid types are LONG, DOUBLE and STRING corresponding to
- *    the token parsed, or a GSTRING holding an unparsed statement
- */
 struct _GtkSettingsValue
 {
   /* origin should be something like "filename:linenumber" for rc files,
@@ -85,64 +78,49 @@ struct _GtkSettingsValue
 
 
 /* --- functions --- */
-GDK_AVAILABLE_IN_ALL
 GType           gtk_settings_get_type                (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
+#ifndef GDK_MULTIHEAD_SAFE
 GtkSettings*    gtk_settings_get_default             (void);
-GDK_AVAILABLE_IN_ALL
+#endif
 GtkSettings*    gtk_settings_get_for_screen          (GdkScreen *screen);
 
-GDK_DEPRECATED_IN_3_16
 void            gtk_settings_install_property        (GParamSpec         *pspec);
-GDK_DEPRECATED_IN_3_16
 void            gtk_settings_install_property_parser (GParamSpec         *pspec,
                                                       GtkRcPropertyParser parser);
 
 /* --- precoded parsing functions --- */
-GDK_AVAILABLE_IN_ALL
 gboolean gtk_rc_property_parse_color       (const GParamSpec *pspec,
                                             const GString    *gstring,
                                             GValue           *property_value);
-GDK_AVAILABLE_IN_ALL
 gboolean gtk_rc_property_parse_enum        (const GParamSpec *pspec,
                                             const GString    *gstring,
                                             GValue           *property_value);
-GDK_AVAILABLE_IN_ALL
 gboolean gtk_rc_property_parse_flags       (const GParamSpec *pspec,
                                             const GString    *gstring,
                                             GValue           *property_value);
-GDK_AVAILABLE_IN_ALL
 gboolean gtk_rc_property_parse_requisition (const GParamSpec *pspec,
                                             const GString    *gstring,
                                             GValue           *property_value);
-GDK_AVAILABLE_IN_ALL
 gboolean gtk_rc_property_parse_border      (const GParamSpec *pspec,
                                             const GString    *gstring,
                                             GValue           *property_value);
 
-GDK_DEPRECATED_IN_3_16
 void     gtk_settings_set_property_value   (GtkSettings            *settings,
                                             const gchar            *name,
                                             const GtkSettingsValue *svalue);
-GDK_DEPRECATED_IN_3_16
 void     gtk_settings_set_string_property  (GtkSettings            *settings,
                                             const gchar            *name,
                                             const gchar            *v_string,
                                             const gchar            *origin);
-GDK_DEPRECATED_IN_3_16
 void     gtk_settings_set_long_property    (GtkSettings            *settings,
                                             const gchar            *name,
                                             glong                   v_long,
                                             const gchar            *origin);
-GDK_DEPRECATED_IN_3_16
 void     gtk_settings_set_double_property  (GtkSettings            *settings,
                                             const gchar            *name,
                                             gdouble                 v_double,
                                             const gchar            *origin);
 
-GDK_AVAILABLE_IN_3_20
-void     gtk_settings_reset_property       (GtkSettings            *settings,
-                                            const gchar            *name);
 
 G_END_DECLS
 

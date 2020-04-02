@@ -21,8 +21,6 @@
 #error "Only <atk/atk.h> can be included directly."
 #endif
 
-#include <atk/atkversion.h>
-
 #ifndef __ATK_NO_OP_OBJECT_H__
 #define __ATK_NO_OP_OBJECT_H__
 
@@ -43,7 +41,6 @@ struct _AtkNoOpObject
   AtkObject     parent;
 };
 
-ATK_AVAILABLE_IN_ALL
 GType atk_no_op_object_get_type (void);
 
 struct _AtkNoOpObjectClass
@@ -51,7 +48,6 @@ struct _AtkNoOpObjectClass
   AtkObjectClass parent_class;
 };
 
-ATK_AVAILABLE_IN_ALL
 AtkObject *atk_no_op_object_new (GObject  *obj);
 
 G_END_DECLS

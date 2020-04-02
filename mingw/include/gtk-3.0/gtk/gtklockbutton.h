@@ -42,15 +42,9 @@ struct _GtkLockButton
   GtkLockButtonPrivate *priv;
 };
 
-/**
- * GtkLockButtonClass:
- * @parent_class: The parent class.
- */
 struct _GtkLockButtonClass
 {
   GtkButtonClass parent_class;
-
-  /*< private >*/
 
   void (*reserved0) (void);
   void (*reserved1) (void);

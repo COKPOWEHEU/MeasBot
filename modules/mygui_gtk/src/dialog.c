@@ -120,7 +120,6 @@ static int L_QuestionDialog(lua_State *L){
 }
 
 void dialog_reg(lua_State *L){
-#ifdef linux //TODO: в винде пока какие-то проблемы
   lua_pushcfunction(L, L_OpenFileDialog);
   lua_setfield(L, -2, "OpenFileDialog");
   lua_pushcfunction(L, L_SaveFileDialog);
@@ -133,6 +132,5 @@ void dialog_reg(lua_State *L){
   lua_setfield(L, -2, "QuestionDialog");
 #ifdef DEBUG
   printf("Dialog registred\n");
-#endif
 #endif
 }

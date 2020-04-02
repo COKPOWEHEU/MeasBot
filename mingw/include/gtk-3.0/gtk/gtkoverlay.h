@@ -18,12 +18,12 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GTK_OVERLAY_H__
-#define __GTK_OVERLAY_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_OVERLAY_H__
+#define __GTK_OVERLAY_H__
 
 #include <gtk/gtkbin.h>
 
@@ -47,23 +47,13 @@ struct _GtkOverlay
   GtkOverlayPrivate *priv;
 };
 
-/**
- * GtkOverlayClass:
- * @parent_class: The parent class.
- * @get_child_position: Signal emitted to determine the position and
- *    size of any overlay child widgets.
- */
 struct _GtkOverlayClass
 {
   GtkBinClass parent_class;
 
-  /*< public >*/
-
   gboolean (*get_child_position) (GtkOverlay    *overlay,
                                   GtkWidget     *widget,
                                   GtkAllocation *allocation);
-
-  /*< private >*/
 
   /* Padding for future expansion */
   void (*_gtk_reserved1) (void);
@@ -83,17 +73,6 @@ GtkWidget *gtk_overlay_new         (void);
 GDK_AVAILABLE_IN_3_2
 void       gtk_overlay_add_overlay (GtkOverlay *overlay,
                                     GtkWidget  *widget);
-GDK_AVAILABLE_IN_3_18
-void       gtk_overlay_reorder_overlay (GtkOverlay *overlay,
-                                        GtkWidget  *child,
-                                        int         index_);
-GDK_AVAILABLE_IN_3_18
-gboolean   gtk_overlay_get_overlay_pass_through (GtkOverlay *overlay,
-						 GtkWidget  *widget);
-GDK_AVAILABLE_IN_3_18
-void       gtk_overlay_set_overlay_pass_through (GtkOverlay *overlay,
-						 GtkWidget  *widget,
-						 gboolean    pass_through);
 
 G_END_DECLS
 

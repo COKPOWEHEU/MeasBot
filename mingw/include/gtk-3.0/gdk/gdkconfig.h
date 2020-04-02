@@ -1,3 +1,8 @@
+/* gdkconfig.h
+ *
+ * This is a generated file.  Please modify `configure.ac'
+ */
+
 #ifndef __GDKCONFIG_H__
 #define __GDKCONFIG_H__
 
@@ -10,11 +15,7 @@
 G_BEGIN_DECLS
 
 
-#undef GDK_WINDOWING_X11
-#define GDK_WINDOWING_BROADWAY
-#undef GDK_WINDOWING_WAYLAND
 #define GDK_WINDOWING_WIN32
-#undef GDK_WINDOWING_QUARTZ
 
 G_END_DECLS
 

@@ -26,13 +26,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_FONTSEL_H__
-#define __GTK_FONTSEL_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_FONTSEL_H__
+#define __GTK_FONTSEL_H__
+
 
 #include <gtk/gtkdialog.h>
 #include <gtk/gtkbox.h>
@@ -103,7 +103,6 @@ struct _GtkFontSelectionDialogClass
   void (*_gtk_reserved4) (void);
 };
 
-GDK_DEPRECATED_IN_3_2
 GType        gtk_font_selection_get_type          (void) G_GNUC_CONST;
 GDK_DEPRECATED_IN_3_2_FOR(GtkFontChooser)
 GtkWidget *  gtk_font_selection_new               (void);
@@ -137,7 +136,7 @@ GDK_DEPRECATED_IN_3_2_FOR(GtkFontChooser)
 void         gtk_font_selection_set_preview_text  (GtkFontSelection *fontsel,
                                                    const gchar      *text);
 
-GDK_DEPRECATED_IN_3_2
+
 GType      gtk_font_selection_dialog_get_type          (void) G_GNUC_CONST;
 GDK_DEPRECATED_IN_3_2_FOR(GtkFontChooser)
 GtkWidget *gtk_font_selection_dialog_new               (const gchar            *title);

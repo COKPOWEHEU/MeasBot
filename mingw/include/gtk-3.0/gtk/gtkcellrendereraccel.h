@@ -15,12 +15,12 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GTK_CELL_RENDERER_ACCEL_H__
-#define __GTK_CELL_RENDERER_ACCEL_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_CELL_RENDERER_ACCEL_H__
+#define __GTK_CELL_RENDERER_ACCEL_H__
 
 #include <gtk/gtkcellrenderertext.h>
 
@@ -37,16 +37,7 @@ typedef struct _GtkCellRendererAccel              GtkCellRendererAccel;
 typedef struct _GtkCellRendererAccelPrivate       GtkCellRendererAccelPrivate;
 typedef struct _GtkCellRendererAccelClass         GtkCellRendererAccelClass;
 
-/**
- * GtkCellRendererAccelMode:
- * @GTK_CELL_RENDERER_ACCEL_MODE_GTK: GTK+ accelerators mode
- * @GTK_CELL_RENDERER_ACCEL_MODE_OTHER: Other accelerator mode
- *
- * Determines if the edited accelerators are GTK+ accelerators. If
- * they are, consumed modifiers are suppressed, only accelerators
- * accepted by GTK+ are allowed, and the accelerators are rendered
- * in the same way as they are in menus.
- */
+
 typedef enum
 {
   GTK_CELL_RENDERER_ACCEL_MODE_GTK,
@@ -83,9 +74,7 @@ struct _GtkCellRendererAccelClass
   void (*_gtk_reserved4) (void);
 };
 
-GDK_AVAILABLE_IN_ALL
 GType            gtk_cell_renderer_accel_get_type        (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
 GtkCellRenderer *gtk_cell_renderer_accel_new             (void);
 
 

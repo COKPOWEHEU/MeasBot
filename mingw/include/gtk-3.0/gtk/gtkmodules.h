@@ -16,12 +16,12 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __GTK_MODULES_H__
-#define __GTK_MODULES_H__
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_MODULES_H__
+#define __GTK_MODULES_H__
 
 #include <gdk/gdk.h>
 
@@ -32,8 +32,9 @@ G_BEGIN_DECLS
  * @argc: (allow-none): GTK+ always passes %NULL for this argument
  * @argv: (allow-none) (array length=argc): GTK+ always passes %NULL for this argument
  *
- * Each GTK+ module must have a function gtk_module_init() with this prototype.
- * This function is called after loading the module.
+ * Each GTK+ module must have a function gtk_module_init()
+ * with this prototype. This function is called after loading
+ * the module.
  */
 typedef void     (*GtkModuleInitFunc)        (gint        *argc,
                                               gchar      ***argv);
@@ -42,8 +43,9 @@ typedef void     (*GtkModuleInitFunc)        (gint        *argc,
  * GtkModuleDisplayInitFunc:
  * @display: an open #GdkDisplay
  *
- * A multihead-aware GTK+ module may have a gtk_module_display_init() function
- * with this prototype. GTK+ calls this function for each opened display.
+ * A multihead-aware GTK+ module may have a gtk_module_display_init()
+ * function with this prototype. GTK+ calls this function for each
+ * opened display.
  *
  * Since: 2.2
  */

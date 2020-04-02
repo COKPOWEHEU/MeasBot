@@ -5,7 +5,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,17 +13,19 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General
- * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
  *
  * Author: David Zeuthen <davidz@redhat.com>
  */
 
-#ifndef __G_DBUS_CONNECTION_H__
-#define __G_DBUS_CONNECTION_H__
-
 #if !defined (__GIO_GIO_H_INSIDE__) && !defined (GIO_COMPILATION)
 #error "Only <gio/gio.h> can be included directly."
 #endif
+
+#ifndef __G_DBUS_CONNECTION_H__
+#define __G_DBUS_CONNECTION_H__
 
 #include <gio/giotypes.h>
 
@@ -33,27 +35,22 @@ G_BEGIN_DECLS
 #define G_DBUS_CONNECTION(o)           (G_TYPE_CHECK_INSTANCE_CAST ((o), G_TYPE_DBUS_CONNECTION, GDBusConnection))
 #define G_IS_DBUS_CONNECTION(o)        (G_TYPE_CHECK_INSTANCE_TYPE ((o), G_TYPE_DBUS_CONNECTION))
 
-GLIB_AVAILABLE_IN_ALL
 GType            g_dbus_connection_get_type                   (void) G_GNUC_CONST;
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GLIB_AVAILABLE_IN_ALL
 void              g_bus_get                    (GBusType             bus_type,
                                                 GCancellable        *cancellable,
                                                 GAsyncReadyCallback  callback,
                                                 gpointer             user_data);
-GLIB_AVAILABLE_IN_ALL
 GDBusConnection  *g_bus_get_finish             (GAsyncResult        *res,
                                                 GError             **error);
-GLIB_AVAILABLE_IN_ALL
 GDBusConnection  *g_bus_get_sync               (GBusType            bus_type,
                                                 GCancellable       *cancellable,
                                                 GError            **error);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_new                        (GIOStream              *stream,
                                                                const gchar            *guid,
                                                                GDBusConnectionFlags    flags,
@@ -61,10 +58,8 @@ void             g_dbus_connection_new                        (GIOStream        
                                                                GCancellable           *cancellable,
                                                                GAsyncReadyCallback     callback,
                                                                gpointer                user_data);
-GLIB_AVAILABLE_IN_ALL
 GDBusConnection *g_dbus_connection_new_finish                 (GAsyncResult           *res,
                                                                GError                **error);
-GLIB_AVAILABLE_IN_ALL
 GDBusConnection *g_dbus_connection_new_sync                   (GIOStream              *stream,
                                                                const gchar            *guid,
                                                                GDBusConnectionFlags    flags,
@@ -72,17 +67,14 @@ GDBusConnection *g_dbus_connection_new_sync                   (GIOStream        
                                                                GCancellable           *cancellable,
                                                                GError                **error);
 
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_new_for_address            (const gchar            *address,
                                                                GDBusConnectionFlags    flags,
                                                                GDBusAuthObserver      *observer,
                                                                GCancellable           *cancellable,
                                                                GAsyncReadyCallback     callback,
                                                                gpointer                user_data);
-GLIB_AVAILABLE_IN_ALL
 GDBusConnection *g_dbus_connection_new_for_address_finish     (GAsyncResult           *res,
                                                                GError                **error);
-GLIB_AVAILABLE_IN_ALL
 GDBusConnection *g_dbus_connection_new_for_address_sync       (const gchar            *address,
                                                                GDBusConnectionFlags    flags,
                                                                GDBusAuthObserver      *observer,
@@ -91,73 +83,54 @@ GDBusConnection *g_dbus_connection_new_for_address_sync       (const gchar      
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_start_message_processing   (GDBusConnection    *connection);
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_is_closed                  (GDBusConnection    *connection);
-GLIB_AVAILABLE_IN_ALL
 GIOStream       *g_dbus_connection_get_stream                 (GDBusConnection    *connection);
-GLIB_AVAILABLE_IN_ALL
 const gchar     *g_dbus_connection_get_guid                   (GDBusConnection    *connection);
-GLIB_AVAILABLE_IN_ALL
 const gchar     *g_dbus_connection_get_unique_name            (GDBusConnection    *connection);
-GLIB_AVAILABLE_IN_ALL
 GCredentials    *g_dbus_connection_get_peer_credentials       (GDBusConnection    *connection);
 
 GLIB_AVAILABLE_IN_2_34
 guint32          g_dbus_connection_get_last_serial            (GDBusConnection    *connection);
 
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_get_exit_on_close          (GDBusConnection    *connection);
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_set_exit_on_close          (GDBusConnection    *connection,
                                                                gboolean            exit_on_close);
-GLIB_AVAILABLE_IN_ALL
 GDBusCapabilityFlags  g_dbus_connection_get_capabilities      (GDBusConnection    *connection);
-GLIB_AVAILABLE_IN_2_60
-GDBusConnectionFlags  g_dbus_connection_get_flags             (GDBusConnection    *connection);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_close                          (GDBusConnection     *connection,
                                                                    GCancellable        *cancellable,
                                                                    GAsyncReadyCallback  callback,
                                                                    gpointer             user_data);
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_close_finish                   (GDBusConnection     *connection,
                                                                    GAsyncResult        *res,
                                                                    GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_close_sync                     (GDBusConnection     *connection,
                                                                    GCancellable        *cancellable,
                                                                    GError             **error);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_flush                          (GDBusConnection     *connection,
                                                                    GCancellable        *cancellable,
                                                                    GAsyncReadyCallback  callback,
                                                                    gpointer             user_data);
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_flush_finish                   (GDBusConnection     *connection,
                                                                    GAsyncResult        *res,
                                                                    GError             **error);
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_flush_sync                     (GDBusConnection     *connection,
                                                                    GCancellable        *cancellable,
                                                                    GError             **error);
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_send_message                   (GDBusConnection     *connection,
                                                                    GDBusMessage        *message,
                                                                    GDBusSendMessageFlags flags,
                                                                    volatile guint32    *out_serial,
                                                                    GError             **error);
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_send_message_with_reply        (GDBusConnection     *connection,
                                                                    GDBusMessage        *message,
                                                                    GDBusSendMessageFlags flags,
@@ -166,11 +139,9 @@ void             g_dbus_connection_send_message_with_reply        (GDBusConnecti
                                                                    GCancellable        *cancellable,
                                                                    GAsyncReadyCallback  callback,
                                                                    gpointer             user_data);
-GLIB_AVAILABLE_IN_ALL
 GDBusMessage    *g_dbus_connection_send_message_with_reply_finish (GDBusConnection     *connection,
                                                                    GAsyncResult        *res,
                                                                    GError             **error);
-GLIB_AVAILABLE_IN_ALL
 GDBusMessage    *g_dbus_connection_send_message_with_reply_sync   (GDBusConnection     *connection,
                                                                    GDBusMessage        *message,
                                                                    GDBusSendMessageFlags flags,
@@ -181,7 +152,6 @@ GDBusMessage    *g_dbus_connection_send_message_with_reply_sync   (GDBusConnecti
 
 /* ---------------------------------------------------------------------------------------------------- */
 
-GLIB_AVAILABLE_IN_ALL
 gboolean  g_dbus_connection_emit_signal                       (GDBusConnection    *connection,
                                                                const gchar        *destination_bus_name,
                                                                const gchar        *object_path,
@@ -189,7 +159,6 @@ gboolean  g_dbus_connection_emit_signal                       (GDBusConnection  
                                                                const gchar        *signal_name,
                                                                GVariant           *parameters,
                                                                GError            **error);
-GLIB_AVAILABLE_IN_ALL
 void      g_dbus_connection_call                              (GDBusConnection    *connection,
                                                                const gchar        *bus_name,
                                                                const gchar        *object_path,
@@ -202,11 +171,9 @@ void      g_dbus_connection_call                              (GDBusConnection  
                                                                GCancellable       *cancellable,
                                                                GAsyncReadyCallback callback,
                                                                gpointer            user_data);
-GLIB_AVAILABLE_IN_ALL
 GVariant *g_dbus_connection_call_finish                       (GDBusConnection    *connection,
                                                                GAsyncResult       *res,
                                                                GError            **error);
-GLIB_AVAILABLE_IN_ALL
 GVariant *g_dbus_connection_call_sync                         (GDBusConnection    *connection,
                                                                const gchar        *bus_name,
                                                                const gchar        *object_path,
@@ -263,7 +230,7 @@ GVariant *g_dbus_connection_call_with_unix_fd_list_sync       (GDBusConnection  
  * @interface_name: The D-Bus interface name the method was invoked on.
  * @method_name: The name of the method that was invoked.
  * @parameters: A #GVariant tuple with parameters.
- * @invocation: (transfer full): A #GDBusMethodInvocation object that must be used to return a value or error.
+ * @invocation: A #GDBusMethodInvocation object that can be used to return a value or error.
  * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_object().
  *
  * The type of the @method_call function in #GDBusInterfaceVTable.
@@ -340,44 +307,9 @@ typedef gboolean  (*GDBusInterfaceSetPropertyFunc) (GDBusConnection       *conne
  * Virtual table for handling properties and method calls for a D-Bus
  * interface.
  *
- * Since 2.38, if you want to handle getting/setting D-Bus properties
- * asynchronously, give %NULL as your get_property() or set_property()
- * function. The D-Bus call will be directed to your @method_call function,
- * with the provided @interface_name set to "org.freedesktop.DBus.Properties".
- *
- * Ownership of the #GDBusMethodInvocation object passed to the
- * method_call() function is transferred to your handler; you must
- * call one of the methods of #GDBusMethodInvocation to return a reply
- * (possibly empty), or an error. These functions also take ownership
- * of the passed-in invocation object, so unless the invocation
- * object has otherwise been referenced, it will be then be freed.
- * Calling one of these functions may be done within your
- * method_call() implementation but it also can be done at a later
- * point to handle the method asynchronously.
- *
- * The usual checks on the validity of the calls is performed. For
- * `Get` calls, an error is automatically returned if the property does
- * not exist or the permissions do not allow access. The same checks are
- * performed for `Set` calls, and the provided value is also checked for
- * being the correct type.
- *
- * For both `Get` and `Set` calls, the #GDBusMethodInvocation
- * passed to the @method_call handler can be queried with
- * g_dbus_method_invocation_get_property_info() to get a pointer
- * to the #GDBusPropertyInfo of the property.
- *
- * If you have readable properties specified in your interface info,
- * you must ensure that you either provide a non-%NULL @get_property()
- * function or provide implementations of both the `Get` and `GetAll`
- * methods on org.freedesktop.DBus.Properties interface in your @method_call
- * function. Note that the required return type of the `Get` call is
- * `(v)`, not the type of the property. `GetAll` expects a return value
- * of type `a{sv}`.
- *
- * If you have writable properties specified in your interface info,
- * you must ensure that you either provide a non-%NULL @set_property()
- * function or provide an implementation of the `Set` call. If implementing
- * the call, you must return the value of type %G_VARIANT_TYPE_UNIT.
+ * If you want to handle getting/setting D-Bus properties asynchronously, simply
+ * register an object with the <literal>org.freedesktop.DBus.Properties</literal>
+ * D-Bus interface using g_dbus_connection_register_object().
  *
  * Since: 2.26
  */
@@ -395,7 +327,6 @@ struct _GDBusInterfaceVTable
   gpointer padding[8];
 };
 
-GLIB_AVAILABLE_IN_ALL
 guint            g_dbus_connection_register_object            (GDBusConnection            *connection,
                                                                const gchar                *object_path,
                                                                GDBusInterfaceInfo         *interface_info,
@@ -403,15 +334,6 @@ guint            g_dbus_connection_register_object            (GDBusConnection  
                                                                gpointer                    user_data,
                                                                GDestroyNotify              user_data_free_func,
                                                                GError                    **error);
-GLIB_AVAILABLE_IN_2_46
-guint            g_dbus_connection_register_object_with_closures (GDBusConnection         *connection,
-                                                                  const gchar             *object_path,
-                                                                  GDBusInterfaceInfo      *interface_info,
-                                                                  GClosure                *method_call_closure,
-                                                                  GClosure                *get_property_closure,
-                                                                  GClosure                *set_property_closure,
-                                                                  GError                 **error);
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_unregister_object          (GDBusConnection            *connection,
                                                                guint                       registration_id);
 
@@ -489,7 +411,7 @@ typedef GDBusInterfaceInfo ** (*GDBusSubtreeIntrospectFunc) (GDBusConnection    
  * @object_path: The object path that was registered with g_dbus_connection_register_subtree().
  * @interface_name: The D-Bus interface name that the method call or property access is for.
  * @node: A node that is a child of @object_path (relative to @object_path) or %NULL for the root of the subtree.
- * @out_user_data: (nullable) (not optional): Return location for user data to pass to functions in the returned #GDBusInterfaceVTable.
+ * @out_user_data: Return location for user data to pass to functions in the returned #GDBusInterfaceVTable (never %NULL).
  * @user_data: The @user_data #gpointer passed to g_dbus_connection_register_subtree().
  *
  * The type of the @dispatch function in #GDBusSubtreeVTable.
@@ -533,7 +455,6 @@ struct _GDBusSubtreeVTable
   gpointer padding[8];
 };
 
-GLIB_AVAILABLE_IN_ALL
 guint            g_dbus_connection_register_subtree           (GDBusConnection            *connection,
                                                                const gchar                *object_path,
                                                                const GDBusSubtreeVTable   *vtable,
@@ -541,7 +462,6 @@ guint            g_dbus_connection_register_subtree           (GDBusConnection  
                                                                gpointer                    user_data,
                                                                GDestroyNotify              user_data_free_func,
                                                                GError                    **error);
-GLIB_AVAILABLE_IN_ALL
 gboolean         g_dbus_connection_unregister_subtree         (GDBusConnection            *connection,
                                                                guint                       registration_id);
 
@@ -569,7 +489,6 @@ typedef void (*GDBusSignalCallback) (GDBusConnection  *connection,
                                      GVariant         *parameters,
                                      gpointer          user_data);
 
-GLIB_AVAILABLE_IN_ALL
 guint            g_dbus_connection_signal_subscribe           (GDBusConnection     *connection,
                                                                const gchar         *sender,
                                                                const gchar         *interface_name,
@@ -580,7 +499,6 @@ guint            g_dbus_connection_signal_subscribe           (GDBusConnection  
                                                                GDBusSignalCallback  callback,
                                                                gpointer             user_data,
                                                                GDestroyNotify       user_data_free_func);
-GLIB_AVAILABLE_IN_ALL
 void             g_dbus_connection_signal_unsubscribe         (GDBusConnection     *connection,
                                                                guint                subscription_id);
 
@@ -606,7 +524,7 @@ void             g_dbus_connection_signal_unsubscribe         (GDBusConnection  
  *                 gboolean         incoming,
  *                 gpointer         user_data)
  * {
- *   // inspect @message
+ *   /<!-- -->* inspect @message *<!-- -->/
  *   return message;
  * }
  * ]|
@@ -639,10 +557,10 @@ void             g_dbus_connection_signal_unsubscribe         (GDBusConnection  
  *
  *   error = NULL;
  *   copy = g_dbus_message_copy (message, &error);
- *   // handle @error being set
+ *   /<!-- -->* handle @error being is set *<!-- -->/
  *   g_object_unref (message);
  *
- *   // modify @copy
+ *   /<!-- -->* modify @copy *<!-- -->/
  *
  *   return copy;
  * }
@@ -650,11 +568,11 @@ void             g_dbus_connection_signal_unsubscribe         (GDBusConnection  
  * If the returned #GDBusMessage is different from @message and cannot
  * be sent on @connection (it could use features, such as file
  * descriptors, not compatible with @connection), then a warning is
- * logged to standard error. Applications can
+ * logged to <emphasis>standard error</emphasis>. Applications can
  * check this ahead of time using g_dbus_message_to_blob() passing a
  * #GDBusCapabilityFlags value obtained from @connection.
  *
- * Returns: (transfer full) (nullable): A #GDBusMessage that will be freed with
+ * Returns: (transfer full) (allow-none): A #GDBusMessage that will be freed with
  * g_object_unref() or %NULL to drop the message. Passive filter
  * functions can simply return the passed @message object.
  *
@@ -665,13 +583,11 @@ typedef GDBusMessage *(*GDBusMessageFilterFunction) (GDBusConnection *connection
                                                      gboolean         incoming,
                                                      gpointer         user_data);
 
-GLIB_AVAILABLE_IN_ALL
 guint g_dbus_connection_add_filter (GDBusConnection            *connection,
                                     GDBusMessageFilterFunction  filter_function,
                                     gpointer                    user_data,
                                     GDestroyNotify              user_data_free_func);
 
-GLIB_AVAILABLE_IN_ALL
 void  g_dbus_connection_remove_filter (GDBusConnection    *connection,
                                        guint               filter_id);
 

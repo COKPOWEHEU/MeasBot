@@ -27,13 +27,13 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GTK_TOOLBAR_H__
-#define __GTK_TOOLBAR_H__
-
-
 #if !defined (__GTK_H_INSIDE__) && !defined (GTK_COMPILATION)
 #error "Only <gtk/gtk.h> can be included directly."
 #endif
+
+#ifndef __GTK_TOOLBAR_H__
+#define __GTK_TOOLBAR_H__
+
 
 #include <gtk/gtkcontainer.h>
 #include <gtk/gtktoolitem.h>
@@ -48,15 +48,6 @@ G_BEGIN_DECLS
 #define GTK_IS_TOOLBAR_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), GTK_TYPE_TOOLBAR))
 #define GTK_TOOLBAR_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), GTK_TYPE_TOOLBAR, GtkToolbarClass))
 
-/**
- * GtkToolbarSpaceStyle:
- * @GTK_TOOLBAR_SPACE_EMPTY: Use blank spacers.
- * @GTK_TOOLBAR_SPACE_LINE: Use vertical lines for spacers.
- *
- * Whether spacers are vertical lines or just blank.
- *
- * Deprecated: 3.20
- */
 typedef enum
 {
   GTK_TOOLBAR_SPACE_EMPTY,
@@ -95,57 +86,48 @@ struct _GtkToolbarClass
   void (*_gtk_reserved4) (void);
 };
 
-GDK_AVAILABLE_IN_ALL
 GType           gtk_toolbar_get_type                (void) G_GNUC_CONST;
-GDK_AVAILABLE_IN_ALL
 GtkWidget *     gtk_toolbar_new                     (void);
 
-GDK_AVAILABLE_IN_ALL
 void            gtk_toolbar_insert                  (GtkToolbar      *toolbar,
 						     GtkToolItem     *item,
 						     gint             pos);
 
-GDK_AVAILABLE_IN_ALL
 gint            gtk_toolbar_get_item_index          (GtkToolbar      *toolbar,
 						     GtkToolItem     *item);
-GDK_AVAILABLE_IN_ALL
 gint            gtk_toolbar_get_n_items             (GtkToolbar      *toolbar);
-GDK_AVAILABLE_IN_ALL
 GtkToolItem *   gtk_toolbar_get_nth_item            (GtkToolbar      *toolbar,
 						     gint             n);
 
-GDK_AVAILABLE_IN_ALL
 gboolean        gtk_toolbar_get_show_arrow          (GtkToolbar      *toolbar);
-GDK_AVAILABLE_IN_ALL
 void            gtk_toolbar_set_show_arrow          (GtkToolbar      *toolbar,
 						     gboolean         show_arrow);
 
-GDK_AVAILABLE_IN_ALL
 GtkToolbarStyle gtk_toolbar_get_style               (GtkToolbar      *toolbar);
-GDK_AVAILABLE_IN_ALL
 void            gtk_toolbar_set_style               (GtkToolbar      *toolbar,
 						     GtkToolbarStyle  style);
-GDK_AVAILABLE_IN_ALL
 void            gtk_toolbar_unset_style             (GtkToolbar      *toolbar);
 
-GDK_AVAILABLE_IN_ALL
 GtkIconSize     gtk_toolbar_get_icon_size           (GtkToolbar      *toolbar);
-GDK_AVAILABLE_IN_ALL
 void            gtk_toolbar_set_icon_size           (GtkToolbar      *toolbar,
                                                      GtkIconSize      icon_size);
-GDK_AVAILABLE_IN_ALL
 void            gtk_toolbar_unset_icon_size         (GtkToolbar      *toolbar);
 
-GDK_AVAILABLE_IN_ALL
 GtkReliefStyle  gtk_toolbar_get_relief_style        (GtkToolbar      *toolbar);
-GDK_AVAILABLE_IN_ALL
 gint            gtk_toolbar_get_drop_index          (GtkToolbar      *toolbar,
 						     gint             x,
 						     gint             y);
-GDK_AVAILABLE_IN_ALL
 void            gtk_toolbar_set_drop_highlight_item (GtkToolbar      *toolbar,
 						     GtkToolItem     *tool_item,
 						     gint             index_);
+
+
+/* internal functions */
+gchar *         _gtk_toolbar_elide_underscores      (const gchar         *original);
+void            _gtk_toolbar_paint_space_line       (GtkWidget           *widget,
+						     GtkToolbar          *toolbar,
+                                                     cairo_t             *cr);
+gint            _gtk_toolbar_get_default_space_size (void);
 
 
 G_END_DECLS

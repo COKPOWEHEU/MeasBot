@@ -22,15 +22,14 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
  */
 
-#ifndef __GDK_SELECTION_H__
-#define __GDK_SELECTION_H__
-
 #if !defined (__GDK_H_INSIDE__) && !defined (GDK_COMPILATION)
 #error "Only <gdk/gdk.h> can be included directly."
 #endif
 
+#ifndef __GDK_SELECTION_H__
+#define __GDK_SELECTION_H__
+
 #include <gdk/gdktypes.h>
-#include <gdk/gdkversionmacros.h>
 
 G_BEGIN_DECLS
 
@@ -40,132 +39,131 @@ G_BEGIN_DECLS
 /**
  * GDK_SELECTION_PRIMARY:
  *
- * A #GdkAtom representing the `PRIMARY` selection.
+ * A #GdkAtom representing the <literal>PRIMARY</literal> selection.
  */
 #define GDK_SELECTION_PRIMARY 		_GDK_MAKE_ATOM (1)
 
 /**
  * GDK_SELECTION_SECONDARY:
  *
- * A #GdkAtom representing the `SECONDARY` selection.
+ * A #GdkAtom representing the <literal>SECONDARY</literal> selection.
  */
 #define GDK_SELECTION_SECONDARY 	_GDK_MAKE_ATOM (2)
 
 /**
  * GDK_SELECTION_CLIPBOARD:
  *
- * A #GdkAtom representing the `CLIPBOARD` selection.
+ * A #GdkAtom representing the <literal>CLIPBOARD</literal> selection.
  */
 #define GDK_SELECTION_CLIPBOARD 	_GDK_MAKE_ATOM (69)
 
 /**
  * GDK_TARGET_BITMAP:
  *
- * A #GdkAtom representing the `BITMAP` selection target.
+ * A #GdkAtom representing the <literal>BITMAP</literal> selection target.
  */
 #define GDK_TARGET_BITMAP 		_GDK_MAKE_ATOM (5)
 
 /**
  * GDK_TARGET_COLORMAP:
  *
- * A #GdkAtom representing the `COLORMAP` selection target.
+ * A #GdkAtom representing the <literal>COLORMAP</literal> selection target.
  */
 #define GDK_TARGET_COLORMAP 		_GDK_MAKE_ATOM (7)
 
 /**
  * GDK_TARGET_DRAWABLE:
  *
- * A #GdkAtom representing the `DRAWABLE` selection target.
+ * A #GdkAtom representing the <literal>DRAWABLE</literal> selection target.
  */
 #define GDK_TARGET_DRAWABLE 		_GDK_MAKE_ATOM (17)
 
 /**
  * GDK_TARGET_PIXMAP:
  *
- * A #GdkAtom representing the `PIXMAP` selection target.
+ * A #GdkAtom representing the <literal>PIXMAP</literal> selection target.
  */
 #define GDK_TARGET_PIXMAP 		_GDK_MAKE_ATOM (20)
 
 /**
  * GDK_TARGET_STRING:
  *
- * A #GdkAtom representing the `STRING` selection target.
+ * A #GdkAtom representing the <literal>STRING</literal> selection target.
  */
 #define GDK_TARGET_STRING 		_GDK_MAKE_ATOM (31)
 
 /**
  * GDK_SELECTION_TYPE_ATOM:
  *
- * A #GdkAtom representing the `ATOM` selection type.
+ * A #GdkAtom representing the <literal>ATOM</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_ATOM 	_GDK_MAKE_ATOM (4)
 
 /**
  * GDK_SELECTION_TYPE_BITMAP:
  *
- * A #GdkAtom representing the `BITMAP` selection type.
+ * A #GdkAtom representing the <literal>BITMAP</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_BITMAP 	_GDK_MAKE_ATOM (5)
 
 /**
  * GDK_SELECTION_TYPE_COLORMAP:
  *
- * A #GdkAtom representing the `COLORMAP` selection type.
+ * A #GdkAtom representing the <literal>COLORMAP</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_COLORMAP 	_GDK_MAKE_ATOM (7)
 
 /**
  * GDK_SELECTION_TYPE_DRAWABLE:
  *
- * A #GdkAtom representing the `DRAWABLE` selection type.
+ * A #GdkAtom representing the <literal>DRAWABLE</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_DRAWABLE 	_GDK_MAKE_ATOM (17)
 
 /**
  * GDK_SELECTION_TYPE_INTEGER:
  *
- * A #GdkAtom representing the `INTEGER` selection type.
+ * A #GdkAtom representing the <literal>INTEGER</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_INTEGER 	_GDK_MAKE_ATOM (19)
 
 /**
  * GDK_SELECTION_TYPE_PIXMAP:
  *
- * A #GdkAtom representing the `PIXMAP` selection type.
+ * A #GdkAtom representing the <literal>PIXMAP</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_PIXMAP 	_GDK_MAKE_ATOM (20)
 
 /**
  * GDK_SELECTION_TYPE_WINDOW:
  *
- * A #GdkAtom representing the `WINDOW` selection type.
+ * A #GdkAtom representing the <literal>WINDOW</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_WINDOW 	_GDK_MAKE_ATOM (33)
 
 /**
  * GDK_SELECTION_TYPE_STRING:
  *
- * A #GdkAtom representing the `STRING` selection type.
+ * A #GdkAtom representing the <literal>STRING</literal> selection type.
  */
 #define GDK_SELECTION_TYPE_STRING 	_GDK_MAKE_ATOM (31)
 
 /* Selections
  */
 
-GDK_AVAILABLE_IN_ALL
+#ifndef GDK_MULTIHEAD_SAFE
 gboolean   gdk_selection_owner_set (GdkWindow	 *owner,
 				    GdkAtom	  selection,
 				    guint32	  time_,
 				    gboolean      send_event);
-GDK_AVAILABLE_IN_ALL
 GdkWindow* gdk_selection_owner_get (GdkAtom	  selection);
-GDK_AVAILABLE_IN_ALL
+#endif/* GDK_MULTIHEAD_SAFE */
+
 gboolean   gdk_selection_owner_set_for_display (GdkDisplay *display,
 						GdkWindow  *owner,
 						GdkAtom     selection,
 						guint32     time_,
 						gboolean    send_event);
-GDK_AVAILABLE_IN_ALL
 GdkWindow *gdk_selection_owner_get_for_display (GdkDisplay *display,
 						GdkAtom     selection);
 
@@ -183,25 +181,21 @@ GdkWindow *gdk_selection_owner_get_for_display (GdkDisplay *display,
  * Retrieves the contents of a selection in a given
  * form.
  */
-GDK_AVAILABLE_IN_ALL
 void	   gdk_selection_convert   (GdkWindow	 *requestor,
 				    GdkAtom	  selection,
 				    GdkAtom	  target,
 				    guint32	  time_);
-GDK_AVAILABLE_IN_ALL
 gint       gdk_selection_property_get (GdkWindow  *requestor,
 				       guchar	 **data,
 				       GdkAtom	  *prop_type,
 				       gint	  *prop_format);
 
-GDK_AVAILABLE_IN_ALL
 void	   gdk_selection_send_notify (GdkWindow      *requestor,
 				      GdkAtom	      selection,
 				      GdkAtom	      target,
 				      GdkAtom	      property,
 				      guint32	      time_);
 
-GDK_AVAILABLE_IN_ALL
 void       gdk_selection_send_notify_for_display (GdkDisplay      *display,
 						  GdkWindow       *requestor,
 						  GdkAtom     	   selection,

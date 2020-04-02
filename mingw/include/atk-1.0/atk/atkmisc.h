@@ -17,15 +17,14 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#ifndef __ATK_MISC_H__
-#define __ATK_MISC_H__
-
 #if defined(ATK_DISABLE_SINGLE_INCLUDES) && !defined (__ATK_H_INSIDE__) && !defined (ATK_COMPILATION)
 #error "Only <atk/atk.h> can be included directly."
 #endif
 
+#ifndef __ATK_MISC_H__
+#define __ATK_MISC_H__
+
 #include <glib-object.h>
-#include <atk/atkversion.h>
 
 /* We prefix variable declarations so they can
  * properly get exported in Windows DLLs.
@@ -37,7 +36,7 @@
 #    else /* !ATK_STATIC_COMPILATION */
 #      ifdef ATK_COMPILATION
 #        ifdef DLL_EXPORT
-#          define ATK_VAR _ATK_EXTERN
+#          define ATK_VAR __declspec(dllexport)
 #        else /* !DLL_EXPORT */
 #          define ATK_VAR extern
 #        endif /* !DLL_EXPORT */
@@ -46,7 +45,7 @@
 #      endif /* !ATK_COMPILATION */
 #    endif /* !ATK_STATIC_COMPILATION */
 #  else /* !G_PLATFORM_WIN32 */
-#    define ATK_VAR _ATK_EXTERN
+#    define ATK_VAR extern
 #  endif /* !G_PLATFORM_WIN32 */
 #endif /* ATK_VAR */
 
@@ -75,20 +74,9 @@ struct _AtkMisc
  * Singleton instance - only the ATK implementation layer for
  * a given GUI toolkit/application instance should touch this
  * symbol directly.
- *
- * Deprecated: Since 2.12.
  */
 ATK_VAR AtkMisc *atk_misc_instance;
 
-/**
- * AtkMiscClass:
- * @threads_enter: This virtual function is deprecated since 2.12 and
- *   it should not be overriden.
- * @threads_leave: This virtual function is deprecated sice 2.12 and
- *   it should not be overriden.
- *
- * Usage of AtkMisc is deprecated since 2.12 and heavily discouraged.
- */
 struct _AtkMiscClass
 {
    GObjectClass parent;
@@ -96,15 +84,27 @@ struct _AtkMiscClass
    void   (* threads_leave)                     (AtkMisc *misc);
    gpointer vfuncs[32]; /* future bincompat */
 };
-
-ATK_DEPRECATED_IN_2_12
 GType atk_misc_get_type (void);
 
-ATK_DEPRECATED_IN_2_12
+/*
+ * Wrapper for thread lock, i.e. take the thread mutex for the GUI toolkit, 
+ * if one exists.  
+ * (This method is implemented by the toolkit ATK implementation layer;
+ *  for instance, for GTK+, GAIL implements this via GDK_THREADS_ENTER).
+ */
 void     atk_misc_threads_enter  (AtkMisc *misc);
-ATK_DEPRECATED_IN_2_12
+
+/*
+ * Wrapper for thread lock, i.e. release the thread mutex for the GUI toolkit, 
+ * if one exists.  
+ * (This method is implemented by the toolkit ATK implementation layer;
+ *  for instance, for GTK+, GAIL implements this via GDK_THREADS_LEAVE).
+ */
 void     atk_misc_threads_leave  (AtkMisc *misc);
-ATK_DEPRECATED_IN_2_12
+
+/*
+ * Obtain (singleton) instance of AtkMisc.
+ */
 const AtkMisc *atk_misc_get_instance (void);
 
 G_END_DECLS

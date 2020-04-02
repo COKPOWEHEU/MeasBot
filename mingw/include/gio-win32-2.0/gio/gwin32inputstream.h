@@ -5,7 +5,7 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 2 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,7 +13,9 @@
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General
- * Public License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ * Public License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+ * Boston, MA 02111-1307, USA.
  *
  * Author: Alexander Larsson <alexl@redhat.com>
  * Author: Tor Lillqvist <tml@iki.fi>
@@ -42,8 +44,6 @@ typedef struct _GWin32InputStream         GWin32InputStream;
 typedef struct _GWin32InputStreamClass    GWin32InputStreamClass;
 typedef struct _GWin32InputStreamPrivate  GWin32InputStreamPrivate;
 
-G_DEFINE_AUTOPTR_CLEANUP_FUNC(GWin32InputStream, g_object_unref)
-
 struct _GWin32InputStream
 {
   GInputStream parent_instance;
@@ -65,18 +65,13 @@ struct _GWin32InputStreamClass
   void (*_g_reserved5) (void);
 };
 
-GLIB_AVAILABLE_IN_ALL
 GType          g_win32_input_stream_get_type         (void) G_GNUC_CONST;
 
-GLIB_AVAILABLE_IN_ALL
 GInputStream * g_win32_input_stream_new              (void              *handle,
 						      gboolean           close_handle);
-GLIB_AVAILABLE_IN_ALL
 void           g_win32_input_stream_set_close_handle (GWin32InputStream *stream,
 						      gboolean           close_handle);
-GLIB_AVAILABLE_IN_ALL
 gboolean       g_win32_input_stream_get_close_handle (GWin32InputStream *stream);
-GLIB_AVAILABLE_IN_ALL
 void          *g_win32_input_stream_get_handle       (GWin32InputStream *stream);
 
 G_END_DECLS
