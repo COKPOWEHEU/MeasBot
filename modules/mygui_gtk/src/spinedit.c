@@ -70,12 +70,12 @@ static int getter_step(lua_State *L, int tblindex){
 static int setter_enabled(lua_State *L, int tblindex){
   SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
   char en = lua_toboolean(L, tblindex+2);
-  gtk_widget_set_sensitive(GTK_SPIN_BUTTON(spined->obj), en);
+  gtk_widget_set_sensitive(GTK_WIDGET(spined->obj), en);
   return 0;
 }
 static int getter_enabled(lua_State *L, int tblindex){
   SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
-  char en = gtk_widget_get_sensitive(GTK_SPIN_BUTTON(spined->obj));
+  char en = gtk_widget_get_sensitive(GTK_WIDGET(spined->obj));
   lua_pushboolean(L, en);
   return 1;
 }
