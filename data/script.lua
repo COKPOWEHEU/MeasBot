@@ -127,7 +127,7 @@ function btn.OnClick()
   --print(ed:GetText())
   local txt = lbl.text
   print(txt)
-  --lbl.text = "Text"
+  lbl.text = "Text"
 end
 
 function btn2.OnClick()

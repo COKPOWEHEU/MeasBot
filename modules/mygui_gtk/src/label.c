@@ -46,8 +46,8 @@ static int getter_y(lua_State *L, int tblindex){
 static int setter_text(lua_State *L, int tblindex){
   int top = lua_gettop(L);
   const char *text = "DEFAULT";
-  if(lua_isstring(L, -1))text = lua_tostring(L, -1);
-  Label *lbl = (Label*)read_handle(L, tblindex+2, NULL);
+  if(lua_isstring(L, tblindex+2))text = lua_tostring(L, tblindex+2);
+  Label *lbl = (Label*)read_handle(L, tblindex, NULL);
   gtk_label_set_text(GTK_LABEL(lbl->obj), text);
   lua_settop(L, top);
   return 0;
