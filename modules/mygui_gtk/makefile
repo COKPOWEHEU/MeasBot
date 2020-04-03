@@ -11,7 +11,7 @@ regproto = $(addprefix void ,$(addsuffix _reg(lua_State*);,$(files)))
 CFLAGS  = -Os -Wall -MD -MP -MT $(builddir)/$(*F).$(arch).o -MF $(builddir)/dep/$(@F).mk
 #-D_REENTERAN
 CFLAGS += -I./ -fPIC -DREGFUNCS="$(regfuncs)" -DREGPROTOS="$(regproto)"
-CFLAGS += -DDEBUG
+#CFLAGS += -DDEBUG
 CXXFLAGS = $(CFLAGS) -std=c++11
 
 LDFLAGS = -lm -fPIC -shared

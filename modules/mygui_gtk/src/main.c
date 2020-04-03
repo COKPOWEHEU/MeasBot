@@ -183,13 +183,6 @@ static int L_update(lua_State *L){
   return 1;
 }
 
-static int L_test(lua_State *L){
-  printf("lua: test\n");
-  return 0;
-}
-
-
-
 static int L_delay_ms(lua_State *L){
   if(!lua_isnumber(L, -1))return 0;
   size_t n = lua_tonumber(L, -1);
@@ -199,7 +192,9 @@ static int L_delay_ms(lua_State *L){
 }
 
 static int L_gc(lua_State *L){
+#ifdef DEBUG
   printf("GUI free\n");
+#endif
   if(gui.poolidx != LUA_NOREF){
     luaL_unref(L, LUA_REGISTRYINDEX, gui.poolidx);
   }

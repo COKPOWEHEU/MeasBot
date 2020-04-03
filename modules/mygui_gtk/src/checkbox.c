@@ -159,7 +159,9 @@ static int L_ChkBoxsetter(lua_State *L){
 }
 
 static int L_ChkBox_GC(lua_State *L){
+#ifdef DEBUG
   printf("Checkbox GC\n");
+#endif
   int top = lua_gettop(L);
   ChkBox *btn = (ChkBox*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(btn->obj))gtk_widget_destroy(btn->obj);

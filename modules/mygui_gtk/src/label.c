@@ -125,7 +125,9 @@ static int L_Labelsetter(lua_State *L){
 }
 
 static int L_Lbl_GC(lua_State *L){
+#ifdef DEBUG
   printf("Btn GC\n");
+#endif
   int top = lua_gettop(L);
   Label *lbl = (Label*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(lbl->obj))gtk_widget_destroy(lbl->obj);

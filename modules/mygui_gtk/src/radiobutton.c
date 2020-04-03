@@ -158,7 +158,9 @@ static int L_RadioBtnsetter(lua_State *L){
 }
 
 static int L_RBtn_GC(lua_State *L){
+#ifdef DEBUG
   printf("RadioBtn GC\n");
+#endif
   int top = lua_gettop(L);
   RadioBtn *btn = (RadioBtn*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(btn->obj))gtk_widget_destroy(btn->obj);

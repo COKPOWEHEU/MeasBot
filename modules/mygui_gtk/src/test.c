@@ -10,7 +10,9 @@ typedef struct{
 }Test;
 
 static int L_Tst_GC(lua_State *L){
+#ifdef DEBUG
   printf("Test GC\n");
+#endif
   lua_getmetatable(L, -1);
   lua_getfield(L, -1, "handle");
   if(!lua_islightuserdata(L, -1)){

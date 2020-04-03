@@ -160,6 +160,9 @@ static int L_Editsetter(lua_State *L){
 }
 
 int L_Ed_GC(lua_State *L){
+#ifdef DEBUG
+  printf("Edit GC\n");
+#endif
   int top = lua_gettop(L);
   Edit *ed = read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(ed->obj))gtk_widget_destroy(ed->obj);

@@ -200,7 +200,9 @@ static int L_SpinEdsetter(lua_State *L){
 }
 
 static int L_SpinEd_GC(lua_State *L){
+#ifdef DEBUG
   printf("SpinEd GC\n");
+#endif
   int top = lua_gettop(L);
   SpinEd *spined = (SpinEd*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(spined->obj))gtk_widget_destroy(spined->obj);

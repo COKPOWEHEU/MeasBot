@@ -111,7 +111,9 @@ static int L_Wndsetter(lua_State *L){
 }
 
 static int L_Wnd_GC(lua_State *L){
+#ifdef DEBUG
   printf("Window GC\n");
+#endif
   int top = lua_gettop(L);
   Wnd *wnd = (Wnd*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(wnd->obj))gtk_widget_destroy(wnd->obj);

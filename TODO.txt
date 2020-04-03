@@ -1,7 +1,3 @@
-modules.mygui_gtk: добавить Progressbar (хз как)
-modules.mygui_gtk: добавить Frame
-modules.mygui_gtk: добавить булевские индикаторы
-modules.mygui_gtk.all: добавить явное указание размера
 modules.mygui_gtk.Edit: добавить колбэк на ввод. Добавить функцию проверки был ли ввод. Добавить привязку к кнопке
 modules.mygui_gtk.Plot: добавить палитру (таблицу)
 modules.mygui_gtk.window: добавить сохранение предыдущей позиции
@@ -10,3 +6,7 @@ DONE:
 modules.mygui_gtk: добавить Label
 modules.mygui_gtk: добавить SpinEdit
 modules.mygui_gtk: добавить вариации Button (checkbox, radiobutton, switch)
+modules.mygui_gtk: добавить Progressbar (хз как)
+modules.mygui_gtk: добавить Frame
+modules.mygui_gtk: добавить булевские индикаторы
+modules.mygui_gtk.all: добавить явное указание размера

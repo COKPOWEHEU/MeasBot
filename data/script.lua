@@ -21,11 +21,6 @@ function tblprint(tbl, pref, postf)
   end
 end
 
-function func(tbl)
-  print(tbl)
-  tblprint(tbl)
-end
-
 function OnImport(a)
   print("On import:", a)
 end
@@ -66,78 +61,33 @@ for i=1,10 do aaa[i] = {i,math.sin(i)} end
 
 gui = require("mygui_gtk")
 gui.wnd = gui:NewWindow(800, 600, "Test gtk")
-print("GUI.WND = ", gui.wnd)
-tblprint(gui.wnd)
 btn = gui.wnd:NewButton(10,10,"Button")
-print("btn = ", btn)
-btn2 = gui.wnd:NewButton(10,50, "Кнопко")
-print("btn2 = ", btn2)
+btn2 = gui.wnd:NewButton(10,50, "Apply radiobutton")
 ed = gui.wnd:NewEdit(10,100, "какой-то текст")
-print("ed = ", ed)
-tst = gui.wnd:NewTest()
-t2 = gui.wnd.NewTest()
 plot = gui.wnd:NewPlot(100,0, 500, 500)
-print("plot = ", plot)
-tblprint(plot)
 plot.format={x=1}
-rb1 = gui.wnd:NewRadioButton(10, 140, "Regilar plot", nil)
+rb1 = gui.wnd:NewRadioButton(10, 140, "Regular plot", nil)
 rb1.data = aaa
 rb2 = gui.wnd:NewRadioButton(10, 170, "Circular buffer", rb1)
 rb2.data = tblring
 lbl = gui.wnd:NewLabel(10, 200, "Label")
---pb = gui.wnd:NewProgressBar(0, 230, 100, 20)
---pb.min, pb.max = 0, tblring.size
 tc = gui.wnd:NewTabControl(600, 0, 200, 400);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 
---name = gui.wnd:OpenFileDialog("TPATATA")
---res = gui.wnd:QuestionDialog()
-
-check = tc[0]:NewCheckBox(10, 10, "BBB")
+check = tc[0]:NewCheckBox(10, 10, "Inversion progress")
 spined = tc[0]:NewSpinEdit(10, 30)
-progress1 = tc[0]:NewProgressBar(10, 100, 30, 20)
-progress2 = tc[0]:NewProgressBar(10, 150, 100, 100)
-progress2.min = -1
-progress2.max = 2
-
-print(progress2.max, progress2.min)
-function func(x)
-  progress1.val = x
-  progress2.val = x
-end
-
-mt = getmetatable(tc)
-print("Tc.tab = ")
-tblprint(mt.tab)
-
-print("tab[0] = ", tc[0])
-tblprint(tc[0])
+pb = tc[0]:NewProgressBar(10, 100, 100, 20)
+pb.min, pb.max = 0, tblring.size
 
 ed.text = "TPATATA"
 
-print("DELETE")
-tst = nil
-collectgarbage("collect")
-print("place to GC")
-print("GUI = ", gui)
-tblprint(gui)
-
 function btn.OnClick()
-  --print(ed:GetText())
-  local txt = lbl.text
-  print(txt)
-  lbl.text = "Text"
+  name = gui.wnd:OpenFileDialog("TPATATA")
+  print("Selected file: ",name)
 end
 
 function btn2.OnClick()
-  --tblprint(plot.data)
-  --[[if plot.data == tblring then
-    plot.data = aaa
-  else
-    plot.data = tblring
-  end--]]
-  --plot.data = 
   plot.data = rb1:GetSelected().data
 end
 
@@ -152,22 +102,9 @@ while gui:update() do
   plot:Refresh()
   x = x+1
   gui:delay_ms(10)
-  --[[if check:IsChecked() then
+  if check.checked then
     pb.val = tblring.st
   else
     pb.val = tblring.size - tblring.st
-  end--]]
-  func(0.5+0.5*math.sin(x*0.1))
+  end
 end
-
---[[
-tblprint(gui)
-gmt = getmetatable(gui)
-print("GUI pool = ", gmt.pool)
-if gmt.pool ~= nil then
-  tblprint(gmt.pool)
-end
---]]
-
-print("\n-----------END-------------")
---]]

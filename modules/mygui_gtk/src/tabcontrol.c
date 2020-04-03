@@ -184,7 +184,7 @@ static int L_SetTab(lua_State *L){
   }else if(lua_isnil(L, -1)){
     //TODO проверить не является ли num последним
     gtk_notebook_remove_page(GTK_NOTEBOOK(tctl->obj), num);
-    printf("Delete [%i]\n", num);
+    //printf("Delete [%i]\n", num);
     lua_settop(L, top);
     return 0;
   }
@@ -193,7 +193,7 @@ static int L_SetTab(lua_State *L){
     lua_getfield(L, -1, "tab"); //real 'tab'
       lua_rawgeti(L, -1, num);
         if(lua_istable(L, -1)){ //элемент уже существует
-          printf("Tab [%i] already exist\n", num);
+          //printf("Tab [%i] already exist\n", num);
           lua_settop(L, top);
           return 0;
         }
@@ -212,7 +212,7 @@ static int L_SetTab(lua_State *L){
           lua_setfield(L, -2, "gtk_container");
         lua_setmetatable(L, -2);
       lua_rawseti(L, -2, num);
-      printf("Tab [%i] = %s created\n", num, text);
+      //printf("Tab [%i] = %s created\n", num, text);
   lua_settop(L, top);
   return 0;
 }
@@ -229,7 +229,7 @@ static int L_GetTab(lua_State *L){
       lua_rawgeti(L, -1, num);
         if(lua_isnil(L, -1)){ //такого элемента не существует
           lua_settop(L, top);
-          printf("tab [%i] does not exist\n", num);
+          //printf("tab [%i] does not exist\n", num);
           return 0;
         }
         return 1;

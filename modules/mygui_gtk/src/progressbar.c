@@ -208,7 +208,9 @@ static int L_setter(lua_State *L){
 }
 
 static int L_Progress_GC(lua_State *L){
+#ifdef DEBUG
   printf("Progress GC\n");
+#endif
   int top = lua_gettop(L);
   Progress *pb = (Progress*)read_handle(L, -1, NULL);
   if(GTK_IS_WIDGET(pb->obj))gtk_widget_destroy(pb->obj);
