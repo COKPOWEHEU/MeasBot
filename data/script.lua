@@ -87,7 +87,7 @@ rb2.data = tblring
 lbl = gui.wnd:NewLabel(10, 200, "Label")
 --pb = gui.wnd:NewProgressBar(0, 230, 100, 20)
 --pb.min, pb.max = 0, tblring.size
-tc = gui.wnd:NewTabControl(600, 0, 200, 200);
+tc = gui.wnd:NewTabControl(600, 0, 200, 400);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 
@@ -96,6 +96,16 @@ tc[1] = "Tab2"
 
 check = tc[0]:NewCheckBox(10, 10, "BBB")
 spined = tc[0]:NewSpinEdit(10, 30)
+progress1 = tc[0]:NewProgressBar(10, 100, 30, 20)
+progress2 = tc[0]:NewProgressBar(10, 150, 100, 100)
+progress2.min = -1
+progress2.max = 2
+
+print(progress2.max, progress2.min)
+function func(x)
+  progress1.val = x
+  progress2.val = x
+end
 
 mt = getmetatable(tc)
 print("Tc.tab = ")
@@ -104,9 +114,7 @@ tblprint(mt.tab)
 print("tab[0] = ", tc[0])
 tblprint(tc[0])
 
-print(btn:WasClicked())
 ed.text = "TPATATA"
-
 
 print("DELETE")
 tst = nil
@@ -115,12 +123,11 @@ print("place to GC")
 print("GUI = ", gui)
 tblprint(gui)
 
-
 function btn.OnClick()
   --print(ed:GetText())
-  local txt = lbl:GetText()
+  local txt = lbl.text
   print(txt)
-  lbl:SetText("Text")
+  --lbl.text = "Text"
 end
 
 function btn2.OnClick()
@@ -139,8 +146,8 @@ plot.data = tblring
 
 while gui:update() do
   collectgarbage("collect")
-  io.write("\r", tostring(collectgarbage("count")*1024))
-  io.flush()
+  --io.write("\r", tostring(collectgarbage("count")*1024))
+  --io.flush()
   tblring:add({math.sin(x*0.1), math.sin(x*0.15), math.sin(x*0.13), math.sin(x*0.17)})
   plot:Refresh()
   x = x+1
@@ -150,6 +157,7 @@ while gui:update() do
   else
     pb.val = tblring.size - tblring.st
   end--]]
+  func(0.5+0.5*math.sin(x*0.1))
 end
 
 --[[

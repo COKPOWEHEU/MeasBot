@@ -3,73 +3,87 @@
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
-/*
+
 typedef struct{
   GtkWidget *obj;
   int pool_idx;
   int x, y, w, h;
+  float min, max, val;
 }Progress;
 
-struct IntVariables{
+struct ProgressVariables{
   char *name;
   int (*setter)(lua_State *L, int tblindex);
   int (*getter)(lua_State *L, int tblindex);
 };
 
+void Progress_resize(Progress *pb){
+  char cssstring[500];
+  sprintf(cssstring,
+    "* {\n"
+    "  min-height: %ipx;\n"
+    "  min-width: 1px;\n"
+    "}\n"
+    , pb->h
+  );
+  gtk_widget_set_size_request(pb->obj, pb->w, pb->h);
+  GtkStyleContext *context = gtk_widget_get_style_context(GTK_WIDGET(pb->obj));
+  GtkCssProvider *provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_data(GTK_CSS_PROVIDER(provider), cssstring, -1, NULL);
+  gtk_style_context_add_provider(
+    context,
+    GTK_STYLE_PROVIDER (provider),
+    GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+  );
+  g_object_unref(provider);
+}
+
 static int setter_min(lua_State *L, int tblindex){
-  float min = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  gtk_level_bar_set_min_value(GTK_LEVEL_BAR(pb->obj), min);
-  printf("Set min = %f\n", min);
+  pb->min = lua_tonumber(L, tblindex+2);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(pb->obj), (pb->val - pb->min)/(pb->max - pb->min));
   return 0;
 }
 static int getter_min(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float min = gtk_level_bar_get_min_value(GTK_LEVEL_BAR(pb->obj));
-  lua_pushnumber(L, min);
+  lua_pushnumber(L, pb->min);
   return 1;
 }
 
 static int setter_max(lua_State *L, int tblindex){
-  float max = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  gtk_level_bar_set_max_value(GTK_LEVEL_BAR(pb->obj), max);
-  printf("Set max = %f\n", max);
+  pb->max = lua_tonumber(L, tblindex+2);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(pb->obj), (pb->val - pb->min)/(pb->max - pb->min));
   return 0;
 }
 static int getter_max(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float max = gtk_level_bar_get_max_value(GTK_LEVEL_BAR(pb->obj));
-  lua_pushnumber(L, max);
+  lua_pushnumber(L, pb->max);
   return 1;
 }
 static int setter_val(lua_State *L, int tblindex){
-  float val = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  gtk_level_bar_set_value(GTK_LEVEL_BAR(pb->obj), val);
+  pb->val = lua_tonumber(L, tblindex+2);
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(pb->obj), (pb->val - pb->min)/(pb->max - pb->min));
   return 0;
 }
 static int getter_val(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float val = gtk_level_bar_get_value(GTK_LEVEL_BAR(pb->obj));
-  lua_pushnumber(L, val);
+  lua_pushnumber(L, pb->val);
   return 1;
 }
 static int setter_frac(lua_State *L, int tblindex){
   float val = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float min = gtk_level_bar_get_min_value(GTK_LEVEL_BAR(pb->obj));
-  float max = gtk_level_bar_get_max_value(GTK_LEVEL_BAR(pb->obj));
-  gtk_level_bar_set_value(GTK_LEVEL_BAR(pb->obj), min + val*(max-min));
+  gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(pb->obj), val);
+  pb->val = pb->min + (pb->max - pb->min)*val;
   return 0;
 }
 static int getter_frac(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
-  float val = gtk_level_bar_get_value(GTK_LEVEL_BAR(pb->obj));
-  float min = gtk_level_bar_get_min_value(GTK_LEVEL_BAR(pb->obj));
-  float max = gtk_level_bar_get_max_value(GTK_LEVEL_BAR(pb->obj));
-  lua_pushnumber(L, (val-min)/(max-min));
+  lua_pushnumber(L, (pb->val - pb->min)/(pb->max - pb->min));
   return 1;
 }
 
@@ -101,7 +115,7 @@ static int setter_width(lua_State *L, int tblindex){
   float w = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
   pb->w = w;
-  gtk_widget_set_size_request(pb->obj, pb->w, pb->h);
+  Progress_resize(pb);
   return 0;
 }
 static int getter_width(lua_State *L, int tblindex){
@@ -113,7 +127,7 @@ static int setter_height(lua_State *L, int tblindex){
   float h = lua_tonumber(L, tblindex+2);
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
   pb->h = h;
-  gtk_widget_set_size_request(pb->obj, pb->w, pb->h);
+  Progress_resize(pb);
   return 0;
 }
 static int getter_height(lua_State *L, int tblindex){
@@ -122,7 +136,7 @@ static int getter_height(lua_State *L, int tblindex){
   return 1;
 }
 
-struct IntVariables progressbar_intvars[] = {
+struct ProgressVariables progressbar_intvars[] = {
   {.name = "x", .setter = setter_x, .getter = getter_x},
   {.name = "y", .setter = setter_y, .getter = getter_y},
   {.name = "width", .setter = setter_width, .getter = getter_width},
@@ -205,7 +219,6 @@ static int L_Progress_GC(lua_State *L){
 }
 
 static int L_NewProgress(lua_State *L){
-  //int x=0, y=0, w=100, h=10;
   //получаем объект родительского окна
   if(lua_gettop(L) < 1){
     printf("Call function as METHOD!\n");
@@ -216,7 +229,7 @@ static int L_NewProgress(lua_State *L){
   GtkWidget *cont = read_container(L, 1, NULL);
   Progress *pb = (Progress*)malloc(sizeof(Progress));
   pb->x = 0; pb->y = 0; pb->w = 100; pb->h = 10;
-  
+  pb->min=0; pb->max=1; pb->val=0;
   if(lua_gettop(L) >= 5){
     if(lua_isnumber(L, 2))pb->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))pb->y = lua_tonumber(L, 3);
@@ -234,8 +247,8 @@ static int L_NewProgress(lua_State *L){
     lua_setfield(L, -2, "__pairs");
   lua_setmetatable(L, -2);
   
-  pb->obj = gtk_level_bar_new();
-  gtk_widget_set_size_request(pb->obj, pb->w, pb->h);
+  pb->obj = gtk_progress_bar_new();
+  Progress_resize(pb);
   gtk_fixed_put(GTK_FIXED(cont), pb->obj, pb->x, pb->y);
   gtk_widget_show(pb->obj);
   return 1;
@@ -248,7 +261,8 @@ void progressbar_reg(lua_State *L){
   printf("Progress registred\n");
 #endif
 }
-*/
+/*
 void progressbar_reg(lua_State *L){
 #warning PROGRESSBAR DOESNT WORK
 }
+*/
