@@ -3,7 +3,7 @@ srcdir = src
 builddir = build
 
 progname := $(resdir)/prog
-files = main
+files = main lps305 ../../tty/src/ttym
 
 CFLAGS  = -Os -Wall -MD -MP -MT $(builddir)/$(*F).$(arch).o -MF $(builddir)/dep/$(@F).mk
 #-D_REENTERAN
