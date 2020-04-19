@@ -23,6 +23,8 @@ obj:setModeTracking(1)
 
 obj:setBeeper(1)
 
+obj:setDigOutput(0)
+
 obj:getStatus()
 
 obj:getModel()
