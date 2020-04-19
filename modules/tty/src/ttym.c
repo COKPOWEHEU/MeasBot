@@ -76,7 +76,15 @@ speed_t speed_convert(unsigned int baudrate){
   }
 }
 
-ttym_t ttym_open(char name[], unsigned int baudrate){
+static const struct{
+  tcflag_t wordLen;
+  tcflag_t parity;
+}tty_attributes[] = {
+  [UART_8N1]={.wordLen = CS8         , .parity = IGNPAR},
+  [UART_8N2]={.wordLen = CS8 | CSTOPB, .parity = IGNPAR}
+};
+
+ttym_t ttym_open(char name[], unsigned int baudrate, enum ttym_mode mode){
   speed_t speed = speed_convert(baudrate);
   ttym_t res = (struct ttym*)malloc(sizeof(struct ttym));
   if(res == NULL)return res;
@@ -87,8 +95,8 @@ ttym_t ttym_open(char name[], unsigned int baudrate){
   }
   tcgetattr( res->fd, &(res->ttyset) );
   memcpy( &(res->oldset), &(res->ttyset), sizeof(struct termios));
-  res->ttyset.c_cflag = speed | CS8 | CLOCAL | CREAD;
-  res->ttyset.c_iflag = IGNPAR;
+  res->ttyset.c_cflag = speed | CLOCAL | CREAD | tty_attributes[mode].wordLen;
+  res->ttyset.c_iflag = tty_attributes[mode].parity;
   res->ttyset.c_oflag = 0;
   res->ttyset.c_lflag = 0;
   res->ttyset.c_cc[VMIN] = 0;

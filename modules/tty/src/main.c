@@ -121,12 +121,14 @@ static int L_Tty_GC(lua_State *L){
 static int L_OpenTty(lua_State *L){
   const char *path = "";
   unsigned int baudrate = 0;
+  unsigned int mode = 0;
   if(lua_gettop(L) >= 3){
     if(lua_isstring(L, 2))path = lua_tostring(L, 2);
     if(lua_isnumber(L, 3))baudrate = lua_tonumber(L, 3);
+    if(lua_isnumber(L,4))mode = lua_tonumber(L, 4);
   }
   lua_settop(L, 0);
-  ttym_t tty = ttym_open((char*)path, baudrate);
+  ttym_t tty = ttym_open((char*)path, baudrate, mode);
   if(tty == NULL){
     //printf("Can not open\n");
     return 0;

@@ -9,7 +9,12 @@ extern "C" {
 struct ttym;
 typedef struct ttym* ttym_t;
 
-ttym_t ttym_open(char name[], unsigned int baudrate);
+enum ttym_mode{
+  UART_8N1,
+  UART_8N2
+};
+
+ttym_t ttym_open(char name[], unsigned int baudrate, enum ttym_mode mode);
 int ttym_close(ttym_t tty);
 ssize_t ttym_write(ttym_t tty, void *buf, size_t count);
 ssize_t ttym_read(ttym_t tty, void *buf, size_t count);
