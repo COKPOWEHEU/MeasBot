@@ -21,6 +21,8 @@ obj:setOutput(0)
 
 obj:setModeTracking(1)
 
+obj:setBeeper(1)
+
 obj:getStatus()
 
 obj:getModel()
