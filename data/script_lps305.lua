@@ -19,6 +19,8 @@ obj:getCurrent(1)
 
 obj:setOutput(0)
 
+obj:setModeTracking(1)
+
 obj:getStatus()
 
 obj:getModel()
