@@ -11,4 +11,9 @@ if obj == nil then
   os.exit()
 end
 
+obj:getStatus()
+
+obj:getModel()
+obj:getVerion()
+
 obj:close()

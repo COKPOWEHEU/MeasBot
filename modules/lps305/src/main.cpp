@@ -1,10 +1,86 @@
 #include <iostream>
+#include <cstring>
 #include <lua5.2/lua.hpp>
 #include "lps305.h"
 
 
 static int L_help(lua_State *L){
   lua_pushstring(L, "This module is needed  to work with power supply LPS-305");
+  return 1;
+}
+
+
+static int L_getStatus(lua_State *L) {
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connect' before using anything functions");
+    return -1;
+  }
+  int res;
+  res = lps->getStatus();
+  
+  lua_pushinteger(L, res);
+  return 1;
+}
+
+static int L_getModel(lua_State *L) {
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+  
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connect' before using anything functions");
+    return -1;
+  }
+  char* res;
+  res = lps->getModel();
+  
+  lua_pushlstring(L, res, strlen(res));
+  free(res);
+  return 1;
+}
+
+static int L_getVersion(lua_State *L) {
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+  
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connect' before using anything functions");
+    return -1;
+  }
+  char* res;
+  res = lps->getVersion();
+  
+  lua_pushlstring(L, res, strlen(res));
+  free(res);
   return 1;
 }
 
@@ -66,6 +142,18 @@ static int L_connect(lua_State *L) {
       lua_pushlightuserdata(L, lps);
       lua_rawset(L, -3);
     lua_setmetatable(L, -2);
+    
+    lua_pushstring(L, "getStatus");
+    lua_pushcfunction(L, L_getStatus);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "getModel");
+    lua_pushcfunction(L, L_getModel);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "getVersion");
+    lua_pushcfunction(L, L_getVersion);
+    lua_rawset(L, -3);
 
     lua_pushstring(L, "close");
     lua_pushcfunction(L, L_close);
