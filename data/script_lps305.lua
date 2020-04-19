@@ -17,6 +17,8 @@ obj:getVoltage(1)
 obj:setCurrent(1, 0.5)
 obj:getCurrent(1)
 
+obj:setOutput(0)
+
 obj:getStatus()
 
 obj:getModel()
