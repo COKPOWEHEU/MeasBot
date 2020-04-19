@@ -11,6 +11,9 @@ if obj == nil then
   os.exit()
 end
 
+obj:setVoltage(1, 5)
+obj:getVoltage(1)
+
 obj:getStatus()
 
 obj:getModel()

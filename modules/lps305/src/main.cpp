@@ -9,6 +9,63 @@ static int L_help(lua_State *L){
   return 1;
 }
 
+static int L_setVoltage(lua_State *L) {
+  int channel = 0;
+  double volt = 0;
+  if(lua_gettop(L) >= 3) {
+    if(lua_isnumber(L, -2)) channel = lua_tointeger(L, -2);
+    if(lua_isnumber(L, -1)) volt = lua_tonumber(L, -1);
+  }
+  
+  lua_getmetatable(L, -3);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connect' before using anything functions");
+    return -1;
+  }
+  lps->setVoltage(channel, volt);
+  
+  return 1;
+}
+
+static int L_getVoltage(lua_State *L) {
+  int channel = 0;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, -1)) channel = lua_tointeger(L, -1);
+  }
+  
+  lua_getmetatable(L, -2);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connect' before using anything functions");
+    return -1;
+  }
+  double res;
+  res = lps->getVoltage(channel);
+  
+  lua_pushnumber(L, res);
+  return 1;
+}
 
 static int L_getStatus(lua_State *L) {
   lua_getmetatable(L, -1);
@@ -143,6 +200,14 @@ static int L_connect(lua_State *L) {
       lua_rawset(L, -3);
     lua_setmetatable(L, -2);
     
+    lua_pushstring(L, "setVoltage");
+    lua_pushcfunction(L, L_setVoltage);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "getVoltage");
+    lua_pushcfunction(L, L_getVoltage);
+    lua_rawset(L, -3);
+
     lua_pushstring(L, "getStatus");
     lua_pushcfunction(L, L_getStatus);
     lua_rawset(L, -3);
