@@ -12,6 +12,10 @@ typedef struct{
   int pool_idx;
   double fontsize;
   int x, y, w, h;
+  float x_min, x_max, y_min, y_max; 
+  int abs_x, abs_y;
+  float rel_x, rel_y;
+  float cur_size;
 }Plot;
 const float plot_colors[][3] = {{1,0,0}, {0,1,0}, {0,0,1}, {1,1,0}, {1,0,1}, {0,1,1}, {1,1,1}};
 //TODO: добавить палитры
@@ -81,6 +85,16 @@ static int getter_enabled(lua_State *L, int tblindex){
   lua_pushboolean(L, en);
   return 1;
 }
+static int setter_cursize(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  plot->cur_size = lua_tonumber(L, tblindex+2);
+  return 0;
+}
+static int getter_cursize(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  lua_pushnumber(L, plot->cur_size);
+  return 1;
+}
 
 struct PlotIntVariables plot_intvars[] = {
   {.name = "x", .setter = setter_x, .getter = getter_x},
@@ -88,6 +102,7 @@ struct PlotIntVariables plot_intvars[] = {
   {.name = "width", .setter = setter_width, .getter = getter_width},
   {.name = "height", .setter = setter_height, .getter = getter_height},
   {.name = "enabled", .setter = setter_enabled, .getter = getter_enabled},
+  {.name = "cur_size", .setter= setter_cursize, .getter = getter_cursize},
 };
 #define ARR_COUNT(arr) (sizeof(arr)/sizeof(arr[0]))
 
@@ -203,6 +218,7 @@ double plot_autorange(double *a, double *b){
   pmax -= ipwr;
   
   if(pmax < log10(2)){
+    if(ipwr < 0)ipwr--;
     man = 2;
   }else if(pmax < log10(5)){
     man = 5;
@@ -389,6 +405,12 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   dx = plot_autorange(&cmin, &cmax);
   kx = rect.width/(cmax-cmin); bx = -kx*cmin;
   
+  //сохранение размеров графика в приватные переменные
+  plot->x_min = cmin; plot->x_max = cmax;
+  plot->y_min = ymin; plot->y_max = ymax;
+  plot->rel_x = plot->x_min + (plot->x_max - plot->x_min)*plot->abs_x / plot->w;
+  plot->rel_y = plot->y_max - (plot->y_max - plot->y_min)*plot->abs_y / plot->h;
+  
   //отрисовка кривых
   for(int line=1; line<fmtlen; line++){
     cairo_set_source_rgb(cr, plot_colors[line-1][0], plot_colors[line-1][1], plot_colors[line-1][2]);
@@ -428,7 +450,7 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   for(x = cmin; x<cmax; x+=dx, rx+=rd){
     if(fabs(x) < dx/2)x = 0;
     cr_line(cr,rx,0, rx,rect.height);
-    sprintf(buf, "%g", x);
+    sprintf(buf, "%.1g", x);
     cairo_move_to(cr, rx, y - 0.2*fontsize);
     cairo_show_text(cr, buf);
   }
@@ -440,10 +462,36 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
     if(fabs(y) < dy/2)y = 0;
     cr_line(cr,0,ry, rect.width,ry);
     if(fabs(y) < dy/2)y = 0;
-    sprintf(buf, "%g", y);
+    sprintf(buf, "%.1g", y);
     cairo_move_to(cr, x, ry + 0.9*fontsize);
     cairo_show_text(cr, buf);
   }
+  
+  //если надо отрисовать курсор - отрисовываем
+  if(plot->cur_size > 0){
+    float size = plot->cur_size/2;
+    if(rect.width > rect.height){
+      size *= rect.height;
+    }else{
+      size *= rect.width;
+    }
+    cr_line(cr, plot->abs_x - size, plot->abs_y, plot->abs_x + size, plot->abs_y);
+    cr_line(cr, plot->abs_x, plot->abs_y - size, plot->abs_x, plot->abs_y + size);
+    sprintf(buf, "%.2g, %.2g", plot->rel_x, plot->rel_y);
+    int tx = plot->abs_x, ty = plot->abs_y;
+    cairo_text_extents_t strprop;
+    cairo_text_extents(cr, buf, &strprop);
+    if(tx + strprop.width > plot->w){
+      tx -= strprop.width;
+    }
+    if(ty - strprop.height < 0){
+      ty += strprop.height;
+    }
+    
+    cairo_move_to(cr, tx, ty);
+    cairo_show_text(cr, buf);
+  }
+  
   cairo_stroke(cr);
   
   cairo_destroy (cr);
@@ -453,8 +501,18 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   return 1;
 }
 
+static gboolean PlotMouse(GtkWidget *widget, GdkEventExpose *event, gpointer data){
+  Plot *plot = (Plot*)data;
+  GdkEventButton *bt = (GdkEventButton*)event;
+  //printf("On Press (%f %f) %i\n", bt->x, bt->y, bt->button); //1=left, 2=mid, 3=right
+  plot->abs_x = bt->x;
+  plot->abs_y = bt->y;
+  plot->rel_x = plot->x_min + (plot->x_max - plot->x_min)*plot->abs_x / plot->w;
+  plot->rel_y = plot->y_max - (plot->y_max - plot->y_min)*plot->abs_y / plot->h;
+  return 1;
+}
+
 static int L_NewPlot(lua_State *L){
-  
   if(lua_gettop(L) < 1){
     printf("Call function as METHOD!\n");
     lua_settop(L, 0);
@@ -464,6 +522,9 @@ static int L_NewPlot(lua_State *L){
   GtkWidget *cont = read_container(L, 1, NULL);
   Plot *plot = (Plot*)malloc(sizeof(Plot));
   plot->x=0; plot->y=0; plot->w=100; plot->h=100;
+  plot->cur_size = -0.1;
+  plot->x_min=0; plot->x_max=1;
+  plot->y_min=0; plot->y_max=1;
   if(lua_gettop(L) >= 5){
     if(lua_isnumber(L, 2))plot->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))plot->y = lua_tonumber(L, 3);
@@ -494,6 +555,10 @@ static int L_NewPlot(lua_State *L){
   gtk_fixed_put(GTK_FIXED(cont), plot->obj, plot->x, plot->y);
   gtk_widget_show(plot->obj);
   g_signal_connect(G_OBJECT(plot->obj), "draw", G_CALLBACK(PlotOnDraw), plot);
+  
+  gtk_widget_add_events(plot->obj, GDK_POINTER_MOTION_MASK | GDK_BUTTON_PRESS_MASK);
+  g_signal_connect(G_OBJECT(plot->obj), "motion-notify-event", G_CALLBACK(PlotMouse), plot);
+  g_signal_connect(G_OBJECT(plot->obj), "button_press_event",  G_CALLBACK(PlotMouse), plot);
   return 1;
 }
 
