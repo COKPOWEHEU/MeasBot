@@ -95,6 +95,16 @@ static int getter_cursize(lua_State *L, int tblindex){
   lua_pushnumber(L, plot->cur_size);
   return 1;
 }
+static int getter_cur_x(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  lua_pushnumber(L, plot->rel_x);
+  return 1;
+}
+static int getter_cur_y(lua_State *L, int tblindex){
+  Plot *plot = (Plot*)read_handle(L, tblindex, NULL);
+  lua_pushnumber(L, plot->rel_y);
+  return 1;
+}
 
 struct PlotIntVariables plot_intvars[] = {
   {.name = "x", .setter = setter_x, .getter = getter_x},
@@ -103,6 +113,8 @@ struct PlotIntVariables plot_intvars[] = {
   {.name = "height", .setter = setter_height, .getter = getter_height},
   {.name = "enabled", .setter = setter_enabled, .getter = getter_enabled},
   {.name = "cur_size", .setter= setter_cursize, .getter = getter_cursize},
+  {.name = "cur_x", .setter = NULL, .getter = getter_cur_x},
+  {.name = "cur_y", .setter = NULL, .getter = getter_cur_y},
 };
 #define ARR_COUNT(arr) (sizeof(arr)/sizeof(arr[0]))
 
@@ -138,6 +150,7 @@ static int L_Plotgetter(lua_State *L){
   lua_pop(L, 1);
   for(int i=0; i<ARR_COUNT(plot_intvars); i++){
     if(strcmp(idx, plot_intvars[i].name)==0){
+      if(plot_intvars[i].getter == NULL)return 0;
       return plot_intvars[i].getter(L, -1);
     }
   }
@@ -151,6 +164,7 @@ static int L_Plotsetter(lua_State *L){
   if(lua_isstring(L, -2))idx = lua_tostring(L, -2);
   for(int i=0; i<ARR_COUNT(plot_intvars); i++){
     if(strcmp(idx, plot_intvars[i].name)==0){
+      if(plot_intvars[i].setter == NULL)return 0;
       return plot_intvars[i].setter(L, -3);
     }
   }
