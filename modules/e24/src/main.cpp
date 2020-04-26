@@ -85,7 +85,7 @@ static int L_setRange(lua_State *L){
 }
 
 static int L_help(lua_State *L){
-  lua_pushstring(L, "This module is needed  to work with a voltmeter e24");
+  lua_pushstring(L, "This module is needed  to work with a voltmeter e24.\nIt contains next functions:\n-- e24[n].getVoltage() - this function returns the ADC value on channel n.\n-- e24[n].setRange(range) - this function setup range value on channel n and returns him.\n!About the channels, see at specification of the device.\n");
   return 1;
 }
 
