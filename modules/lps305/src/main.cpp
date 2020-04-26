@@ -212,6 +212,61 @@ static int L_negGetCurrent(lua_State *L) {
   return 1;
 }
 
+static int L_bothSetVoltage(lua_State *L) {
+  double volt1 = 0, volt2 = 0;
+  if(lua_gettop(L) >= 3) {
+    if(lua_isnumber(L, -2)) volt1 = lua_tonumber(L, -2);
+    if(lua_isnumber(L, -1)) volt2 = lua_tonumber(L, -1);
+  }
+  
+  lua_getmetatable(L, -3);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return -1;
+  }
+  lps->setVoltage(1, volt1);
+  lps->setVoltage(2, volt2);
+  
+  return 0;
+}
+
+static int L_bothGetVoltage(lua_State *L) {  
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return -1;
+  }
+  double res1, res2;
+  res1 = lps->getVoltage(1);
+  res2 = lps->getVoltage(2);
+  
+  lua_pushnumber(L, res1);
+  lua_pushnumber(L, res2);
+  return 1;
+}
+
 static int L_setOutput(lua_State *L) {
   int mode = 0;
   if(lua_gettop(L) >= 2) {
@@ -424,6 +479,24 @@ static int L_connectNewDevice(lua_State *L) {
 
       lua_pushstring(L, "getCurrent");
       lua_pushcfunction(L, L_negGetCurrent);
+      lua_rawset(L, -3);
+
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "both");
+    lua_newtable(L);
+      lua_newtable(L);
+        lua_pushstring(L, "_objLPS305_");
+        lua_pushlightuserdata(L, lps);
+        lua_rawset(L, -3);
+      lua_setmetatable(L, -2);
+      
+      lua_pushstring(L, "setVoltage");
+      lua_pushcfunction(L, L_bothSetVoltage);
+      lua_rawset(L, -3);
+
+      lua_pushstring(L, "getVoltage");
+      lua_pushcfunction(L, L_bothGetVoltage);
       lua_rawset(L, -3);
 
     lua_rawset(L, -3);
