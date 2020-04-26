@@ -7,4 +7,6 @@ print(lps305:help())
 
 obj = lps305:connectNewDevice("/dev/ttyUSB0")
 
+obj:setOutput(0)
+
 obj:disconnect()
