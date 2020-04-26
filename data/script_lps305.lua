@@ -15,5 +15,7 @@ obj:setOutput(0)
 
 obj.pos:setVoltage(5)
 print(obj.pos:getVoltage())
+obj.pos:setCurrent(0.1)
+print(obj.pos:getCurrent())
 
 obj:disconnect()
