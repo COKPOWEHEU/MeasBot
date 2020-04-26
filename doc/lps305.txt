@@ -1,0 +1,7 @@
+Now:
+  require("lps305")
+  |
+  +-- help(): string -------------------- Строка подсказки
+Future:
+  +-- createNewDevice(path to device, baudrate): table ------------------ Подключается к заданному path со скоростью baudrate. Возвращает таблицу для работы с прибором.
+      |
