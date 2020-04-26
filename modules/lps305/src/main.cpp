@@ -3,7 +3,34 @@
 #include "lps305.h"
 
 static int L_help(lua_State *L){
-  lua_pushstring(L, "This module is needed  to work with power supply LPS-305.\nIt contains next functions:\n-- lps305:connectNewDevice(path, baudrate) - The function of connecting to a given 'path' with rate a 'baudrate'. Returns the table for working with the device.\n-- obj:disconnect() - Function to disconnect from the device.\n!'obj' is the variable to which the table was assigned using 'lps305: connectNewDevice'\n");
+  lua_pushstring(L, "This module is needed  to work with power supply LPS-305.\nIt contains next functions:\n-- lps305:connectNewDevice(path, baudrate) - The function of connecting to a given 'path' with rate a 'baudrate'. Returns the table for working with the device.\n-- obj:setOuput(mode) - performs enable/disable outputs device\n-- obj:disconnect() - function to disconnect from the device.\n!'obj' is the variable to which the table was assigned using 'lps305: connectNewDevice'\n");
+  return 1;
+}
+
+static int L_setOutput(lua_State *L) {
+  int mode = 0;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, -1)) mode = lua_tointeger(L, -1);
+  }
+  
+  lua_getmetatable(L, -2);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connect' before using anything functions");
+    return -1;
+  }
+  lps->setOutput(mode);
+  
   return 1;
 }
 
@@ -68,6 +95,10 @@ static int L_connectNewDevice(lua_State *L) {
       lua_pushlightuserdata(L, lps);
       lua_rawset(L, -3);
     lua_setmetatable(L, -2);
+
+    lua_pushstring(L, "setOutput");
+    lua_pushcfunction(L, L_setOutput);
+    lua_rawset(L, -3);
 
     lua_pushstring(L, "disconnect");
     lua_pushcfunction(L, L_disconnect);
