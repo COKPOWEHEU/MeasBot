@@ -13,4 +13,7 @@ print(obj:getDeviceHelp())
 
 obj:setOutput(0)
 
+obj.pos:setVoltage(5)
+print(obj.pos:getVoltage())
+
 obj:disconnect()
