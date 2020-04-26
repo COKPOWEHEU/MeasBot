@@ -161,6 +161,57 @@ static int L_negGetVoltage(lua_State *L) {
   return 1;
 }
 
+static int L_negSetCurrent(lua_State *L) {
+  double curr = 0;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, -1)) curr = lua_tonumber(L, -1);
+  }
+  
+  lua_getmetatable(L, -2);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return -1;
+  }
+  lps->setCurrent(2, curr);
+  
+  return 1;
+}
+
+static int L_negGetCurrent(lua_State *L) {
+  lua_getmetatable(L, -1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return -1;
+  }
+  double res;
+  res = lps->getCurrent(2);
+  
+  lua_pushnumber(L, res);
+  return 1;
+}
+
 static int L_setOutput(lua_State *L) {
   int mode = 0;
   if(lua_gettop(L) >= 2) {
@@ -365,6 +416,14 @@ static int L_connectNewDevice(lua_State *L) {
 
       lua_pushstring(L, "getVoltage");
       lua_pushcfunction(L, L_negGetVoltage);
+      lua_rawset(L, -3);
+
+      lua_pushstring(L, "setCurrent");
+      lua_pushcfunction(L, L_negSetCurrent);
+      lua_rawset(L, -3);
+
+      lua_pushstring(L, "getCurrent");
+      lua_pushcfunction(L, L_negGetCurrent);
       lua_rawset(L, -3);
 
     lua_rawset(L, -3);

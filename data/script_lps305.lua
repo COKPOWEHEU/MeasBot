@@ -18,9 +18,9 @@ print(obj.pos:getVoltage())
 obj.pos:setCurrent(0.1)
 print(obj.pos:getCurrent())
 
-obj.pos:setVoltage(2)
-print(obj.pos:getVoltage())
-obj.pos:setCurrent(0.05)
-print(obj.pos:getCurrent())
+obj.neg:setVoltage(2)
+print(obj.neg:getVoltage())
+obj.neg:setCurrent(0.05)
+print(obj.neg:getCurrent())
 
 obj:disconnect()
