@@ -347,7 +347,7 @@ static int L_connectNewDevice(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isstring(L, 2)) portname = (char*)lua_tostring(L, 2);
   } else {
-    std::cerr << "Error: " << "This function must contain at least 1 parameter (port name)" << std::endl;
+    std::cerr << "LPS-305 error: This function must contain at least 1 parameter (port name)" << std::endl;
   }
   if(lua_gettop(L) >= 3) {
     if(lua_isnumber(L, 3)) baud = lua_tonumber(L, 3);
@@ -375,6 +375,11 @@ static int L_connectNewDevice(lua_State *L) {
       lua_pushstring(L, "_objLPS305_");
       lua_pushlightuserdata(L, lps);
       lua_rawset(L, -3);
+
+      lua_pushstring(L, "__gc");
+      lua_pushcfunction(L,L_disconnect);
+      lua_rawset(L, -3);
+
     lua_setmetatable(L, -2);
 
     lua_pushstring(L, "pos");
@@ -443,10 +448,6 @@ static int L_connectNewDevice(lua_State *L) {
 
     lua_pushstring(L, "getDeviceHelp");
     lua_pushcfunction(L, L_getDeviceHelp);
-    lua_rawset(L, -3);
-    
-    lua_pushstring(L, "disconnect");
-    lua_pushcfunction(L, L_disconnect);
     lua_rawset(L, -3);
 
   return 1;
