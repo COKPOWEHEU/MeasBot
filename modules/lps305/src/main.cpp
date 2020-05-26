@@ -342,14 +342,15 @@ static int L_disconnect(lua_State *L) {
 }
 
 static int L_connectNewDevice(lua_State *L) {
-  char *portname = NULL;
-  int baud = 0, checkError = 0;
-  if(lua_gettop(L) >= 3) {
-    if(lua_isnumber(L, -2)) portname = (char*)lua_tostring(L, -2);
-    if(lua_isnumber(L, -1)) baud = lua_tonumber(L, -1);
+  char *portname = nullptr;
+  int baud = 2400, checkError = 0;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isstring(L, 2)) portname = (char*)lua_tostring(L, 2);
   } else {
-    if(lua_isnumber(L, -1)) portname = (char*)lua_tostring(L, -2);
-    baud = 2400;
+    std::cerr << "Error: " << "This function must contain at least 1 parameter (port name)" << std::endl;
+  }
+  if(lua_gettop(L) >= 3) {
+    if(lua_isnumber(L, 3)) baud = lua_tonumber(L, 3);
   }
 
   LPS305 *lps;
