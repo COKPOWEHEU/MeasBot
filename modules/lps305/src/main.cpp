@@ -11,10 +11,10 @@ static int L_help(lua_State *L){
 static int L_posSetVoltage(lua_State *L) {
   double volt = 0;
   if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, -1)) volt = lua_tonumber(L, -1);
+    if(lua_isnumber(L, 2)) volt = lua_tonumber(L, 2);
   }
   
-  lua_getmetatable(L, -2);
+  lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
     printf("Not metatable!\n");
     return 0;
@@ -62,10 +62,10 @@ static int L_posGetVoltage(lua_State *L) {
 static int L_posSetCurrent(lua_State *L) {
   double curr = 0;
   if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, -1)) curr = lua_tonumber(L, -1);
+    if(lua_isnumber(L, 2)) curr = lua_tonumber(L, 2);
   }
   
-  lua_getmetatable(L, -2);
+  lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
     printf("Not metatable!\n");
     return 0;
@@ -113,7 +113,7 @@ static int L_posGetCurrent(lua_State *L) {
 static int L_negSetVoltage(lua_State *L) {
   double volt = 0;
   if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, -1)) volt = lua_tonumber(L, -1);
+    if(lua_isnumber(L, 2)) volt = lua_tonumber(L, 2);
   }
   
   lua_getmetatable(L, -2);
@@ -167,7 +167,7 @@ static int L_negSetCurrent(lua_State *L) {
     if(lua_isnumber(L, -1)) curr = lua_tonumber(L, -1);
   }
   
-  lua_getmetatable(L, -2);
+  lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
     printf("Not metatable!\n");
     return 0;
@@ -218,7 +218,7 @@ static int L_bothSetVoltage(lua_State *L) {
     if(lua_isnumber(L, 2)) volt = lua_tonumber(L, 2);
   }
   
-  lua_getmetatable(L, -2);
+  lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
     printf("Not metatable!\n");
     return 0;
@@ -269,10 +269,10 @@ static int L_bothGetVoltage(lua_State *L) {
 static int L_bothSetCurrent(lua_State *L) {
   double curr = 0;
   if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, -1)) curr = lua_tonumber(L, -1);
+    if(lua_isnumber(L, 2)) curr = lua_tonumber(L, 2);
   }
   
-  lua_getmetatable(L, -2);
+  lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
     printf("Not metatable!\n");
     return 0;
@@ -324,10 +324,10 @@ static int L_bothGetCurrent(lua_State *L) {
 static int L_setOutput(lua_State *L) {
   int mode = 0;
   if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, -1)) mode = lua_tointeger(L, -1);
+    if(lua_isnumber(L, 2)) mode = lua_tointeger(L, 2);
   }
   
-  lua_getmetatable(L, -2);
+  lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
     printf("Not metatable!\n");
     return 0;
