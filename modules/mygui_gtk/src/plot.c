@@ -224,6 +224,14 @@ double plot_autorange(double *a, double *b){
     *b = *a;
     *a = temp;
   }
+  if(*b - *a < 1e-100){
+    if(*a < 1e-100){
+      *a = -1; *b=1;
+    }else{
+      *a -= *b/10;
+      *b += *b/10;
+    }
+  }
   double pmax;
   int man, ipwr;
   
@@ -242,6 +250,7 @@ double plot_autorange(double *a, double *b){
   
   int min = (int)(*a * pow(0.1, ipwr-1));
   int max = (int)(*b * pow(0.1, ipwr-1));
+  
   int diff = min % man;
   if(min > 0){min -= diff;}else{min -= man+diff;}
   diff = max % man;
@@ -461,10 +470,16 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   if(ymin < 0 && ymax > 0)y = by; else y = by + ky*ymin;
   rx = bx + kx*cmin;
   rd = kx*dx;
+  char *fmt;
+  {
+    float rng;
+    if(fabs(cmin) > fabs(cmax))rng = fabs(cmin); else rng = fabs(cmax);
+    if((rng <= 100 && rng >= 1) || rng < 1e-100)fmt = "%.1f"; else fmt = ".1e";
+  }
   for(x = cmin; x<cmax; x+=dx, rx+=rd){
     if(fabs(x) < dx/2)x = 0;
     cr_line(cr,rx,0, rx,rect.height);
-    sprintf(buf, "%.1g", x);
+    sprintf(buf, fmt, x);
     cairo_move_to(cr, rx, y - 0.2*fontsize);
     cairo_show_text(cr, buf);
   }
@@ -472,11 +487,16 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   if(cmin < 0 && cmax > 0)x = bx; else x = bx + kx*cmin;
   ry = by + ky*ymin;
   rd = ky*dy;
+  {
+    float rng;
+    if(fabs(ymin) > fabs(ymax))rng = fabs(ymin); else rng = fabs(ymax);
+    if((rng <= 100 && rng >= 1) || rng < 1e-100)fmt = "%.1f"; else fmt = ".1e";
+  }
   for(y = ymin; y<ymax+dy; y+=dy, ry+=rd){
     if(fabs(y) < dy/2)y = 0;
     cr_line(cr,0,ry, rect.width,ry);
     if(fabs(y) < dy/2)y = 0;
-    sprintf(buf, "%.1g", y);
+    sprintf(buf, fmt, y);
     cairo_move_to(cr, x, ry + 0.9*fontsize);
     cairo_show_text(cr, buf);
   }

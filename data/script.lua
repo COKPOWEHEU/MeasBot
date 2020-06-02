@@ -73,9 +73,12 @@ while gui:update() do
   dat = tty:gets()
   if dat ~= nil then
     dat = dat:gsub("%.", ",")
-    tblring:add( {tonumber(dat)} )
-    plot:Refresh()
-    ed.text = dat
+    dat = tonumber(dat)
+    if dat ~= nil then
+      tblring:add( {dat} )
+      plot:Refresh()
+      ed.text = string.format("%.1f", dat)
+    end
   end
   gui:delay_ms(10)
 end
