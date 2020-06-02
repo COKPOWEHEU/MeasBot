@@ -67,14 +67,18 @@ static int L_gets(lua_State *L){
   int dat;
   while(1){
     dat = ttym_readchar(tty);
-    if(dat <= 0)break;
-    if(dat == '\r' && ch == str)continue;
-    if(dat == '\n' && ch[0] == '\r')ch--;
+    if(dat <= 0){ //timeout
+      lua_pushnil(L);
+      return 0;
+    }
+    if(dat == '\r')continue; //ignore
+    if(dat == '\n'){
+      ch[0] = 0;
+      break;
+    }
     ch[0] = dat;
     ch++;
   }
-  ch[0] = 0;
-  
   lua_pushstring(L, str);
   return 1;
 }
