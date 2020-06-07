@@ -38,6 +38,7 @@ int main(int argc, char **argv){
   if(argc > 1){
     scriptname = argv[1];
   }
+  printf("Loading script [%s]\n", scriptname);
   lua_State *L = luaL_newstate();
   res = luaL_loadfile(L, scriptname);
   if(res != 0){

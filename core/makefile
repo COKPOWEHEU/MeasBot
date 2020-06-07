@@ -97,7 +97,7 @@ allarch:
 #	make -r -j 10 arch=arch_lin32
 	make -r -j 10 arch=arch_lin64
 	make -r -j 10 arch=arch_win32
-	make -r -j 10 arch=arch_win64
+#	make -r -j 10 arch=arch_win64
 
 build/%.$(arch).o: $(srcdir)/%.c
 	mkdir -p build
