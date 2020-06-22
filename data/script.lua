@@ -74,6 +74,11 @@ lbl = gui.wnd:NewLabel(10, 200, "Label")
 tc = gui.wnd:NewTabControl(600, 0, 200, 400);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
+sc = gui.wnd:NewScroller(5, 250)
+
+function sc:OnChange(val)
+  print(val)
+end
 
 check = tc[0]:NewCheckBox(10, 10, "Inversion progress")
 spined = tc[0]:NewSpinEdit(10, 30)
@@ -82,7 +87,7 @@ pb.min, pb.max = 0, tblring.size
 
 ed.text = "TPATATA"
 
-function btn.OnClick()
+function btn:OnClick()
   name = gui.wnd:OpenFileDialog("TPATATA")
   print("Selected file: ",name)
 end
