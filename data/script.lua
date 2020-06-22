@@ -81,6 +81,7 @@ function sc:OnChange(val)
 end
 
 check = tc[0]:NewCheckBox(10, 10, "Inversion progress")
+
 spined = tc[0]:NewSpinEdit(10, 30)
 pb = tc[0]:NewProgressBar(10, 100, 100, 20)
 pb.min, pb.max = 0, tblring.size

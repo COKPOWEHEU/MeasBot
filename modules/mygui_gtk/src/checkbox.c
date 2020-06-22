@@ -81,12 +81,26 @@ static int getter_enabled(lua_State *L, int tblindex){
 static int setter_checked(lua_State *L, int tblindex){
   ChkBox *btn = (ChkBox*)read_handle(L, tblindex, NULL);
   char res = lua_toboolean(L, tblindex+2);
-  gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn->obj), res);
+  if(GTK_IS_TOGGLE_BUTTON(btn->obj)){
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(btn->obj), res);
+  }else if(GTK_IS_SWITCH(btn->obj)){
+    gtk_switch_set_active(GTK_SWITCH(btn->obj), res);
+  }else{
+    printf("Err\n");
+  }
+  
   return 0;
 }
 static int getter_checked(lua_State *L, int tblindex){
   ChkBox *btn = (ChkBox*)read_handle(L, tblindex, NULL);
-  char res = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(btn->obj));
+  char res;
+  if(GTK_IS_TOGGLE_BUTTON(btn->obj)){
+    res = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(btn->obj));
+  }else if(GTK_IS_SWITCH(btn->obj)){
+    res = gtk_switch_get_active(GTK_SWITCH(btn->obj));
+  }else{
+    printf("Err\n");
+  }
   lua_pushboolean(L, res);
   return 1;
 }
@@ -171,22 +185,20 @@ static int L_ChkBox_GC(lua_State *L){
   return 0;
 }
 
-static int L_NewChkBox(lua_State *L){
-  const char *caption="NONAME";
+ChkBox* NewToggle(lua_State *L, GtkWidget*(*create_widget)(void)){
   //получаем объект родительского окна
   if(lua_gettop(L) < 1){
     printf("Call function as METHOD!\n");
     lua_settop(L, 0);
     lua_pushnil(L);
-    return 1;
+    return NULL;
   }
   GtkWidget *cont = read_container(L, 1, NULL);
   ChkBox *btn = (ChkBox*)malloc(sizeof(ChkBox));
   btn->x = 0; btn->y = 0;
-  if(lua_gettop(L) >= 4){
+  if(lua_gettop(L) >= 3){
     if(lua_isnumber(L, 2))btn->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))btn->y = lua_tonumber(L, 3);
-    if(lua_isstring(L, 4))caption = lua_tostring(L, 4);
   }
   
   btn->pool_idx = mk_blank_table(L, btn, L_ChkBox_GC);
@@ -199,16 +211,39 @@ static int L_NewChkBox(lua_State *L){
     lua_setfield(L, -2, "__pairs");
   lua_setmetatable(L, -2);
   
-  btn->obj = gtk_check_button_new_with_label(caption);
+  btn->obj = create_widget();
   
   gtk_fixed_put(GTK_FIXED(cont), btn->obj, btn->x, btn->y);
   gtk_widget_show(btn->obj);
+  return btn;
+}
+
+static int L_NewChkBox(lua_State *L){
+  const char *caption="NONAME";
+  if(lua_gettop(L) >= 4)caption = lua_tostring(L, 4);
+  ChkBox *btn = NewToggle(L, gtk_check_button_new);
+  gtk_button_set_label(GTK_BUTTON(btn->obj), caption);
+  return 1;
+}
+static int L_NewToggleButton(lua_State *L){
+  const char *caption="NONAME";
+  if(lua_gettop(L) >= 4)caption = lua_tostring(L, 4);
+  ChkBox *btn = NewToggle(L, gtk_toggle_button_new);
+  gtk_button_set_label(GTK_BUTTON(btn->obj), caption);
+  return 1;
+}
+static int L_NewSwitchButton(lua_State *L){
+  ChkBox *btn = NewToggle(L, gtk_switch_new);
   return 1;
 }
 
 void checkbox_reg(lua_State *L){
   lua_pushcfunction(L, L_NewChkBox);
   lua_setfield(L, -2, "NewCheckBox");
+  lua_pushcfunction(L, L_NewToggleButton);
+  lua_setfield(L, -2, "NewToggleButton");
+  lua_pushcfunction(L, L_NewSwitchButton);
+  lua_setfield(L, -2, "NewSwitchButton");
 #ifdef DEBUG
   printf("ChkBox registred\n");
 #endif
