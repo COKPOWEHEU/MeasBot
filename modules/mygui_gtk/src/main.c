@@ -4,6 +4,7 @@
 #include <inttypes.h>
 #include <math.h>
 #include <stdlib.h>
+#include <locale.h>
 #include <lua5.2/lua.h>
 #include <lua5.2/lualib.h>
 #include <lua5.2/lauxlib.h>
@@ -203,6 +204,8 @@ static int L_gc(lua_State *L){
 }
 
 int luaopen_mygui_gtk(lua_State *L){
+  char *loc = strdup(setlocale(LC_ALL, NULL));
+  
   lua_settop(L, 0);
   
   //при импорте вызываем внешнюю функцию OnImport (если она есть)
@@ -240,5 +243,8 @@ int luaopen_mygui_gtk(lua_State *L){
     lua_setfield(L, -2, "update");
     window_reg(L);
     gui.L = L;
+    
+  setlocale(LC_ALL, loc);
+  free(loc);
   return 1;
 }
