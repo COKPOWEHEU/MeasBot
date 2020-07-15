@@ -474,13 +474,21 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   {
     float rng;
     if(fabs(cmin) > fabs(cmax))rng = fabs(cmin); else rng = fabs(cmax);
-    if((rng <= 100 && rng >= 1) || rng < 1e-100)fmt = "%.1f"; else fmt = ".1e";
+    if((rng <= 100 && rng >= 1) || rng < 1e-100)fmt = "%.1f"; else fmt = "%.1e";
   }
-  for(x = cmin; x<cmax; x+=dx, rx+=rd){
+  char par=0;
+  for(x = cmin;  x<cmax;  x+=dx, rx+=rd, par=!par){
     if(fabs(x) < dx/2)x = 0;
     cr_line(cr,rx,0, rx,rect.height);
     sprintf(buf, fmt, x);
-    cairo_move_to(cr, rx, y - 0.2*fontsize);
+    cairo_text_extents_t strprop;
+    cairo_text_extents(cr, buf, &strprop);
+    if(par && strprop.width > rd){
+      cairo_move_to(cr, rx - strprop.width/4, y - 1.5*fontsize);
+    }else{
+      if(x == cmin)strprop.width = 0;
+      cairo_move_to(cr, rx - strprop.width/4, y - 0.2*fontsize);
+    }
     cairo_show_text(cr, buf);
   }
   
@@ -490,7 +498,7 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   {
     float rng;
     if(fabs(ymin) > fabs(ymax))rng = fabs(ymin); else rng = fabs(ymax);
-    if((rng <= 100 && rng >= 1) || rng < 1e-100)fmt = "%.1f"; else fmt = ".1e";
+    if((rng <= 100 && rng >= 1) || rng < 1e-100)fmt = "%.1f"; else fmt = "%.1e";
   }
   for(y = ymin; y<ymax+dy; y+=dy, ry+=rd){
     if(fabs(y) < dy/2)y = 0;
