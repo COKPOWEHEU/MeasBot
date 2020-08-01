@@ -4,7 +4,21 @@
 #include "lps305.h"
 
 static int L_help(lua_State *L){
-  lua_pushstring(L, "This module is needed  to work with power supply LPS-305.\nIt contains next functions:\n-- lps305:connectNewDevice(path, baudrate) - The function of connecting to a given 'path' with rate a 'baudrate'. Returns the table for working with the device.\n-- obj:setOuput(mode) - performs enable/disable outputs device\n-- obj:getModel() - returns a string containing the model of the device\n-- obj:getVersion() - returns a string containing the version of the device\n-- obj:getDeviceHelp() - returns a string containing commands for working with the device\n-- obj:disconnect() - function to disconnect from the device.\n!'obj' is the variable to which the table was assigned using 'lps305: connectNewDevice'\n");
+  static const std::string helpstring =
+            "Module for working with power supply LPS-305\n"
+            "  connectNewDevice(path, baudrate):table - connecting to a given 'path' with rate a 'baudrate'\n"
+            "  setOuput(mode):nil - performs enable/disable outputs of device\n"
+            "  getModel():string - gets model of device\n"
+            "  getVersion():string - gets version of device\n"
+            "  getDeviceHelp() - gets commands for working with the device\n"
+            "  {pos, neg, both} - sub power supplies with following fields:\n"
+            "    setVoltage(U):nil - sets voltage U (in Volts)\n"
+            "    getVoltage():number - gets stetted voltage (in Volts)\n"
+            "    setCurrent(I):nil - sets maximum current (in Ampers)\n"
+            "    getCurrent():number - gets setted maximum currnt (in Ampers)\n"
+            ;
+
+  lua_pushstring(L, helpstring.c_str());
   return 1;
 }
 
