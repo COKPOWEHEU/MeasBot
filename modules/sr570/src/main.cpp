@@ -10,6 +10,52 @@ static int L_help(lua_State *L){
   return 1;
 }
 
+static int L_reset(lua_State *L) {
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->reset();
+
+  return 0;
+}
+
+static int L_resetFilCap(lua_State *L) {
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->resetFilCap();
+
+  return 0;
+}
+
 static int L_disconnect(lua_State *L) {
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
@@ -76,6 +122,14 @@ static int L_connectNewDevice(lua_State *L) {
       lua_pushcfunction(L, L_disconnect);
       lua_rawset(L, -3);
     lua_setmetatable(L, -2);
+
+    lua_pushstring(L, "reset");
+    lua_pushcfunction(L, L_reset);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "resetFilCap");
+    lua_pushcfunction(L, L_resetFilCap);
+    lua_rawset(L, -3);
 
   return 1;
 }
