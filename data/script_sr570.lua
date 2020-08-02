@@ -6,3 +6,4 @@ sr570 = require("sr570")
 sr570:help()
 
 sr_object = sr570:connectNewDevice("/dev/ttyUSB0");
+sr_object:reset()
