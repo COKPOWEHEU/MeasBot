@@ -95,6 +95,99 @@ static int L_setCalOffsetCurrentLVL(lua_State *L) {
   return 0;
 }
 
+static int L_setHighFilter(lua_State *L) {
+  float freqFilter;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) freqFilter = lua_tonumber(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setHighFilter(freqFilter);
+
+  return 0;
+}
+
+static int L_setLowFilter(lua_State *L) {
+  float freqFilter;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) freqFilter = lua_tonumber(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setLowFilter(freqFilter);
+
+  return 0;
+}
+
+static int L_setTypeFilter(lua_State *L) {
+  int nType;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) nType = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setTypeFilter(nType);
+
+  return 0;
+}
+
 static int L_setUncalInOffsetVernier(lua_State *L) {
   int scale;
   if(lua_gettop(L) >= 2) {
@@ -412,6 +505,18 @@ static int L_connectNewDevice(lua_State *L) {
 
     lua_pushstring(L, "setCalOffsetCurrentLVL");
     lua_pushcfunction(L, L_setCalOffsetCurrentLVL);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setHighFilter");
+    lua_pushcfunction(L, L_setHighFilter);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setLowFilter");
+    lua_pushcfunction(L, L_setLowFilter);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setTypeFilter");
+    lua_pushcfunction(L, L_setTypeFilter);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "setUncalInOffsetVernier");
