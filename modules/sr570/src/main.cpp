@@ -64,6 +64,130 @@ static int L_reset(lua_State *L) {
   return 0;
 }
 
+static int L_setCalOffsetCurrentLVL(lua_State *L) {
+  int curr;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) curr = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setCalOffsetCurrentLVL(curr);
+
+  return 0;
+}
+
+static int L_setUncalInOffsetVernier(lua_State *L) {
+  int scale;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) scale = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setUncalInOffsetVernier(scale);
+
+  return 0;
+}
+
+static int L_setInOffsetCalMode(lua_State *L) {
+  int calMode;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) calMode = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setInOffsetCalMode(calMode);
+
+  return 0;
+}
+
+static int L_turnInOffsetCurr(lua_State *L) {
+  int val;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) val = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->turnInOffsetCurr(val);
+
+  return 0;
+}
+
 static int L_setSenCal(lua_State *L) {
   int calMode;
   if(lua_gettop(L) >= 2) {
@@ -91,6 +215,37 @@ static int L_setSenCal(lua_State *L) {
     return 0;
   }
   sr->setSenCal(calMode);
+
+  return 0;
+}
+
+static int L_setInOffsetCurrSign(lua_State *L) {
+  int sign;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) sign = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setInOffsetCurrSign(sign);
 
   return 0;
 }
@@ -255,8 +410,28 @@ static int L_connectNewDevice(lua_State *L) {
     lua_pushcfunction(L, L_reset);
     lua_rawset(L, -3);
 
+    lua_pushstring(L, "setCalOffsetCurrentLVL");
+    lua_pushcfunction(L, L_setCalOffsetCurrentLVL);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setUncalInOffsetVernier");
+    lua_pushcfunction(L, L_setUncalInOffsetVernier);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setInOffsetCalMode");
+    lua_pushcfunction(L, L_setInOffsetCalMode);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "turnInOffsetCurr");
+    lua_pushcfunction(L, L_turnInOffsetCurr);
+    lua_rawset(L, -3);
+
     lua_pushstring(L, "setSenCal");
     lua_pushcfunction(L, L_setSenCal);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setInOffsetCurrSign");
+    lua_pushcfunction(L, L_setInOffsetCurrSign);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "setSigInvertSense");
