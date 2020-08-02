@@ -20,3 +20,6 @@ sr_object:setInOffsetCalMode(0)
 sr_object:turnInOffsetCurr(0)
 sr_object:setInOffsetCurrSign(1)
 
+sr_object:setTypeFilter(2)
+sr_object:setHighFilter(2)
+sr_object:setLowFilter(11)
