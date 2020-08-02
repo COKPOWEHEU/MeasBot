@@ -281,6 +281,37 @@ static int L_turnInOffsetCurr(lua_State *L) {
   return 0;
 }
 
+static int L_turnBiasVolt(lua_State *L) {
+  int val;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) val = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->turnBiasVolt(val);
+
+  return 0;
+}
+
 static int L_setSenCal(lua_State *L) {
   int calMode;
   if(lua_gettop(L) >= 2) {
@@ -401,6 +432,68 @@ static int L_setUncalSensVernier(lua_State *L) {
     return 0;
   }
   sr->setUncalSensVernier(scale);
+
+  return 0;
+}
+
+static int L_setBiasVoltLVL(lua_State *L) {
+  int nLevel;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) nLevel = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setBiasVoltLVL(nLevel);
+
+  return 0;
+}
+
+static int L_setGainMode(lua_State *L) {
+  int mode;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) mode = lua_tointeger(L, 2);
+  } else {
+    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setGainMode(mode);
 
   return 0;
 }
@@ -531,6 +624,10 @@ static int L_connectNewDevice(lua_State *L) {
     lua_pushcfunction(L, L_turnInOffsetCurr);
     lua_rawset(L, -3);
 
+    lua_pushstring(L, "turnBiasVolt");
+    lua_pushcfunction(L, L_turnBiasVolt);
+    lua_rawset(L, -3);
+
     lua_pushstring(L, "setSenCal");
     lua_pushcfunction(L, L_setSenCal);
     lua_rawset(L, -3);
@@ -545,6 +642,14 @@ static int L_connectNewDevice(lua_State *L) {
 
     lua_pushstring(L, "setUncalSensVernier");
     lua_pushcfunction(L, L_setUncalSensVernier);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setBiasVoltLVL");
+    lua_pushcfunction(L, L_setBiasVoltLVL);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setGainMode");
+    lua_pushcfunction(L, L_setGainMode);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "resetFilCap");
