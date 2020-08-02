@@ -23,3 +23,7 @@ sr_object:setInOffsetCurrSign(1)
 sr_object:setTypeFilter(2)
 sr_object:setHighFilter(2)
 sr_object:setLowFilter(11)
+
+sr_object:turnBiasVolt(0)
+sr_object:setBiasVoltLVL(0)
+sr_object:setGainMode(0)
