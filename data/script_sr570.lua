@@ -6,4 +6,9 @@ sr570 = require("sr570")
 sr570:help()
 
 sr_object = sr570:connectNewDevice("/dev/ttyUSB0");
+
 sr_object:reset()
+sr_object:setSens(27)
+sr_object:setSenCal(0)
+sr_object:setSigInvertSense(1)
+sr_object:setUncalSensVernier(0)
