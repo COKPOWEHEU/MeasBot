@@ -53,7 +53,7 @@ void SR570::reset() {
 void SR570::setSens(int sens) {
   char buff[256];
   if(sens < 0 || sens > 27) {
-    printf("Wrong sens");
+    ERROR_LOG("Wrong sens");
     return;
   }
   
@@ -65,7 +65,7 @@ void SR570::setSens(int sens) {
 void SR570::setCalOffsetCurrentLVL(int curr) {
   char buff[256];
   if(curr < 0 || curr > 29) {
-    printf("Wrong current value");
+    ERROR_LOG("Wrong current value");
     return;
   }
   
@@ -77,7 +77,7 @@ void SR570::setCalOffsetCurrentLVL(int curr) {
 void SR570::setTypeFilter(int nType) {
   char buff[256];
   if(nType < 0 || nType > 5) {
-    printf("Wrong type value");
+    ERROR_LOG("Wrong type value");
     return;
   }
   
@@ -89,7 +89,7 @@ void SR570::setTypeFilter(int nType) {
 void SR570::setHighFilter(int freqFilter) {
   char buff[256];
   if(freqFilter < 0 || freqFilter > 11) {
-    printf("Wrong Highpass filter frequency value");
+    ERROR_LOG("Wrong Highpass filter frequency value");
     return;
   }
   
@@ -101,7 +101,7 @@ void SR570::setHighFilter(int freqFilter) {
 void SR570::setLowFilter(int freqFilter) {
   char buff[256];
   if(freqFilter < 0 || freqFilter > 15) {
-    printf("Wrong Lowpass filter frequency value");
+    ERROR_LOG("Wrong Lowpass filter frequency value");
     return;
   }
   
@@ -113,7 +113,7 @@ void SR570::setLowFilter(int freqFilter) {
 void SR570::setUncalInOffsetVernier(int scale) {
   char buff[256];
   if(scale < -1000 || scale > 1000) {
-    printf("Wrong value");
+    ERROR_LOG("Wrong value");
     return;
   }
   
@@ -125,7 +125,7 @@ void SR570::setUncalInOffsetVernier(int scale) {
 void SR570::setInOffsetCalMode(int calMode) {
   char buff[256];
   if(calMode < 0 || calMode > 1) {
-    printf("Wrong mode value");
+    ERROR_LOG("Wrong mode value");
     return;
   }
   
@@ -137,7 +137,7 @@ void SR570::setInOffsetCalMode(int calMode) {
 void SR570::turnInOffsetCurr(int val) {
   char buff[256];
   if(val < 0 || val > 1) {
-    printf("Wrong turn the input offset current value");
+    ERROR_LOG("Wrong turn the input offset current value");
     return;
   }
   
@@ -149,7 +149,7 @@ void SR570::turnInOffsetCurr(int val) {
 void SR570::turnBiasVolt(int val) {
   char buff[256];
   if(val < 0 || val > 1) {
-    printf("Wrong turn bias voltage value");
+    ERROR_LOG("Wrong turn bias voltage value");
     return;
   }
   
@@ -161,7 +161,7 @@ void SR570::turnBiasVolt(int val) {
 void SR570::setSenCal(int calMode) {
   char buff[256];
   if(calMode < 0 || calMode > 1) {
-    printf("Wrong cal mode value");
+    ERROR_LOG("Wrong cal mode value");
     return;
   }
   
@@ -173,7 +173,7 @@ void SR570::setSenCal(int calMode) {
 void SR570::setInOffsetCurrSign(int sign) {
   char buff[256];
   if(sign < 0 || sign > 1) {
-    printf("Wrong sign value");
+    ERROR_LOG("Wrong sign value");
     return;
   }
   
@@ -185,7 +185,7 @@ void SR570::setInOffsetCurrSign(int sign) {
 void SR570::setSigInvertSense(int mode) {
   char buff[256];
   if(mode < 0 || mode > 1) {
-    printf("Wrong invert sense value");
+    ERROR_LOG("Wrong invert sense value");
     return;
   }
   
@@ -197,7 +197,7 @@ void SR570::setSigInvertSense(int mode) {
 void SR570::setBlanksOutAmplifier(int mode) {
   char buff[256];
   if(mode < 0 || mode > 1) {
-    printf("Wrong output amplifier value");
+    ERROR_LOG("Wrong output amplifier value");
     return;
   }
   
@@ -209,7 +209,7 @@ void SR570::setBlanksOutAmplifier(int mode) {
 void SR570::setUncalSensVernier(int scale) {
   char buff[256];
   if(scale < 0 || scale > 100) {
-    printf("Wrong scale value");
+    ERROR_LOG("Wrong scale value");
     return;
   }
   
@@ -221,7 +221,7 @@ void SR570::setUncalSensVernier(int scale) {
 void SR570::setBiasVoltLVL(int nLevel) {
   char buff[256];
   if(nLevel < 0 || nLevel > 1) {
-    printf("Wrong bias voltage level value");
+    ERROR_LOG("Wrong bias voltage level value");
     return;
   }
   
@@ -233,7 +233,7 @@ void SR570::setBiasVoltLVL(int nLevel) {
 void SR570::setGainMode(int mode) {
   char buff[256];
   if(mode < 0 || mode > 2) {
-    printf("Wrong gain mode value");
+    ERROR_LOG("Wrong gain mode value");
     return;
   }
   

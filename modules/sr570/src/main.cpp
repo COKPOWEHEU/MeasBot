@@ -76,25 +76,25 @@ static int L_setSens(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) sens = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (sensitivity)");
     return 0;
   }
   
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setSens(sens);
@@ -105,19 +105,19 @@ static int L_setSens(lua_State *L) {
 static int L_reset(lua_State *L) {
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->reset();
@@ -130,25 +130,25 @@ static int L_setCalOffsetCurrentLVL(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) curr = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (current)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setCalOffsetCurrentLVL(curr);
@@ -161,25 +161,25 @@ static int L_setHighFilter(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) freqFilter = lua_tonumber(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (freq)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setHighFilter(freqFilter);
@@ -192,25 +192,25 @@ static int L_setLowFilter(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) freqFilter = lua_tonumber(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (freq)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setLowFilter(freqFilter);
@@ -223,25 +223,25 @@ static int L_setTypeFilter(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) nType = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (ntype)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setTypeFilter(nType);
@@ -254,25 +254,25 @@ static int L_setUncalInOffsetVernier(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) scale = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (nscale)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setUncalInOffsetVernier(scale);
@@ -285,25 +285,25 @@ static int L_setInOffsetCalMode(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) calMode = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (calmode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setInOffsetCalMode(calMode);
@@ -316,25 +316,25 @@ static int L_turnInOffsetCurr(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) val = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (value)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->turnInOffsetCurr(val);
@@ -347,25 +347,25 @@ static int L_turnBiasVolt(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) val = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (value)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->turnBiasVolt(val);
@@ -378,25 +378,25 @@ static int L_setSenCal(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) calMode = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (calmode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setSenCal(calMode);
@@ -409,25 +409,25 @@ static int L_setInOffsetCurrSign(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) sign = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (sign)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setInOffsetCurrSign(sign);
@@ -440,25 +440,25 @@ static int L_setSigInvertSense(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) mode = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (mode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setSigInvertSense(mode);
@@ -471,25 +471,25 @@ static int L_setUncalSensVernier(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) scale = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (nscale)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setUncalSensVernier(scale);
@@ -502,25 +502,25 @@ static int L_setBiasVoltLVL(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) nLevel = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (nlevel)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setBiasVoltLVL(nLevel);
@@ -533,25 +533,25 @@ static int L_setGainMode(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) mode = lua_tointeger(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (mode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->setGainMode(mode);
@@ -562,19 +562,19 @@ static int L_setGainMode(lua_State *L) {
 static int L_resetFilCap(lua_State *L) {
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->resetFilCap();
@@ -585,19 +585,19 @@ static int L_resetFilCap(lua_State *L) {
 static int L_disconnect(lua_State *L) {
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
-    printf("Not metatable!\n");
+    ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
   if(!lua_islightuserdata(L, -1)) {
-    printf("Not userdata!\n");
+    ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
   if(sr == NULL) {
-    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
   sr->closePort();
@@ -615,7 +615,7 @@ static int L_connectNewDevice(lua_State *L) {
   if(lua_gettop(L) >= 2) {
     if(lua_isstring(L, 2)) portname = (char*)lua_tostring(L, 2);
   } else {
-    std::cerr << "SR570 error: This function must contain at least 1 parameter (port name)" << std::endl;
+    ERROR_LOG("This function must contain at least 1 parameter (port name)");
     return 0;
   }
   if(lua_gettop(L) >= 3) {
@@ -626,14 +626,14 @@ static int L_connectNewDevice(lua_State *L) {
   try {
     sr = new SR570;
   } catch (std::bad_alloc &ba) {
-    std::cerr << ba.what() << std::endl;
+    ERROR_LOG(ba.what());
     return 0;
   }
 
   checkError = sr->connect(portname, baud);
 
   if(checkError == 0) {
-    std::cerr << "Port isn't open" << std::endl;
+    ERROR_LOG("Port isn't open");
     delete sr;
     return 0;
   }
