@@ -3,7 +3,7 @@
 #include "SR570.hpp"
 
 static int L_help(lua_State *L){
-  static const std::string helpstring =
+  const char helpstring[] =
                     "Module for working with low noise current preamplifier SR570\n"
                     "  reset():nil - resets the amplifier to the default settings\n"
                     "  setSens(nsens):nil - sets the sensitivity of the amplifier. See table below\n"
@@ -67,7 +67,7 @@ static int L_help(lua_State *L){
                     "  \t 2     low Drift\n\n"
                     "  resetFilCap():nil - resets the filter capacitors to clear an overload condition\n"
                     ;
-  lua_pushstring(L, helpstring.c_str());
+  lua_pushstring(L, helpstring);
   return 1;
 }
 

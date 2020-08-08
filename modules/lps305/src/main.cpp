@@ -4,7 +4,7 @@
 #include "lps305.h"
 
 static int L_help(lua_State *L){
-  static const std::string helpstring =
+  const char helpstring[] =
             "Module for working with power supply LPS-305\n"
             "  connectNewDevice(path, baudrate):table - connecting to a given 'path' with rate a 'baudrate'\n"
             "  setOuput(mode):nil - performs enable/disable outputs of device\n"
@@ -18,7 +18,7 @@ static int L_help(lua_State *L){
             "    getCurrent():number - gets setted maximum currnt (in Ampers)\n"
             ;
 
-  lua_pushstring(L, helpstring.c_str());
+  lua_pushstring(L, helpstring);
   return 1;
 }
 
