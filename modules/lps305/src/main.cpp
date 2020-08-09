@@ -6,7 +6,7 @@
 static int L_help(lua_State *L){
   const char helpstring[] =
             "Module for working with power supply LPS-305\n"
-            "  connectNewDevice(path, baudrate):table - connecting to a given 'path' with rate a 'baudrate'\n"
+            "  connectNewDevice(path, [baudrate]):table - connecting to a given 'path' with rate a 'baudrate'\n"
             "  setOuput(mode):nil - performs enable/disable outputs of device\n"
             "  getModel():string - gets model of device\n"
             "  getVersion():string - gets version of device\n"
