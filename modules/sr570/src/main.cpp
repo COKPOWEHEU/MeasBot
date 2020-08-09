@@ -5,6 +5,7 @@
 static int L_help(lua_State *L){
   const char helpstring[] =
                     "Module for working with low noise current preamplifier SR570\n"
+                    "  connectNewDevice(path, [baudrate]):table - connecting to a given 'path' with rate a 'baudrate'\n"
                     "  reset():nil - resets the amplifier to the default settings\n"
                     "  setSens(nsens):nil - sets the sensitivity of the amplifier. See table below\n"
                     "  \t  nsens        scale\n"
