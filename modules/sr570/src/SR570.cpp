@@ -1,9 +1,11 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
 #include <math.h>
 #include "SR570.hpp"
 
+size_t findValAtArr(std::vector<float> arr, float val);
 
 SR570::SR570() {
   tty = NULL;
@@ -23,12 +25,12 @@ int SR570::connect(char portName[], int baud) {
   ttym_timeout(tty, 1000);
   
   SR570::reset(); // *RST - сброс усилителя в настройки по умолчанию
-  SR570::setSens(27); // SENS - устанавливаем чувствительность усилителя
+  SR570::setSens(0.001); // SENS - устанавливаем чувствительность усилителя
   SR570::turnInOffsetCurr(0); // IOON - выключатель входного тока смещения
-  SR570::setCalOffsetCurrentLVL(1); // IOLV - устанавливает калиброванный уровень входного тока смещения
+  SR570::setCalOffsetCurrentLVL(2e-12); // IOLV - устанавливает калиброванный уровень входного тока смещения
   SR570::setTypeFilter(2); // FLTT - устанавливает тип фильтра
-  SR570::setHighFilter(2); // HFRQ - устанавливает значение точки высокочастотного фильтра 3дБ
-  SR570::setLowFilter(11); // LFRQ - устанавливает значение точки низкочастотного фильтра 3дБ
+  SR570::setHighFilter(0.3); // HFRQ - устанавливает значение точки высокочастотного фильтра 3дБ
+  SR570::setLowFilter(1e+4); // LFRQ - устанавливает значение точки низкочастотного фильтра 3дБ
   SR570::setUncalInOffsetVernier(0); // IOUV - установка некалиброванного входного  смещения веренье. Веренье используется в калбировке для компенсации колебаний усиления, вознакающих при изменениях конфигурации, таких как входное соединение и настройки фильтра. Так же для некалбированных.
   SR570::setSenCal(0); // SUCM - устанавливает режим калибровки чувствительности
   SR570::setInOffsetCurrSign(1); // IOSN - устанавливает знак(+/-) входного тока смещения
@@ -50,26 +52,29 @@ void SR570::reset() {
   ttym_write(tty, (void*)"*RST;\n", 6);
 }
 
-void SR570::setSens(int sens) {
+void SR570::setSens(float sens) {
   char buff[256];
-  if(sens < 0 || sens > 27) {
-    ERROR_LOG("Wrong sens");
-    return;
-  }
+  size_t nsens;
+  nsens = findValAtArr((std::vector<float>) {1e-12, 2e-12, 5e-12, 10e-12, 20e-12, 50e-12, 100e-12, 200e-12, 500e-12,
+                                     1e-9, 2e-9, 5e-9, 10e-9, 20e-9, 50e-9, 100e-9, 200e-9, 500e-9,
+                                     1e-6, 2e-6, 5e-6, 10e-6, 20e-6, 50e-6, 100e-6, 200e-6, 500e-6,
+                                     1e-3}, sens);
   
-  sprintf(buff, "SENS%d;\n", sens);
+  sprintf(buff, "SENS%d;\n", nsens);
   ttym_write(tty, buff, 8);
   ttym_read(tty, buff, 255);
 }
 
-void SR570::setCalOffsetCurrentLVL(int curr) {
+void SR570::setCalOffsetCurrentLVL(float curr) {
   char buff[256];
-  if(curr < 0 || curr > 29) {
-    ERROR_LOG("Wrong current value");
-    return;
-  }
+  size_t ncurr;
+
+  ncurr = findValAtArr((std::vector<float>) {1e-12, 2e-12, 5e-12, 10e-12, 20e-12, 50e-12, 100e-12, 200e-12, 500e-12,
+                                     1e-9, 2e-9, 5e-9, 10e-9, 20e-9, 50e-9, 100e-9, 200e-9, 500e-9,
+                                     1e-6, 2e-6, 5e-6, 10e-6, 20e-6, 50e-6, 100e-6, 200e-6, 500e-6,
+                                     1e-3, 2e-3, 5e-3}, curr);
   
-  sprintf(buff, "%s%d;\n", "IOLV", curr);
+  sprintf(buff, "%s%d;\n", "IOLV", ncurr);
   
   ttym_write(tty, buff, strlen(buff));
 }
@@ -86,26 +91,28 @@ void SR570::setTypeFilter(int nType) {
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setHighFilter(int freqFilter) {
+void SR570::setHighFilter(float freq) {
   char buff[256];
-  if(freqFilter < 0 || freqFilter > 11) {
-    ERROR_LOG("Wrong Highpass filter frequency value");
-    return;
-  }
+  size_t nfreq;
+  nfreq = findValAtArr((std::vector<float>) {3e-2, 1e-1, 3e-1, 1e+0, 
+                                             3e+0, 1e+1, 3e+1, 1e+2,
+                                             3e+2, 1e+3, 3e+3, 1e+4}, freq);
   
-  sprintf(buff, "%s%d;\n", "HFRQ", freqFilter);
+  sprintf(buff, "%s%d;\n", "HFRQ", nfreq);
   
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setLowFilter(int freqFilter) {
+void SR570::setLowFilter(float freq) {
   char buff[256];
-  if(freqFilter < 0 || freqFilter > 15) {
-    ERROR_LOG("Wrong Lowpass filter frequency value");
-    return;
-  }
+  size_t nfreq;
+
+  nfreq = findValAtArr((std::vector<float>) {3e-2, 1e-1, 3e-1, 1e+0, 
+                                             3e+0, 1e+1, 3e+1, 1e+2,
+                                             3e+2, 1e+3, 3e+3, 1e+4,
+                                             3e+4, 1e+5, 3e+5, 1e+6}, freq);
   
-  sprintf(buff, "%s%d;\n", "LFRQ", freqFilter);
+  sprintf(buff, "%s%d;\n", "LFRQ", nfreq);
   
   ttym_write(tty, buff, strlen(buff));
 }
@@ -249,4 +256,21 @@ void SR570::resetFilCap() {
 void SR570::closePort() {
   ttym_close(tty);
   tty=NULL;
+}
+
+size_t findValAtArr(std::vector<float> arr, float val) {
+  size_t res;
+
+  if(val > arr[arr.size()-1])
+    return arr.size()-1;
+  else if(val < arr[0])
+    return 0;
+
+  for(size_t i = 0; i != arr.size(); i++) {
+    if(val <= arr.at(i)) {
+      res = i;
+      break;
+    }
+  }
+  return res;
 }

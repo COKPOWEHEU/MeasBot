@@ -30,7 +30,7 @@ class SR570 {
       24, 25, 26    100, 200, 500 мкА/В
       27                  1       мА/В
     */
-    void setSens(int sens);
+    void setSens(float sens);
 
     /*
       Установить калиброванный уровень входного тока смещения по таблице:
@@ -46,13 +46,13 @@ class SR570 {
       24, 25, 26    100, 200, 500 мкА
       27                  1       мА
     */
-    void setCalOffsetCurrentLVL(int curr);
+    void setCalOffsetCurrentLVL(float curr);
 
     //Установить значение точки 3 дБ фильтра высоких частот. freqFilter находится в диапазоне от 0 (0,03 Гц) до 11 (10 кГц)
-    void setHighFilter(int freqFilter);
+    void setHighFilter(float freq);
     
     //Установить значение точки 3 дБ фильтра нижних частот. freqFilter находится в диапазоне от 0 (0,03 Гц) до 15 (1 МГц)
-    void setLowFilter(int freqFilter);
+    void setLowFilter(float freq);
     
     /*Установить тип фильтра по таблице:
     ntype   тип фильтра
