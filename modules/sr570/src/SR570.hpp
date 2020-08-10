@@ -66,7 +66,7 @@ class SR570 {
     void setUncalSensVernier(int scale);
     
     //Установить уровень напряжения смещения в диапазоне [-5000 ≤ nLevel ≤ +5000] (от -5,000 В до +5,000 В)
-    void setBiasVoltLVL(int nLevel);
+    void setBiasVoltLVL(float bias_V);
     
     /*Установить режим усиления усилителя.
       mode  режим усиления

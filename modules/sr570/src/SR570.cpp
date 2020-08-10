@@ -276,14 +276,14 @@ void SR570::setUncalSensVernier(int scale) {
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setBiasVoltLVL(int nLevel) {
+void SR570::setBiasVoltLVL(float bias_V){
   char buff[256];
-  if(nLevel < 0 || nLevel > 1) {
+  if(bias_V < -5 || bias_V > 5){
     ERROR_LOG("Wrong bias voltage level value");
     return;
   }
   
-  sprintf(buff, "%s%d;\n", "BSLV", nLevel);
+  sprintf(buff, "%s%d;\n", "BSLV", (int)(bias_V*1000));
   
   ttym_write(tty, buff, strlen(buff));
 }
