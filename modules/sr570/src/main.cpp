@@ -7,31 +7,9 @@ static int L_help(lua_State *L){
                     "Module for working with low noise current preamplifier SR570\n"
                     "  connectNewDevice(path, [baudrate]):table - connecting to a given 'path' with rate a 'baudrate'\n"
                     "  reset():nil - resets the amplifier to the default settings\n"
-                    "  setSens(nsens):nil - sets the sensitivity of the amplifier. See table below\n"
-                    "  \t  nsens        scale\n"
-                    "  \t0, 1, 2     1, 2, 5 pA/V\n"
-                    "  \t3, 4, 5     10, 20, 50 pA/V\n"
-                    "  \t6, 7, 8     100, 200, 500 pA/V\n"
-                    "  \t9, 10, 11   1, 2, 5 nA/V\n"
-                    "  \t12, 13, 14  10, 20, 50 nA/V\n"
-                    "  \t15, 16, 17  100, 200, 500 nA/V\n"
-                    "  \t18, 19, 20  1, 2, 5 uA/V\n"
-                    "  \t21, 22, 23  10, 20, 50 uA/V\n"
-                    "  \t24, 25, 26  100, 200, 500 uA/V\n"
-                    "  \t27          1 mA/V\n\n"
+                    "  setSens(sens):nil - sets the sensitivity of the amplifier (in Amps/Volts)\n"
                     "  turnInOffsetCurr(value):nil - turn the input offset current on (value=1) or off (value=0)\n"
-                    "  setCalOffsetCurrentLVL(ncurr):nil - sets the calibrated input offset current level. See table below\n"
-                    "  \t ncurr         scale\n"
-                    "  \t0, 1, 2     1, 2, 5 pA\n"
-                    "  \t3, 4, 5     10, 20, 50 pA\n"
-                    "  \t6, 7, 8     100, 200, 500 pA\n"
-                    "  \t9, 10, 11   1, 2, 5 nA\n"
-                    "  \t12, 13, 14  10, 20, 50 nA\n"
-                    "  \t15, 16, 17  100, 200, 500 nA\n"
-                    "  \t18, 19, 20  1, 2, 5 uA\n"
-                    "  \t21, 22, 23  10, 20, 50 uA\n"
-                    "  \t24, 25, 26  100, 200, 500 uA\n"
-                    "  \t27, 28, 29  1, 2, 5 mA\n\n"
+                    "  setCalOffsetCurrentLVL(curr):nil - sets the calibrated input offset current (in Amps)\n"
                     "  setTypeFilter(ntype):nil - sets the filter type. See table below\n"
                     "  \tntype   filter type\n"
                     "  \t  0    6 dB highpass\n"
@@ -40,18 +18,8 @@ static int L_help(lua_State *L){
                     "  \t  3    6 dB lowpass\n"
                     "  \t  4    12 dB lowpass\n"
                     "  \t  5    none\n\n"
-                    "  setHighFilter(nfreq):nil - sets the value of the highpass filter 3dB point. nfreq ranges from 0 (0.03Hz) to 11 (10 kHz). See table below\n"
-                    "  \tnfreq   filter frequency\n"
-                    "  \t  0      0.03 Hz\n"
-                    "  \t  1, 2   0.1, 0.3 Hz\n"
-                    "  \t  3, 4   1, 3 Hz\n"
-                    "  \t  5, 6   10, 30 Hz\n"
-                    "  \t  7, 8   100, 300 Hz\n"
-                    "  \t  9, 10  1, 3 kHz\n"
-                    "  \t 11, 12  10, 30 kHz\n"
-                    "  \t 13, 14  100, 300 kHz\n"
-                    "  \t 15      1 MHz\n\n"
-                    "  setLowFilter(nfreq):nil - sets the value of the lowpass filter 3dB point. nfreq ranges from 0 (0.03Hz) to 15 (1 MHz). See table below function 'setHighFilter'\n"
+                    "  setHighFilter(freq):nil - sets the value of the highpass filter 3dB point (in Hertz)\n"
+                    "  setLowFilter(nfreq):nil - sets the value of the lowpass filter 3dB point. See also 'setHighFilter'\n"
                     "  setUncalInOffsetVernier(nscale):nil - Sets the uncalibrated input offset vernier. [-1000 ≤ nscale ≤ +1000] (0 - ±100.0% of full scale)\n"
                     "  setSenCal(calmode):nil - sets the sensitivity cal mode. 0 = cal, 1 = uncal\n"
                     "  setInOffsetCurrSign(sign):nil - sets the input offset current sign. 0 = neg, 1 = pos\n"
@@ -72,23 +40,23 @@ static int L_help(lua_State *L){
   return 1;
 }
 
-static int L_setSens(lua_State *L) {
-  int sens;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) sens = lua_tointeger(L, 2);
-  } else {
+static int L_setSens(lua_State *L){
+  int sens = 1e-3;
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    sens = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (sensitivity)");
     return 0;
   }
   
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
@@ -103,7 +71,7 @@ static int L_setSens(lua_State *L) {
   return 0;
 }
 
-static int L_reset(lua_State *L) {
+static int L_reset(lua_State *L){
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
     ERROR_LOG("Not metatable!");
@@ -111,7 +79,7 @@ static int L_reset(lua_State *L) {
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
@@ -126,11 +94,11 @@ static int L_reset(lua_State *L) {
   return 0;
 }
 
-static int L_setCalOffsetCurrentLVL(lua_State *L) {
+static int L_setCalOffsetCurrentLVL(lua_State *L){
   int curr;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) curr = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    curr = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (current)");
     return 0;
   }
@@ -157,29 +125,29 @@ static int L_setCalOffsetCurrentLVL(lua_State *L) {
   return 0;
 }
 
-static int L_setHighFilter(lua_State *L) {
+static int L_setHighFilter(lua_State *L){
   float freqFilter;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) freqFilter = lua_tonumber(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    freqFilter = lua_tonumber(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (freq)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -188,23 +156,23 @@ static int L_setHighFilter(lua_State *L) {
   return 0;
 }
 
-static int L_setLowFilter(lua_State *L) {
+static int L_setLowFilter(lua_State *L){
   float freqFilter;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) freqFilter = lua_tonumber(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    freqFilter = lua_tonumber(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (freq)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
@@ -219,11 +187,11 @@ static int L_setLowFilter(lua_State *L) {
   return 0;
 }
 
-static int L_setTypeFilter(lua_State *L) {
+static int L_setTypeFilter(lua_State *L){
   int nType;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) nType = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    nType = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (ntype)");
     return 0;
   }
@@ -235,13 +203,13 @@ static int L_setTypeFilter(lua_State *L) {
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -250,29 +218,29 @@ static int L_setTypeFilter(lua_State *L) {
   return 0;
 }
 
-static int L_setUncalInOffsetVernier(lua_State *L) {
+static int L_setUncalInOffsetVernier(lua_State *L){
   int scale;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) scale = lua_tointeger(L, 2);
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    scale = lua_tointeger(L, 2);
   } else {
     ERROR_LOG("This function must contain at least 1 parameter (nscale)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -281,29 +249,29 @@ static int L_setUncalInOffsetVernier(lua_State *L) {
   return 0;
 }
 
-static int L_setInOffsetCalMode(lua_State *L) {
+static int L_setInOffsetCalMode(lua_State *L){
   int calMode;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) calMode = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    calMode = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (calmode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -312,29 +280,29 @@ static int L_setInOffsetCalMode(lua_State *L) {
   return 0;
 }
 
-static int L_turnInOffsetCurr(lua_State *L) {
+static int L_turnInOffsetCurr(lua_State *L){
   int val;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) val = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    val = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (value)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -343,29 +311,29 @@ static int L_turnInOffsetCurr(lua_State *L) {
   return 0;
 }
 
-static int L_turnBiasVolt(lua_State *L) {
+static int L_turnBiasVolt(lua_State *L){
   int val;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) val = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    val = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (value)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -374,29 +342,29 @@ static int L_turnBiasVolt(lua_State *L) {
   return 0;
 }
 
-static int L_setSenCal(lua_State *L) {
+static int L_setSenCal(lua_State *L){
   int calMode;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) calMode = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    calMode = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (calmode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -405,29 +373,29 @@ static int L_setSenCal(lua_State *L) {
   return 0;
 }
 
-static int L_setInOffsetCurrSign(lua_State *L) {
+static int L_setInOffsetCurrSign(lua_State *L){
   int sign;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) sign = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    sign = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (sign)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -436,29 +404,29 @@ static int L_setInOffsetCurrSign(lua_State *L) {
   return 0;
 }
 
-static int L_setSigInvertSense(lua_State *L) {
+static int L_setSigInvertSense(lua_State *L){
   int mode;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) mode = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    mode = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (mode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -467,29 +435,29 @@ static int L_setSigInvertSense(lua_State *L) {
   return 0;
 }
 
-static int L_setUncalSensVernier(lua_State *L) {
+static int L_setUncalSensVernier(lua_State *L){
   int scale;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) scale = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    scale = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (nscale)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -500,9 +468,9 @@ static int L_setUncalSensVernier(lua_State *L) {
 
 static int L_setBiasVoltLVL(lua_State *L) {
   int nLevel;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) nLevel = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    nLevel = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (nlevel)");
     return 0;
   }
@@ -514,13 +482,13 @@ static int L_setBiasVoltLVL(lua_State *L) {
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
@@ -529,29 +497,29 @@ static int L_setBiasVoltLVL(lua_State *L) {
   return 0;
 }
 
-static int L_setGainMode(lua_State *L) {
+static int L_setGainMode(lua_State *L){
   int mode;
-  if(lua_gettop(L) >= 2) {
-    if(lua_isnumber(L, 2)) mode = lua_tointeger(L, 2);
-  } else {
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    mode = lua_tointeger(L, 2);
+  }else{
     ERROR_LOG("This function must contain at least 1 parameter (mode)");
     return 0;
   }
 
   lua_getmetatable(L, 1);
-  if(!lua_istable(L, -1)) {
+  if(!lua_istable(L, -1)){
     ERROR_LOG("Not metatable!");
     return 0;
   }
 
   lua_getfield(L, -1, "_objSR570_");
-  if(!lua_islightuserdata(L, -1)) {
+  if(!lua_islightuserdata(L, -1)){
     ERROR_LOG("Not userdata!");
     return 0;
   }
 
   SR570 *sr = (SR570*)lua_touserdata(L, -1);
-  if(sr == NULL) {
+  if(sr == NULL){
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
