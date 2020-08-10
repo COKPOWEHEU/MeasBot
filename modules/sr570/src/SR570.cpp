@@ -27,8 +27,8 @@ int SR570::connect(char portName[], int baud) {
   SR570::turnInOffsetCurr(0); // IOON - выключатель входного тока смещения
   SR570::setCalOffsetCurrentLVL(1); // IOLV - устанавливает калиброванный уровень входного тока смещения
   SR570::setTypeFilter(2); // FLTT - устанавливает тип фильтра
-  SR570::setHighFilter(2); // HFRQ - устанавливает значение точки высокочастотного фильтра 3дБ
-  SR570::setLowFilter(11); // LFRQ - устанавливает значение точки низкочастотного фильтра 3дБ
+  SR570::setHighFilter(0.3); // HFRQ - устанавливает значение точки высокочастотного фильтра 3дБ
+  SR570::setLowFilter(10*1000); // LFRQ - устанавливает значение точки низкочастотного фильтра 3дБ
   SR570::setUncalInOffsetVernier(0); // IOUV - установка некалиброванного входного  смещения веренье. Веренье используется в калбировке для компенсации колебаний усиления, вознакающих при изменениях конфигурации, таких как входное соединение и настройки фильтра. Так же для некалбированных.
   SR570::setSenCal(0); // SUCM - устанавливает режим калибровки чувствительности
   SR570::setInOffsetCurrSign(1); // IOSN - устанавливает знак(+/-) входного тока смещения
@@ -116,25 +116,53 @@ void SR570::setTypeFilter(int nType) {
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setHighFilter(int freqFilter) {
-  char buff[256];
-  if(freqFilter < 0 || freqFilter > 11) {
+void SR570::setHighFilter(int freqFilter){
+  const float freq[] = {
+    0.03,
+    0.1, 0.3,
+    1e0, 3e0,
+    1e1, 3e1,
+    1e2, 3e2,
+    1e3, 3e3,
+    1e4, 3e4, 
+    1e5, 3e5,
+    1e6,
+    FP_NAN
+  };
+  int freq_num = findCeilInArr(freq, freqFilter);
+  
+  if( freq_num < 0 ){
     ERROR_LOG("Wrong Highpass filter frequency value");
     return;
   }
   
-  sprintf(buff, "%s%d;\n", "HFRQ", freqFilter);
+  char buff[256];
+  sprintf(buff, "%s%d;\n", "HFRQ", freq_num);
   
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setLowFilter(int freqFilter) {
-  char buff[256];
-  if(freqFilter < 0 || freqFilter > 15) {
+void SR570::setLowFilter(int freqFilter){
+  const float freq[] = {
+    0.03,
+    0.1, 0.3,
+    1e0, 3e0,
+    1e1, 3e1,
+    1e2, 3e2,
+    1e3, 3e3,
+    1e4, 3e4, 
+    1e5, 3e5,
+    1e6,
+    FP_NAN
+  };
+  int freq_num = findCeilInArr(freq, freqFilter);
+  
+  if( freq_num < 0 ){
     ERROR_LOG("Wrong Lowpass filter frequency value");
     return;
   }
   
+  char buff[256];
   sprintf(buff, "%s%d;\n", "LFRQ", freqFilter);
   
   ttym_write(tty, buff, strlen(buff));
