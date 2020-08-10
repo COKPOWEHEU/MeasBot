@@ -23,7 +23,7 @@ int SR570::connect(char portName[], int baud) {
   ttym_timeout(tty, 1000);
   
   SR570::reset(); // *RST - сброс усилителя в настройки по умолчанию
-  SR570::setSens(27); // SENS - устанавливаем чувствительность усилителя
+  SR570::setSens(1e-3); // SENS - устанавливаем чувствительность усилителя
   SR570::turnInOffsetCurr(0); // IOON - выключатель входного тока смещения
   SR570::setCalOffsetCurrentLVL(1); // IOLV - устанавливает калиброванный уровень входного тока смещения
   SR570::setTypeFilter(2); // FLTT - устанавливает тип фильтра
@@ -50,27 +50,57 @@ void SR570::reset() {
   ttym_write(tty, (void*)"*RST;\n", 6);
 }
 
-void SR570::setSens(int sens) {
-  char buff[256];
-  if(sens < 0 || sens > 27) {
+void SR570::setSens(float sens_A_V){
+  const float sens[] = {
+    1e-12,  2e-12,  5e-12,
+    10e-12, 20e-12, 50e-12,
+    100e-12,200e-12,500e-12,
+    1e-9,   2e-9,   5e-9,
+    10e-9,  20e-9,  50e-9,
+    100e-9, 200e-9, 500e-9,
+    1e-6,   2e-6,   5e-6,
+    10e-6,  20e-6,  50e-6,
+    100e-6, 200e-6, 500e-6,
+    1e-3,
+    FP_NAN
+  };
+  
+  int sens_num = findCeilInArr(sens, sens_A_V);
+  if(sens_num < 0){
     ERROR_LOG("Wrong sens");
     return;
   }
-  
-  sprintf(buff, "SENS%d;\n", sens);
+  char buff[256];
+
+  sprintf(buff, "SENS%d;\n", sens_num);
   ttym_write(tty, buff, 8);
   ttym_read(tty, buff, 255);
 }
 
-void SR570::setCalOffsetCurrentLVL(int curr) {
-  char buff[256];
-  if(curr < 0 || curr > 29) {
+void SR570::setCalOffsetCurrentLVL(float curr_A){
+  const float curr[] = {
+    1e-12,  2e-12,  5e-12,
+    10e-12, 20e-12, 50e-12,
+    100e-12,200e-12,500e-12,
+    1e-9,   2e-9,   5e-9,
+    10e-9,  20e-9,  50e-9,
+    100e-9, 200e-9, 500e-9,
+    1e-6,   2e-6,   5e-6,
+    10e-6,  20e-6,  50e-6,
+    100e-6, 200e-6, 500e-6,
+    1e-3,   2e-3,   5e-3,
+    FP_NAN
+  };
+  
+  int curr_num = findCeilInArr(curr, curr_A);
+  
+  if(curr_num < 0){
     ERROR_LOG("Wrong current value");
     return;
   }
   
-  sprintf(buff, "%s%d;\n", "IOLV", curr);
-  
+  char buff[256];
+  sprintf(buff, "%s%d;\n", "IOLV", curr_num);
   ttym_write(tty, buff, strlen(buff));
 }
 
@@ -249,4 +279,11 @@ void SR570::resetFilCap() {
 void SR570::closePort() {
   ttym_close(tty);
   tty=NULL;
+}
+
+int SR570::findCeilInArr(const float arr[], float val){
+  for(int i=0; arr[i] != FP_NAN; i++){
+    if( val <= arr[i] )return i;
+  }
+  return -1;
 }
