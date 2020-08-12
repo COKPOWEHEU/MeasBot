@@ -124,9 +124,11 @@ void SR570::setHighFilter(int freqFilter){
     1e1, 3e1,
     1e2, 3e2,
     1e3, 3e3,
-    1e4, 3e4, 
-    1e5, 3e5,
-    1e6,
+    1e4,
+    // Допустимое значения для High Filter - 10 кГц
+    // 3e4,  
+    // 1e5, 3e5,
+    // 1e6,
     FP_NAN
   };
   int freq_num = findCeilInArr(freq, freqFilter);
