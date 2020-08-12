@@ -25,7 +25,7 @@ int SR570::connect(char portName[], int baud) {
   SR570::reset(); // *RST - сброс усилителя в настройки по умолчанию
   SR570::setSens(1e-3); // SENS - устанавливаем чувствительность усилителя
   SR570::turnInOffsetCurr(0); // IOON - выключатель входного тока смещения
-  SR570::setCalOffsetCurrentLVL(1); // IOLV - устанавливает калиброванный уровень входного тока смещения
+  SR570::setCalOffsetCurrentLVL(2e-12); // IOLV - устанавливает калиброванный уровень входного тока смещения
   SR570::setTypeFilter(2); // FLTT - устанавливает тип фильтра
   SR570::setHighFilter(0.3); // HFRQ - устанавливает значение точки высокочастотного фильтра 3дБ
   SR570::setLowFilter(10*1000); // LFRQ - устанавливает значение точки низкочастотного фильтра 3дБ
@@ -116,7 +116,7 @@ void SR570::setTypeFilter(int nType) {
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setHighFilter(int freqFilter){
+void SR570::setHighFilter(float freqFilter){
   const float freq[] = {
     0.03,
     0.1, 0.3,
@@ -124,9 +124,11 @@ void SR570::setHighFilter(int freqFilter){
     1e1, 3e1,
     1e2, 3e2,
     1e3, 3e3,
-    1e4, 3e4, 
-    1e5, 3e5,
-    1e6,
+    1e4,
+    // Допустимое значения для High Filter - 10 кГц
+    // 3e4,  
+    // 1e5, 3e5,
+    // 1e6,
     FP_NAN
   };
   int freq_num = findCeilInArr(freq, freqFilter);
@@ -142,7 +144,7 @@ void SR570::setHighFilter(int freqFilter){
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setLowFilter(int freqFilter){
+void SR570::setLowFilter(float freqFilter){
   const float freq[] = {
     0.03,
     0.1, 0.3,
