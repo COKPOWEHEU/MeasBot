@@ -22,10 +22,10 @@ class SR570 {
     void setCalOffsetCurrentLVL(float curr_A);
 
     //Установить значение точки 3 дБ фильтра высоких частот. freqFilter находится в диапазоне от 0 (0,03 Гц) до 11 (10 кГц)
-    void setHighFilter(int freqFilter);
+    void setHighFilter(float freqFilter);
     
     //Установить значение точки 3 дБ фильтра нижних частот. freqFilter находится в диапазоне от 0 (0,03 Гц) до 15 (1 МГц)
-    void setLowFilter(int freqFilter);
+    void setLowFilter(float freqFilter);
     
     /*Установить тип фильтра по таблице:
     ntype   тип фильтра

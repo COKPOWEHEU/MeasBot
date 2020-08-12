@@ -116,7 +116,7 @@ void SR570::setTypeFilter(int nType) {
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setHighFilter(int freqFilter){
+void SR570::setHighFilter(float freqFilter){
   const float freq[] = {
     0.03,
     0.1, 0.3,
@@ -144,7 +144,7 @@ void SR570::setHighFilter(int freqFilter){
   ttym_write(tty, buff, strlen(buff));
 }
 
-void SR570::setLowFilter(int freqFilter){
+void SR570::setLowFilter(float freqFilter){
   const float freq[] = {
     0.03,
     0.1, 0.3,

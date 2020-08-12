@@ -41,9 +41,9 @@ static int L_help(lua_State *L){
 }
 
 static int L_setSens(lua_State *L){
-  int sens = 1e-3;
+  float sens = 1e-3;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    sens = lua_tointeger(L, 2);
+    sens = lua_tonumber(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (sensitivity)");
     return 0;
@@ -95,9 +95,9 @@ static int L_reset(lua_State *L){
 }
 
 static int L_setCalOffsetCurrentLVL(lua_State *L){
-  int curr;
+  float curr;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    curr = lua_tointeger(L, 2);
+    curr = lua_tonumber(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (current)");
     return 0;
