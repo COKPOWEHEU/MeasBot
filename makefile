@@ -18,3 +18,5 @@ gtk:
 	bash -c "cd modules/mygui_gtk; make $(rarch) $(target) -j"
 sr570:
 	bash -c "cd modules/sr570; make $(rarch) $(target) -j"
+sr5105:
+	bash -c "cd modules/sr5105; make $(rarch) $(target) -j"
