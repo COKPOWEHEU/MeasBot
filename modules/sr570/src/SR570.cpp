@@ -165,7 +165,7 @@ void SR570::setLowFilter(float freqFilter){
   }
   
   char buff[256];
-  sprintf(buff, "%s%d;\n", "LFRQ", freqFilter);
+  sprintf(buff, "%s%d;\n", "LFRQ", freq_num);
   
   ttym_write(tty, buff, strlen(buff));
 }
