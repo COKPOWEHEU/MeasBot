@@ -174,7 +174,41 @@ static int L_OnDestroy(lua_State *L){
 }
 
 static int L_help(lua_State *L){
-  const char helpstring[] = "Здесь могла быть ваша справка";
+  const char helpstring[] = 
+    "SR5105\n"
+    "  connectNewDevice(path, [baudrate]):table - connect to SR5105. Default baudrate is 4800\n"
+    "  help():string - return this help\n"
+    "  rawSend(str):str - send raw string to device and return it response\n"
+    "  getID():str - return ID string of device\n"
+    "  getErrors():str - return composition of all errors (one error by line)\n"
+    "  getVersion():str - return Version string from device\n"
+    "  reset():nil - reset some parameters: delimiter symbol, input filters, phase, offsets, time constants, output filter\n"
+    "  setSens(num):num - set sensitivity (in Volts per full scale) and return it\n"
+    "  getSens():num - return current sensitivity (in Volts)\n"
+    "  getXY():num,num,num - read and return X and Y values of input signal and maximum avaible value (sensitivity)\n"
+    "  getMagPhase():num,num,num - read and return Magnitude and Phase and then maximum avaible value of Magnitude\n"
+    "  getFreq(nil):num - return reference frequency (in Hertz)\n"
+    "  setRefPhase(num):nil - set signal phase (in degrees)\n"
+    "             (str 'Auto'):nil - set reference phase automatically my maximizing X component and minimizing Y compontnt\n"
+    "             (nil):num - same as 'getRefPhase'\n"
+    "  getRefPhase(nil):num - read current refeence phase (in degrees)\n"
+    "  setFilters(num,num):num,num - set High-pass and Low-pass filters (in Hertz) and return actual values. Correct High-pass filter frequencies are 1, 10, 100, 1000 Hz. Correct Low-pass filter frequencies are 50, 500 Hz, 5, 50 kHz. If one of input values in zero, this filter does not change\n"
+    "  getFilters (nil):num,num - read current High-pass and Low-pass filters (in Hertz)\n"
+    "  setOutputOffsets(num,num):num,num - set output offsets (X, Y) in fraction of full scale. Avaible values are -200..200, where 1000 is full range. If one of inputs is zero, if will not change\n"
+    "                  (str 'Auto'):num,num - set current values of X and Y as offsets and return them\n"
+    "                  (nil):num,num - same as 'getOutputOffsets'\n"
+    "  getOutputOffsets():num,num - return current offset values X and Y\n"
+    "  setTimeConstant(num):num - set output Time constant (in Seconds) and return it\n"
+    "  getTimeConstant():num - return current Time constant (in Seconds)\n"
+    "  setDynamicReserve(num):num - set Dynamic reserve:\n"
+    "                   (0) - high stability\n"
+    "                   (1) - normal\n"
+    "                   (2) - high reserve\n"
+    "  getDynamicReserve():num - return curent Dynamic reserve\n"
+    "  setOutputSlope_6():nil - set output filter slope to 6 dB/octave\n"
+    "  setOutputSlope_12():nil - set output filter slope to 12 dB/octave\n"
+    "  outputConfig(num, bool, bum):str - combination of setTimeConstant (1st), setOutputSlope (2nd) and setDynamicReserve (3rd) and return getErrors()\n"
+  ;
   lua_pushstring(L, helpstring);
   return 1;
 }
@@ -582,8 +616,6 @@ static int L_connectNewDevice(lua_State *L){
     lua_setfield(L, -2, "getMagPhase");
     lua_pushcfunction(L, L_SetPhase);
     lua_setfield(L, -2, "setRefPhase");
-    lua_pushcfunction(L, L_SetPhase); //(!)It is not an error, it is the same function as previous
-    lua_setfield(L, -2, "setRefPhaseAuto");
     lua_pushcfunction(L, L_SetPhase); //(!)It is not an error, it is the same function as previous
     lua_setfield(L, -2, "getRefPhase");
     lua_pushcfunction(L, L_GetFreq);
