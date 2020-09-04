@@ -87,7 +87,7 @@ ttym_t ttym_open(char name[], unsigned int baudrate){
   }
   tcgetattr( res->fd, &(res->ttyset) );
   memcpy( &(res->oldset), &(res->ttyset), sizeof(struct termios));
-  res->ttyset.c_cflag = speed | CLOCAL | CREAD | CS8 | CSTOPB;
+  res->ttyset.c_cflag = speed | CS8 | CLOCAL | CREAD;
   res->ttyset.c_iflag = IGNPAR;
   res->ttyset.c_oflag = 0;
   res->ttyset.c_lflag = 0;
