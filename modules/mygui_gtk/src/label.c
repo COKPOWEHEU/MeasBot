@@ -138,7 +138,7 @@ static int L_Lbl_GC(lua_State *L){
 }
 
 static int L_NewLbl(lua_State *L){
-  const char *text="NONAME";
+  const char *text="";
   //получаем объект родительского окна
   if(lua_gettop(L) < 1){
     printf("Call function as METHOD!\n");
@@ -149,11 +149,11 @@ static int L_NewLbl(lua_State *L){
   GtkWidget *cont = read_container(L, 1, NULL);
   Label *lbl = (Label*)malloc(sizeof(Label));
   lbl->x=0; lbl->y=0;
-  if(lua_gettop(L) >= 4){
+  if(lua_gettop(L) >= 3){
     if(lua_isnumber(L, 2))lbl->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))lbl->y = lua_tonumber(L, 3);
-    if(lua_isstring(L, 4))text = lua_tostring(L, 4);
   }
+  if(lua_isstring(L, 4))text = lua_tostring(L, 4);
   
   lbl->pool_idx = mk_blank_table(L, lbl, L_Lbl_GC);
   lua_getmetatable(L, -1);

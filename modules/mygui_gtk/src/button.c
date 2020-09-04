@@ -199,11 +199,11 @@ static int L_NewBtn(lua_State *L){
   GtkWidget *cont = read_container(L, 1, NULL);
   Button *btn = (Button*)malloc(sizeof(Button));
   btn->x = 0; btn->y = 0;
-  if(lua_gettop(L) >= 4){
+  if(lua_gettop(L) >= 3){
     if(lua_isnumber(L, 2))btn->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))btn->y = lua_tonumber(L, 3);
-    if(lua_isstring(L, 4))caption = lua_tostring(L, 4);
   }
+  if(lua_isstring(L, 4))caption = lua_tostring(L, 4);
   
   btn->pool_idx = mk_blank_table(L, btn, L_Btn_GC);
   lua_pushcfunction(L, L_BtnWasClicked);

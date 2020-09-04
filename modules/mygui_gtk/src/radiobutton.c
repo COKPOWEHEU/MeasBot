@@ -235,7 +235,7 @@ static int L_RBtn_Get_Selected(lua_State *L){
 }
 
 static int L_RNewBtn(lua_State *L){
-  const char *caption="NONAME";
+  const char *caption="";
   //получаем объект родительского окна
   if(lua_gettop(L) < 1){
     printf("Call function as METHOD!\n");
@@ -249,8 +249,9 @@ static int L_RNewBtn(lua_State *L){
   if(lua_gettop(L) >= 4){
     if(lua_isnumber(L, 2))btn->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))btn->y = lua_tonumber(L, 3);
-    if(lua_isstring(L, 4))caption = lua_tostring(L, 4);
   }
+  if(lua_isstring(L, 4))caption = lua_tostring(L, 4);
+
   GSList *group = NULL;
   //последний аргумент - к какому виджету привязаться
   if(lua_gettop(L) >= 5){

@@ -187,8 +187,8 @@ static int L_NewEdit(lua_State *L){
   if(lua_gettop(L) >= 4){
     if(lua_isnumber(L, 2))x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))y = lua_tonumber(L, 3);
-    if(lua_isstring(L, 4))text = lua_tostring(L, 4);
   }
+  if(lua_isstring(L, 4))text = lua_tostring(L, 4);
   
   ed->pool_idx = mk_blank_table(L, ed, L_Ed_GC);
   lua_getmetatable(L, -1);
