@@ -236,7 +236,8 @@ static int L_GetXY(lua_State *L){
   sscanf(buffer, " %d,%d", &xval, &yval);
   lua_pushnumber(L, ((double)xval)*device->sens*0.001);
   lua_pushnumber(L, ((double)yval)*device->sens*0.001);
-  return 2;
+  lua_pushnumber(L, device->sens);
+  return 3;
 }
 
 static int L_GetMagPhase(lua_State *L){
@@ -247,16 +248,15 @@ static int L_GetMagPhase(lua_State *L){
   char buffer[20];
   tty_puts(device->tty, "MAG\r");
   tty_gets(device->tty, buffer, 19);
-  printf("mag:%s\n", buffer);
   mag = atoi(buffer);
   tty_puts(device->tty, "PHA\r");
   tty_gets(device->tty, buffer, 19);
-  printf("pha:%s\n", buffer);
   
   phase = atoi(buffer);
   lua_pushnumber(L, ((double)mag)*device->sens*0.001);
   lua_pushnumber(L, ((double)phase)*0.1);
-  return 2;
+  lua_pushnumber(L, device->sens);
+  return 3;
 }
 
 static int L_connectNewDevice(lua_State *L){

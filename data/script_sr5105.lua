@@ -49,9 +49,9 @@ while gui:update() do
       fldSens.prev = fldSens.cur
     end
   end
-  local x,y = sr5105:getXY()
-  fldX.label = tostring(x)
-  fldY.label = tostring(y)
+  local r,a,m = sr5105:getMagPhase()
+  fldX.label = tostring(r)
+  fldY.label = tostring(m)
 end
 
 
