@@ -30,6 +30,7 @@ tblprint(sr5105_lib)
 
 sr5105 = sr5105_lib:connectNewDevice("/dev/ttyUSB0", 4800)
 if sr5105 == nil then os.exit(); end
+--[[
 tblprint(sr5105)
 
 gui = require("mygui_gtk")
@@ -53,10 +54,12 @@ while gui:update() do
   fldX.label = tostring(r)
   fldY.label = tostring(m)
 end
+--]]
+
+print(sr5105:getXY()) --OK
 
 
---print(sr5105:getXY()) --OK
---print(sr5105:getMagPhase()) --OK
+
 --print(sr5105:getSens())
 --sens = sr5105:setSens(1e-1) --OK
 --print(sens)

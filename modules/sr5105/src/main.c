@@ -69,11 +69,11 @@ static double sr5105_setSens(ttym_t tty, double sens){
   };
   
   char buf[20];
-  int sens_num;
-  if(sens > 0){
+  int sens_num = -1;
+  if(sens >= 0){
     sens_num = findCeilInArr(sens_arr, sens);
     if(sens_num < 0)return -1;
-    sprintf(buf, "SEN %i\r", sens_num);
+    sprintf(buf, "SEN %d\r", sens_num);
     tty_puts(tty, buf);
     tty_gets(tty, buf, 19);
   }
@@ -81,6 +81,35 @@ static double sr5105_setSens(ttym_t tty, double sens){
   tty_gets(tty, buf, 19);
   sens_num = atoi(buf);
   return sens_arr[sens_num];
+}
+
+static double SetTimeConst(sr5105_t *device, double time){
+  const double time_consts[] = {
+    300e-6, 1e-3, 3e-3, 10e-3, 30e-3,
+    100e-3, 300e-3, 1, 3, 10,
+    FP_NAN
+  };
+  char buf[20];
+  int time_num = -1;
+  if(time > 0){
+    time_num = findCeilInArr(time_consts, time);
+  }
+  if(time_num >= 0){
+    sprintf(buf, "XTC %d\r", time_num);
+    tty_puts(device->tty, buf);
+    tty_gets(device->tty, buf, 19);
+    if(time_num <= 3){ //time <= 10ms - see manual
+      if(device->sens < 400e-6){
+        printf("WARNING: sr5105 sensitivity was reduced due time constant\n");
+      }
+      device->sens = sr5105_setSens(device->tty, 0);
+    }
+  }else{
+    tty_puts(device->tty, "XTC\r");
+    tty_gets(device->tty, buf, 19);
+    time_num = atoi(buf);
+  }
+  return time_consts[time_num];
 }
 
 #define str_append(str, app) do{memcpy(str, app, sizeof(app)); str+=sizeof(app)-1; }while(0)
@@ -107,10 +136,10 @@ static const char* sr5105_get_error(ttym_t tty){
 }
 
 static void sr5105_reset(ttym_t tty){
-  tty_puts(tty, "HPF 0; LPF 3; P 0 0; TC 3; XDB 1; XOF 0 0; YOF 0 0\r");
+  tty_puts(tty, "DD 32; HPF 0; LPF 3; P 0 0; TC 3; XDB 1; XOF 0 0; YOF 0 0\r");
   
-  char buf[1000];
-  tty_gets(tty, buf, 1000);
+  char buf[100];
+  tty_gets(tty, buf, 100);
 }
 
 //=======================================================================================
@@ -233,7 +262,7 @@ static int L_GetXY(lua_State *L){
   char buffer[20];
   int xval=-100500, yval=100500;
   tty_gets(device->tty, buffer, 20);
-  sscanf(buffer, " %d,%d", &xval, &yval);
+  sscanf(buffer, " %d %d", &xval, &yval);
   lua_pushnumber(L, ((double)xval)*device->sens*0.001);
   lua_pushnumber(L, ((double)yval)*device->sens*0.001);
   lua_pushnumber(L, device->sens);
@@ -257,6 +286,230 @@ static int L_GetMagPhase(lua_State *L){
   lua_pushnumber(L, ((double)phase)*0.1);
   lua_pushnumber(L, device->sens);
   return 3;
+}
+
+//если вызвано с параметром "auto" (или любой другой строкой) выставляем автоматически
+//если вызвано без параметров, только читаем фазу
+static int L_SetPhase(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  char buf[20];
+  if(lua_gettop(L) == 2){
+    if(lua_isnumber(L, 2)){
+      int phase = 10*lua_tonumber(L, 2);
+      phase %= 3600;
+      if(phase < 0)phase += 3600;
+      int quad = phase / (90*10);
+      phase %= (90*10);
+      sprintf(buf, "P %d %d\r", quad, phase);
+      tty_puts(device->tty, buf);
+      tty_gets(device->tty, buf, 19);
+      return 0;
+    }else if(lua_isstring(L, 2)){
+      char *cmd = (char*)lua_tostring(L, 2);
+      if(strcasecmp(cmd, "auto")==0){
+        tty_puts(device->tty, "AQN\r");
+        tty_gets(device->tty, buf, 19);
+        return 0;
+      }else{
+        ERROR_LOG("SetPhase. Incorrect string");
+        return 0;
+      }
+    }else{
+      ERROR_LOG("SetPhase. Incorrect argument");
+      return 0;
+    }
+  }else{
+    tty_puts(device->tty, "P\r");
+    tty_gets(device->tty, buf, 19);
+    int n1, n2;
+    sscanf(buf, " %d %d", &n1, &n2);
+    float phase = 90.0*n1 + (n2*0.1);
+    lua_pushnumber(L, phase);
+    return 1;
+  }
+}
+
+static int L_GetFreq(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  int freq = -1;
+  char buffer[20];
+  tty_puts(device->tty, "FRQ\r");
+  tty_gets(device->tty, buffer, 19);
+  freq = atoi(buffer);
+  lua_pushnumber(L, freq*0.001);
+  return 1;
+}
+
+//если параметров нет, возвращаем текущие значения, если есть - меняем
+static int L_Filters(lua_State *L){
+  const double hpf_arr[] = { //небольшой хак чтобы поменять подбор "сверху" на подбор "снизу"
+    -1000, -100, -10, -1, FP_NAN
+  };
+  const double lpf_arr[] = {
+    50, 500, 5000, 50000, FP_NAN
+  };
+  const double lpf_arr2[] = { //TODO: WTF?!
+    2.2e2, 2.2e3, 2.2e4, 2.2e5, FP_NAN
+  }; (void)lpf_arr2;
+  
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  char buf[20];
+  double flt;
+  int hpf, lpf;
+  if(lua_isnumber(L, 2)){
+    flt = lua_tonumber(L, 2);
+    hpf = 3-findCeilInArr(hpf_arr, -(flt*1.001));
+    if(hpf < 0 || hpf > 3)hpf = 0;
+    sprintf(buf, "HPF %d\r", hpf);
+    tty_puts(device->tty, buf);
+    tty_gets(device->tty, buf, 19);
+  }else{
+    tty_puts(device->tty, "HPF\r");
+    tty_gets(device->tty, buf, 19);
+    hpf = atoi(buf);
+  }
+  if(lua_isnumber(L, 3)){
+    flt = lua_tonumber(L, 3);
+    lpf = findCeilInArr(lpf_arr, flt);
+    if(lpf < 0)lpf = 0;
+    sprintf(buf, "LPF %d\r", lpf);
+    tty_puts(device->tty, buf);
+    tty_gets(device->tty, buf, 19);
+  }else{
+    tty_puts(device->tty, "LPF\r");
+    tty_gets(device->tty, buf, 19);
+    lpf = atoi(buf);
+  }
+  lua_pushnumber(L, -hpf_arr[3-hpf]);
+  lua_pushnumber(L, lpf_arr[lpf]);
+  return 2;
+}
+
+//если вызвано без аргументов, вернуть текущие значения
+//если с 1 аргументом - строкой 'Auto' - включить авто-смещение
+//если с 2 аргументами (возможно, nil) - установить новые. Если любой из аргументов 0 или nil - выключить смещение на текущем канале
+static int L_Offsets(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  char buf[20];
+  int xen=1, xval=0, yen=1, yval=0;
+    
+  if(lua_gettop(L) == 2){
+    char *cmd = NULL;
+    if(lua_isstring(L, -1)){
+      cmd = (char*)lua_tostring(L, -1);
+      if(strcasecmp(cmd, "auto")==0){
+        tty_puts(device->tty, "AXO\r");
+        tty_gets(device->tty, buf, 19);
+      }
+    }
+  }else if(lua_gettop(L) == 3){
+    if(lua_isnumber(L, 2))xval = lua_tonumber(L, 2);
+    if(lua_isnumber(L, 3))yval = lua_tonumber(L, 3);
+    if(xval == 0){
+      tty_puts(device->tty, "XOF 0\r"); tty_gets(device->tty, buf, 19);
+    }else{
+      sprintf(buf, "XOF 1 %d\r", xval);
+      tty_puts(device->tty, buf); tty_gets(device->tty, buf, 19);
+    }
+    if(yval == 0){
+      tty_puts(device->tty, "YOF 0\r"); tty_gets(device->tty, buf, 19);
+    }else{
+      sprintf(buf, "YOF 1 %d\r", yval);
+      tty_puts(device->tty, buf); tty_gets(device->tty, buf, 19);
+    }
+  }
+  if(xval == 0){
+    tty_puts(device->tty, "XOF\r");
+    tty_gets(device->tty, buf, 19);
+    sscanf(buf, " %d %d", &xen, &xval);
+  }
+  if(yval == 0){
+    tty_puts(device->tty, "YOF\r");
+    tty_gets(device->tty, buf, 19);
+    sscanf(buf, " %d %d", &yen, &yval);
+  }
+  //TODO: возвращаемое значение
+  if(xen == 0)lua_pushnumber(L, 0); else lua_pushnumber(L, xval);
+  if(yen == 0)lua_pushnumber(L, 0); else lua_pushnumber(L, yval);
+  return 2;
+}
+
+static int L_TimeConst(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  double time = -1;
+  if(lua_isnumber(L, 2))time = lua_tonumber(L, 2);
+  time = SetTimeConst(device, time);
+  lua_pushnumber(L, time);
+  return 1;
+}
+
+static int L_DynReserve(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  int mode = -1;
+  char buf[20];
+  if(lua_isnumber(L, 2))mode = lua_tonumber(L, 2);
+  if(mode >=0 && mode <=2){
+    sprintf(buf, "DR %d\r", mode);
+    tty_puts(device->tty, buf);
+    tty_gets(device->tty, buf, 19);
+    lua_pushnumber(L, mode);
+    return 1;
+  }else{
+    tty_puts(device->tty, "DR\r");
+    tty_gets(device->tty, buf, 19);
+    mode = atoi(buf);
+    lua_pushnumber(L, mode);
+    return 1;
+  }
+}
+
+static int L_Slope_6(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  tty_puts(device->tty, "XDB 0\r");
+  char buf[20];
+  tty_gets(device->tty, buf, 19);
+  return 0;
+}
+static int L_Slope_12(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  tty_puts(device->tty, "XDB 1\r");
+  char buf[20];
+  tty_gets(device->tty, buf, 19);
+  return 0;
+}
+
+static int L_OutConfig(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  
+  if(lua_isnumber(L, 2) && lua_isboolean(L, 3) && lua_isnumber(L, 4)){
+    double time = lua_tonumber(L, 2);
+    int slope_12 = lua_toboolean(L, 3);
+    int dynrsv = lua_tonumber(L, 4);
+    char buf[20];
+    SetTimeConst(device, time);
+    if(slope_12){
+      tty_puts(device->tty, "XDB 1\r"); tty_gets(device->tty, buf, 19);
+    }else{
+      tty_puts(device->tty, "XDB 0\r"); tty_gets(device->tty, buf, 19);
+    }
+    sprintf(buf, "DR %d\r", dynrsv);
+    tty_puts(device->tty, buf); tty_gets(device->tty, buf, 19);
+    const char *str = sr5105_get_error(device->tty);
+    lua_pushstring(L, str);
+    return 1;
+  }else{
+    ERROR_LOG("Wrong parameters( time(float), slope12(bool), DRmode(0-2))");
+    return 0;
+  }
 }
 
 static int L_connectNewDevice(lua_State *L){
@@ -321,42 +574,53 @@ static int L_connectNewDevice(lua_State *L){
     
     lua_pushcfunction(L, L_SetSens);
     lua_setfield(L, -2, "setSens");
-    lua_pushcfunction(L, L_SetSens); //It is not an error, it is the same function as previous
+    lua_pushcfunction(L, L_SetSens); //(!)It is not an error, it is the same function as previous
     lua_setfield(L, -2, "getSens");
     lua_pushcfunction(L, L_GetXY);
     lua_setfield(L, -2, "getXY");
     lua_pushcfunction(L, L_GetMagPhase);
     lua_setfield(L, -2, "getMagPhase");
+    lua_pushcfunction(L, L_SetPhase);
+    lua_setfield(L, -2, "setRefPhase");
+    lua_pushcfunction(L, L_SetPhase); //(!)It is not an error, it is the same function as previous
+    lua_setfield(L, -2, "setRefPhaseAuto");
+    lua_pushcfunction(L, L_SetPhase); //(!)It is not an error, it is the same function as previous
+    lua_setfield(L, -2, "getRefPhase");
+    lua_pushcfunction(L, L_GetFreq);
+    lua_setfield(L, -2, "getFreq");
+    lua_pushcfunction(L, L_Filters);
+    lua_setfield(L, -2, "setFilters");
+    lua_pushcfunction(L, L_Filters); //(!)It is not an error, it is the same function as previous
+    lua_setfield(L, -2, "getFilters");
+    lua_pushcfunction(L, L_Offsets);
+    lua_setfield(L, -2, "setOutputOffsets");
+    lua_pushcfunction(L, L_Offsets); //(!)It is not an error, it is the same function as previous
+    lua_setfield(L, -2, "getOutputOffsets");
+    //TODO
+    lua_pushcfunction(L, L_TimeConst);
+    lua_setfield(L, -2, "setTimeConstant");
+    lua_pushcfunction(L, L_TimeConst);
+    lua_setfield(L, -2, "getTimeConstant");
+    lua_pushcfunction(L, L_DynReserve);
+    lua_setfield(L, -2, "setDynamicReserve");
+    lua_pushcfunction(L, L_DynReserve);
+    lua_setfield(L, -2, "getDynamicReserve");
+    lua_pushcfunction(L, L_Slope_6);
+    lua_setfield(L, -2, "setOutputSlope_6");
+    lua_pushcfunction(L, L_Slope_12);
+    lua_setfield(L, -2, "setOutputSlope_12");
+    lua_pushcfunction(L, L_OutConfig);
+    lua_setfield(L, -2, "outputConfig");
     
     //TODO: add methods
   return 1;
 }
 #if 1==0
-ID
-VERSION
-reset
 
-void defDelimeterControl(int n); //DD %i
-void setFreqOfHPF(int n); //HPF %i
-void setFreqOfLPF(int n); //LPF %i
-void setSens(int mode); //SEN %d
-void configRefChannel(int refPh); //P %d %d
-void configOutChannels(int statusX, int rangeX, int statusY, int rangeY); //XOF %d %d or YOF %d %d
 void configOut(int time, int slope, int DRmode); //timeconst + slope + drmode
-void runAutoPhase(); //AQN
-void runAutoOffset(); //AXO
-double readX(); //XOF
-double readY(); //YOF
 void setTimeConstant(int time); //XTC
 void setSlope(int slope); //XDB
 void setDRmode(int DRmode); //DR
-double getSens(); //SEN
-double outRefPh(); //P
-double outChannelX(); //X
-complex<double> outChannelXY(); //XY
-double outMagnitude(); //MAG
-double outSigPh(); //PHA
-double outFrequency(); //FRQ        
 #endif
 
 int luaopen_sr5105(lua_State *L) {
