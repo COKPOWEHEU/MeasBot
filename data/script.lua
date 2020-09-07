@@ -75,6 +75,12 @@ tc = gui.wnd:NewTabControl(600, 0, 200, 400);
 tc[0] = {text="Tab1"}
 tc[1] = "Tab2"
 sc = gui.wnd:NewScroller(5, 250)
+cb = gui.wnd:NewComboBox(5, 300, "-")
+cb:SetItems({"aaa", "bbb", "ccc"})
+
+function cb:OnChange(val, str)
+  print(val, str)
+end
 
 function sc:OnChange(val)
   print(val)
