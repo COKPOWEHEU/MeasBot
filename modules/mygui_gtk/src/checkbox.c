@@ -100,6 +100,7 @@ static int getter_checked(lua_State *L, int tblindex){
     res = gtk_switch_get_active(GTK_SWITCH(btn->obj));
   }else{
     printf("Err\n");
+    return 0;
   }
   lua_pushboolean(L, res);
   return 1;
@@ -233,7 +234,7 @@ static int L_NewToggleButton(lua_State *L){
   return 1;
 }
 static int L_NewSwitchButton(lua_State *L){
-  ChkBox *btn = NewToggle(L, gtk_switch_new);
+  NewToggle(L, gtk_switch_new);
   return 1;
 }
 
