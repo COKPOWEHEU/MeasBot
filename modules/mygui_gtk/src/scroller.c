@@ -229,20 +229,9 @@ static gboolean ScrlOnChange(GtkWidget *obj, GtkScrollType scroll, gdouble value
   return 0;
 }
 
-static int L_BtnWasClicked(lua_State *L){
-  int top = lua_gettop(L);
-  Scroller *scrl = (Scroller*)read_handle(L, -1, NULL);
-  char res = scrl->was_clicked;
-  scrl->was_clicked = 0;
-
-  lua_settop(L, top);
-  lua_pushboolean(L, res);
-  return 1;
-}
-
 static int L_Btn_GC(lua_State *L){
 #ifdef DEBUG
-  printf("Btn GC\n");
+  printf("Scroller GC\n");
 #endif
   int top = lua_gettop(L);
   Scroller *scrl = (Scroller*)read_handle(L, -1, NULL);
@@ -253,8 +242,7 @@ static int L_Btn_GC(lua_State *L){
   return 0;
 }
 
-static int L_NewBtn(lua_State *L){
-  const char *caption="NONAME";
+static int L_NewScrl(lua_State *L){
   //получаем объект родительского окна
   if(lua_gettop(L) < 1){
     printf("Call function as METHOD!\n");
@@ -294,7 +282,7 @@ static int L_NewBtn(lua_State *L){
   return 1;
 }
 void scroller_reg(lua_State *L){
-  lua_pushcfunction(L, L_NewBtn);
+  lua_pushcfunction(L, L_NewScrl);
   lua_setfield(L, -2, "NewScroller");
 #ifdef DEBUG
   printf("Scroller registred\n");
