@@ -1,5 +1,3 @@
-//TODO возвращающее значение функций get привести к числам.
-
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -29,7 +27,6 @@ int SR830::connect(char portName[], int baud) {
   
   setPermStatReg(53, 15, 214, 63);    
   setInSettings(0, 1, 0);
-  startManualSetting(0, 23, 1);
 
   setPhase(0);
   setSens(1);

@@ -42,6 +42,7 @@ class SR830 {
     void setAuxOutVolt(int nOutput, double volt);
     void setZeroAOV();
     
+    //TODO разбить каждую команду на функции
     void startManualSetting(double phase, int sens, int rmod);
     void startAutoSetting();
     void refSetting(int RSmode, int harm, double freq, double volt, int RTmode);
@@ -60,7 +61,7 @@ class SR830 {
     int getSyncFiltStatus();
     int getTimeConst();
     int getFiltSlope();
-    std::complex<double> getOffsetGain(int nchannel);//TODO команда возращает 2 параметра, а функция 1
+    std::complex<double> getOffsetGain(int nchannel);
     double getAuxOutVolt(int nOutput);
     double getX();
     double getY();
