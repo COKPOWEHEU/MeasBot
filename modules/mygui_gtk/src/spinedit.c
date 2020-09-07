@@ -11,6 +11,7 @@ typedef struct{
   int pool_idx;
   int x, y, w, h;
   double min, max, step;
+  int digits;
 }SpinEd;
 
 struct SpinEdIntVariables{
@@ -41,6 +42,18 @@ static int getter_max(lua_State *L, int tblindex){
   SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
   float max = spined->max;
   lua_pushnumber(L, max);
+  return 1;
+}
+static int setter_digits(lua_State *L, int tblindex){
+  SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
+  spined->digits = lua_tonumber(L, tblindex+2);
+  gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spined->obj), spined->digits);
+  return 0;
+}
+static int getter_digits(lua_State *L, int tblindex){
+  SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
+  spined->digits = gtk_spin_button_get_digits(GTK_SPIN_BUTTON(spined->obj));
+  lua_pushnumber(L, spined->digits);
   return 1;
 }
 static int setter_val(lua_State *L, int tblindex){
@@ -133,6 +146,7 @@ struct SpinEdIntVariables spined_intvars[] = {
   {.name = "y", .setter = setter_y, .getter = getter_y},
   {.name = "min", .setter = setter_min, .getter = getter_min},
   {.name = "max", .setter = setter_max, .getter = getter_max},
+  {.name = "digits", .setter = setter_digits, .getter = getter_digits},
   {.name = "width", .setter = setter_width, .getter = getter_width},
   {.name = "height", .setter = setter_height, .getter = getter_height},
   {.name = "value", .setter = setter_val, .getter = getter_val},
@@ -199,6 +213,23 @@ static int L_SpinEdsetter(lua_State *L){
   return 0;
 }
 
+static void SpinEdOnChange(GtkWidget *obj, gpointer data){
+  SpinEd *spined = data;
+  lua_State *L = gui.L;
+  int prev = lua_gettop(L);
+  read_self(L, spined->pool_idx);
+  
+  lua_getfield(L, -1, "OnChange");
+  lua_pushvalue(L, -2);
+  if(lua_isfunction(L, -2)){
+    float val = gtk_spin_button_get_value(GTK_SPIN_BUTTON(spined->obj));
+    lua_pushnumber(L, val);
+    lua_pcall(L, 2, 0, 0);
+    lua_pop(L, 1);
+  }
+  lua_settop(L, prev);
+}
+
 static int L_SpinEd_GC(lua_State *L){
 #ifdef DEBUG
   printf("SpinEd GC\n");
@@ -223,11 +254,18 @@ static int L_NewSpinEd(lua_State *L){
   GtkWidget *cont = read_container(L, 1, NULL);
   SpinEd *spined = (SpinEd*)malloc(sizeof(SpinEd));
   spined->x = 0; spined->y = 0; spined->w = 100; spined->h = 10;
+  spined->min = 0; spined->max = 1; spined->digits = 1;
   
   if(lua_gettop(L) >= 3){
     if(lua_isnumber(L, 2))spined->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))spined->y = lua_tonumber(L, 3);
   }
+  if(lua_gettop(L) == 4)if(lua_isnumber(L, 4))spined->digits = lua_tonumber(L, 4);
+  if(lua_gettop(L) >= 5){
+    if(lua_isnumber(L, 4))spined->min = lua_tonumber(L, 4);
+    if(lua_isnumber(L, 5))spined->max = lua_tonumber(L, 5);
+  }
+  if(lua_gettop(L) == 6)if(lua_isnumber(L, 6))spined->digits = lua_tonumber(L, 6);
   
   spined->pool_idx = mk_blank_table(L, spined, L_SpinEd_GC);
   lua_getmetatable(L, -1);
@@ -239,8 +277,11 @@ static int L_NewSpinEd(lua_State *L){
     lua_setfield(L, -2, "__pairs");
   lua_setmetatable(L, -2);
   
-  spined->obj = gtk_spin_button_new_with_range(0, 1, 0.1);
+  spined->obj = gtk_spin_button_new_with_range(spined->min, spined->max, 0.1);
+  gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spined->obj), spined->digits);
+  gtk_spin_button_set_update_policy(GTK_SPIN_BUTTON(spined->obj), GTK_UPDATE_IF_VALID);
   gtk_fixed_put(GTK_FIXED(cont), spined->obj, spined->x, spined->y);
+  g_signal_connect(G_OBJECT(spined->obj), "value-changed", G_CALLBACK(SpinEdOnChange), spined);
   gtk_widget_show(spined->obj);
   return 1;
 }
