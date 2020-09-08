@@ -12,7 +12,7 @@ all:
 	@echo
 	@echo "  <modules> are:"
 	@grep ":$$" makefile
-core:
+runtime:
 	bash -c "cd core; make $(rarch) $(target) -j"
 gtk:
 	bash -c "cd modules/mygui_gtk; make $(rarch) $(target) -j"
