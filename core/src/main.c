@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "portability.h"
+#include <signal.h>
 
 #ifdef __cplusplus
 extern "C"{
@@ -32,6 +33,19 @@ int addmodules(lua_State *L){
   return 1;
 }
 
+int script_retcode = 0;
+char script_osexit = 0;
+static int L_Exit(lua_State *L){
+  fprintf(stderr, "DO NOT USE os.exit!\n");
+  script_osexit = 1;
+  script_retcode = 0;
+  if(!lua_isnil(L, 1)){
+    if(lua_isnumber(L, 1))script_retcode = lua_tonumber(L, 1);
+  }
+  luaL_error(L, "os.exit");
+  return 0;
+}
+
 int main(int argc, char **argv){
   char *scriptname = "data/script.lua";
   int res = 0;
@@ -46,10 +60,39 @@ int main(int argc, char **argv){
   }
   luaL_openlibs(L);
   //addmodules(L);
+  
   lua_pushcfunction(L, addmodules);
   lua_setglobal(L, "ModuleSuffix");
   
-  lua_call(L,0,0);
+  //fix 'os.exit' function
+  lua_getglobal(L, "os");
+    lua_pushcfunction(L, L_Exit);
+    lua_setfield(L, -2, "exit");
+  lua_pop(L, 1);
+  
+  
+  lua_newtable(L);
+    int i=0;
+    lua_pushstring(L, scriptname);
+    lua_rawseti(L, -2, i++);
+    lua_pushnumber(L, 123);
+    lua_rawseti(L, -2, i++);
+  lua_setglobal(L, "arg");
+  
+  lua_pcall(L, 0, 0, 0);
+  
+  if(script_osexit){
+    if(lua_isstring(L, -1)){
+      printf("Script result: %i\n", script_retcode);
+    }else{
+      printf("Script result: UNKNOWN\n");
+    }
+  }else{
+    if(lua_isstring(L, -1)){
+      char *funcres = (char*)lua_tostring(L, -1);
+      printf("Script ERROR [%s]\n", funcres);
+    }
+  }
   
   lua_close(L);
 }
