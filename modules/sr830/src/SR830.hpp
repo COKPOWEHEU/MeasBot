@@ -35,7 +35,7 @@ class SR830 {
     void setRefTrig(int mode);
     void setNotchFiltStatus(int status);
     void setSyncFiltStatus(bool status);
-    void setTimeConst(int time);
+    void setTimeConst(double time);
     void setFiltSlope(double slope);
     void setDisplaySettings(int nchannel, int ndisplay, int ratio);
     void setOutSource(int nchannel, int outQuan);
@@ -49,7 +49,7 @@ class SR830 {
     //TODO разбить каждую команду на функции
     //Стр. 95 (5-11)
     void startAutoSetting();
-    void refSetting(int RSmode, int harm, double freq, double volt, int RTmode);
+    void refSetting(bool RSmode, int harm, double freq, double volt, int RTmode);
     void filtSetting(int Nstatus, bool Sstatus, int time, int slope);
     void settingEveryAuxOutVolt(double volt1, double volt2, double volt3, double volt4);
     
