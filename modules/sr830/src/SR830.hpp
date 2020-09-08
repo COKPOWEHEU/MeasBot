@@ -19,9 +19,12 @@ class SR830 {
     void clrRegs();
 
     //TODO разбить каждую команду на функции
-    void setPermStatReg(int stdEventB, int liaB, int errB, int serialPollB);
-    void setInSettings(int inConfig, int inShGND, int inCoupl);
+    //Стр. 104-107 (с 5-20 до 5-23)
+    void setPermStatRegs(int stdEventB, int liaB, int errB, int serialPollB);
 
+    void setInConfig(int inConf);
+    void setInGndShield(bool gndval);
+    void setInCoupling(bool coupling);
     void setPhase(double phase);
     void setSens(double sens);
     void setReserveMode(int mode);
@@ -42,11 +45,12 @@ class SR830 {
     void setAuxOutVolt(int nOutput, double volt);
     void setZeroAOV();
     
-    //TODO разбить каждую команду на функции
     void startManualSetting(double phase, int sens, int rmod);
+    //TODO разбить каждую команду на функции
+    //Стр. 95 (5-11)
     void startAutoSetting();
     void refSetting(int RSmode, int harm, double freq, double volt, int RTmode);
-    void filtSetting(int Nstatus, int Sstatus, int time, int slope);
+    void filtSetting(int Nstatus, bool Sstatus, int time, int slope);
     void settingEveryAuxOutVolt(double volt1, double volt2, double volt3, double volt4);
     
     double getPhase();
