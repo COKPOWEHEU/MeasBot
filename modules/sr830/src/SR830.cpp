@@ -25,15 +25,15 @@ int SR830::connect(char portName[], int baud) {
   setRS232();
   clrRegs();   
   
-  setPermStatReg(53, 15, 214, 63);    
-  setInSettings(0, 1, 0);
-
+  setPermStatRegs(53, 15, 214, 63);
+  setInConfig(0);
+  setInGndShield(true);
+  setInCoupling(false);
   setPhase(0);
   setSens(1);
   setReserveMode(1);
-
   refSetting(1, 1, 133, 0.004,  0);
-  filtSetting(0, 0, 10, 3);
+  filtSetting(0, false, 10, 3);
   setDisplaySettings(1, 0, 0);
   setOutSource(1, 1);
   setDisplaySettings(2, 0, 0);
@@ -91,7 +91,7 @@ void SR830::clrRegs() {
   }
 }
 
-void SR830::setPermStatReg(int stdEventB, int liaB, int errB, int serialPollB) {
+void SR830::setPermStatRegs(int stdEventB, int liaB, int errB, int serialPollB) {
   int n;
   char buff[64];
   sprintf(buff, "*ESE %d;LIAE %d;ERRE %d;*SRE %d;\r", stdEventB, liaB, errB, serialPollB);
@@ -103,13 +103,35 @@ void SR830::setPermStatReg(int stdEventB, int liaB, int errB, int serialPollB) {
   }
 }
 
-void SR830::setInSettings(int inConfig, int inShGND, int inCoupl) {
+void SR830::setInConfig(int inConfig) {
   int n;
-  char buff[64];
-  sprintf(buff, "ISRC %d;IGND %d;ICPL %d;\r", inConfig, inShGND, inCoupl);
+  char buff[20];
+  sprintf(buff, "ISRC %d\r", inConfig);
   n = ttym_write(tty, buff, strlen(buff));
   if(!n) {
-    ERROR_LOG("Error of set incoming settings");
+    ERROR_LOG("Error of set incoming config");
+    return;
+  }
+}
+
+void SR830::setInGndShield(bool gndval) {
+  int n;
+  char buff[20];
+  sprintf(buff, "IGND %d\r", gndval);
+  n = ttym_write(tty, buff, strlen(buff));
+  if(!n) {
+    ERROR_LOG("Error of set input ground shield");
+    return;
+  }
+}
+
+void SR830::setInCoupling(bool coupling) {
+  int n;
+  char buff[20];
+  sprintf(buff, "ICPL %d\r", coupling);
+  n = ttym_write(tty, buff, strlen(buff));
+  if(!n) {
+    ERROR_LOG("Error of set input coupling");
     return;
   }
 }
@@ -423,7 +445,7 @@ void SR830::refSetting(int RSmode, int harm, double freq, double volt, int RTmod
   setRefTrig(RTmode);
 }
 
-void SR830::filtSetting(int Nstatus, int Sstatus, int time, int slope) {
+void SR830::filtSetting(int Nstatus, bool Sstatus, int time, int slope) {
   setNotchFiltStatus(Nstatus);
   setSyncFiltStatus(Sstatus);
   setTimeConst(time);
