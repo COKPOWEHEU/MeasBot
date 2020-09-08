@@ -293,7 +293,7 @@ void SR830::setSyncFiltStatus(bool status) {
   }
 }
 
-void SR830::setTimeConst(int time) {
+void SR830::setTimeConst(double time) {
   const double time_arr[] = {
     1e-5, 3e-5,
     1e-4, 3e-4,
@@ -437,7 +437,7 @@ void SR830::startAutoSetting() {
   }
 }
 
-void SR830::refSetting(int RSmode, int harm, double freq, double volt, int RTmode) {
+void SR830::refSetting(bool RSmode, int harm, double freq, double volt, int RTmode) {
   setRefSource(RSmode);
   setDetHarm(harm);
   setRefFreq(freq);
