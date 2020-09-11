@@ -356,6 +356,11 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
         for(int i=0; i<data_len; i++){
           lua_pushnumber(L, i+1);
           lua_gettable(L, -2); //data[i+1]
+          if(lua_isnil(L, -1)){
+            data_len = i;
+            lua_pop(L, 1);
+            break;
+          }
           if(!lua_istable(L, -1)){
             data_len = i;
             lua_pop(L, 1);
