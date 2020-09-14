@@ -144,10 +144,9 @@ static int L_readID(lua_State *L) {
     ERROR_LOG("Call 'connectNewDevice' before using anything functions");
     return 0;
   }
-  char* res;
-  res = sr->readID();
+  auto res = sr->readID();
 
-  lua_pushstring(L, res);
+  lua_pushstring(L, res.c_str());
   return 1;
 }
 

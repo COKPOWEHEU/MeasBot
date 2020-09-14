@@ -42,7 +42,7 @@ int SR830::connect(char portName[], int baud) {
   setOffsetGainY(0, 0);
   setZeroAOV();
   
-  ttym_read(tty,buff,200);
+  ttym_read(tty,buff,255);
   return 1;
 }
 
@@ -54,41 +54,44 @@ void SR830::setRS232() {
     ERROR_LOG("Error of set RS232");
     return;
   }
-  ttym_read(tty, buff, 200);
-  while(!n) {
-    ttym_write(tty, (void*)"*STB?\r", 6);
-    n = ttym_read(tty, buff, 200);
-  }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::reset() {
   int n;
+  char buff[20];
   n = ttym_write(tty, (void*)"*RST\r", 5);
   if(!n) {
     ERROR_LOG("Error of enable reset");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
-char* SR830::readID() {
-  char *buff = new char[256];
+std::string SR830::readID() {//char* SR830::readID() {
+  //char *buff = new char[256];
+  std::string buff;
   int n;
   n = ttym_write(tty, (void*)"*IDN?\r", 6);
   if(!n) {
     ERROR_LOG("Error of read ID");
     return (char*)"ID:-1";
   }
-  ttym_read(tty, buff, 200);
+  //ttym_read(tty, buff, 255);
+  buff = getstr();
+
   return buff;
 }
 
 void SR830::clrRegs() {
   int n;
+  char buff[20];
   n = ttym_write(tty, (void*)"*CLS\r",6);
   if(!n) {
     ERROR_LOG("Error of clear status bytes");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setPermStatRegs(int stdEventB, int liaB, int errB, int serialPollB) {
@@ -101,6 +104,7 @@ void SR830::setPermStatRegs(int stdEventB, int liaB, int errB, int serialPollB) 
     ERROR_LOG("Error of set status registers");
     return;
   }
+  ttym_read(tty, buff, 63);
 }
 
 void SR830::setInConfig(int inConfig) {
@@ -112,6 +116,7 @@ void SR830::setInConfig(int inConfig) {
     ERROR_LOG("Error of set incoming config");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setInGndShield(bool gndval) {
@@ -123,6 +128,7 @@ void SR830::setInGndShield(bool gndval) {
     ERROR_LOG("Error of set input ground shield");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setInCoupling(bool coupling) {
@@ -134,6 +140,7 @@ void SR830::setInCoupling(bool coupling) {
     ERROR_LOG("Error of set input coupling");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setPhase(double phase) {
@@ -149,6 +156,7 @@ void SR830::setPhase(double phase) {
     ERROR_LOG("Phase set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setSens(double sens) {
@@ -179,6 +187,7 @@ void SR830::setSens(double sens) {
     ERROR_LOG("Sensitivity set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setReserveMode(int mode) {
@@ -194,6 +203,7 @@ void SR830::setReserveMode(int mode) {
     ERROR_LOG("Reverse mode set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setRefSource(bool mode) {
@@ -205,6 +215,7 @@ void SR830::setRefSource(bool mode) {
     ERROR_LOG("Reference source set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setDetHarm(int harm) {
@@ -220,6 +231,7 @@ void SR830::setDetHarm(int harm) {
     ERROR_LOG("Detection harmonic set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setRefFreq(double freq) {
@@ -235,6 +247,7 @@ void SR830::setRefFreq(double freq) {
     ERROR_LOG("Reference frequency set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setAmplSinOut(double volt) {
@@ -250,6 +263,7 @@ void SR830::setAmplSinOut(double volt) {
     ERROR_LOG("Error set amplitude of the sine output");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setRefTrig(int mode) {
@@ -265,6 +279,7 @@ void SR830::setRefTrig(int mode) {
     ERROR_LOG("Reference trigger set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setNotchFiltStatus(int status) {
@@ -280,6 +295,7 @@ void SR830::setNotchFiltStatus(int status) {
     ERROR_LOG("Notch filter status set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setSyncFiltStatus(bool status) {
@@ -291,6 +307,7 @@ void SR830::setSyncFiltStatus(bool status) {
     ERROR_LOG("Synchronous filter status set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setTimeConst(double time) {
@@ -322,6 +339,7 @@ void SR830::setTimeConst(double time) {
     ERROR_LOG("Time constant set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setFiltSlope(double slope) {
@@ -340,6 +358,7 @@ void SR830::setFiltSlope(double slope) {
     ERROR_LOG("Low pass filter slope set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setDisplaySettings(int nchannel, int ndisplay, int ratio) {
@@ -347,14 +366,15 @@ void SR830::setDisplaySettings(int nchannel, int ndisplay, int ratio) {
     ERROR_LOG("Wrong values of display settings");
     return;
   }
-  char buff[20];
   int n;
+  char buff[20];
   sprintf(buff, "DDEF%d, %d, %d;\r", nchannel, ndisplay, ratio);
   n = ttym_write(tty, buff, strlen(buff));
   if(!n) {
     ERROR_LOG("Display settings set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setOutSource(int nchannel, int outQuan) {
@@ -370,6 +390,7 @@ void SR830::setOutSource(int nchannel, int outQuan) {
     ERROR_LOG("Output source set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setOffsetGain(int nChannel, int perOffset, int nExpand) {
@@ -385,6 +406,7 @@ void SR830::setOffsetGain(int nChannel, int perOffset, int nExpand) {
     ERROR_LOG("Offset and gain set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setOffsetGainX(int perOffset, int nExpand) {
@@ -416,6 +438,7 @@ void SR830::setAuxOutVolt(int nOutput, double volt) {
     ERROR_LOG("Aux output voltage set error");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::setZeroAOV() {
@@ -430,11 +453,13 @@ void SR830::startManualSetting(double phase, int sens, int rmod) {
 
 void SR830::startAutoSetting() {
   int n;
+  char buff[20];
   n = ttym_write(tty, (void*)"AGAN;ARSV;APHS\r", 15);
   if(!n) {
     ERROR_LOG("Error set phase");
     return;
   }
+  ttym_read(tty, buff, 19);
 }
 
 void SR830::refSetting(bool RSmode, int harm, double freq, double volt, int RTmode) {
@@ -466,194 +491,290 @@ void SR830::settingEveryAuxOutVolt(double volt1, double volt2, double volt3, dou
 double SR830::getPhase() {
   int n;
   double res;
-  char buff[20];
+  //char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"PHAS?\r", 6);
   if(!n) {
     ERROR_LOG("Error get phase");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
+  //ttym_read(tty, buff, 19);
+  //res = strtod(buff, NULL);
 
-  res = strtod(buff, NULL);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
+
   return res;
 }
 
 int SR830::getSens() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"SENS?\r", 6);
   if(!n) {
     ERROR_LOG("Error get sensitivity");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getReserveMode() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"RMOD?\r", 6);
   if(!n) {
     ERROR_LOG("Error get reverse mode");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getRefSource() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"FMOD?\r", 6);
   if(!n) {
     ERROR_LOG("Error get reference source");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getDetHarm() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"HARM?\r", 6);
   if(!n) {
     ERROR_LOG("Error get detection harmonic");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 double SR830::getRefFreq() {
   int n;
   double res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"FREQ?\r", 6);
   if(!n) {
     ERROR_LOG("Error get reference frequency");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atof(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atof(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 double SR830::getAmplSinOut() {
   int n;
   double res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"SLVL?\r", 6);
   if(!n) {
     ERROR_LOG("Error get amplitude of the sine output");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atof(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atof(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getRefTrig() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"RSLP?\r", 6);
   if(!n) {
     ERROR_LOG("Error get reference trigger");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getNotchFiltStatus() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"ILIN?\r", 6);
   if(!n) {
     ERROR_LOG("Error get notch filter status");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getSyncFiltStatus() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"SYNC?\r", 6);
   if(!n) {
     ERROR_LOG("Error get synchronous filter status");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getTimeConst() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"OFLT?\r", 6);
   if(!n) {
     ERROR_LOG("Error get time constant");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
 int SR830::getFiltSlope() {
   int n, res;
-  char buff[20];
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"OFSL?\r", 6);
   if(!n) {
     ERROR_LOG("Error get filter slope");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-
-  res = atoi(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
-
+//TODO
 std::complex<double> SR830::getOffsetGain(int nchannel) {
   if(nchannel < 1 || nchannel > 3) {
     ERROR_LOG("Wrong value of offset or gain");
     return -1004;
   }
-  char buff[20];
-  char *end;
   int n;
   double a, b;
+  char buff[20];
+  // char *end;
+  std::string resbuff;
+  size_t end;
   sprintf(buff, "OEXP? %d;\r", nchannel);
   n = ttym_write(tty, buff, strlen(buff));
   if(!n) {
     ERROR_LOG("Offset and gain get error");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-
-  a = strtod(buff, &end);
-  b = strtod(end+1, NULL);
+  // ttym_read(tty, buff, 20);
+  // a = strtod(buff, &end);
+  // b = strtod(end+1, NULL);
+  resbuff = getstr();
+  try {
+    a = stod(resbuff, &end);
+    resbuff.erase(resbuff.begin(), resbuff.begin()+end);
+    b = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    a = NAN;
+    b = NAN;
+  }
   std::complex<double> z(a,b);
   return z;
 }
@@ -663,74 +784,110 @@ double SR830::getAuxOutVolt(int nOutput) {
     ERROR_LOG("Wrong value of aux output voltage");
     return -1004;
   }
-  char buff[20];
   int n;
   double res;
+  char buff[20];
+  std::string resbuff; 
   sprintf(buff, "AUXV%d\r", nOutput);
   n = ttym_write(tty, buff, strlen(buff));
   if(!n) {
     ERROR_LOG("Aux output voltage get error");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-  
-  res = atof(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atof(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 double SR830::getX() {
-  char buff[20];
   int n;
   double res;
+  // char buff[20];
+  std::string resbuff;
+  
   n = ttym_write(tty, (void*)"OUTP? 1\r", 8);
   if(!n) {
     ERROR_LOG("Get X read error");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-
-  res = atof(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atof(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 double SR830::getY() {
-  char buff[20];
   int n;
   double res;
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"OUTP? 2\r", 8);
   if(!n) {
     ERROR_LOG("Get Y read error");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-
-  res = atof(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atof(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 double SR830::getR() {
-  char buff[20];
   int n;
   double res;
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"OUTP? 3\r", 8);
   if(!n) {
     ERROR_LOG("Get R read error");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-
-  res = atof(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atof(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 double SR830::getTetta() {
-  char buff[20];
   int n;
   double res;
+  // char buff[20];
+  std::string resbuff;
   n = ttym_write(tty, (void*)"OUTP? 4\r", 8);
   if(!n) {
     ERROR_LOG("Get Tetta read error");
     return -1001;
   }
-  ttym_read(tty, buff, 20);
-
-  res = atof(buff);
+  // ttym_read(tty, buff, 20);
+  // res = atof(buff);
+  resbuff = getstr();
+  try {
+    res = stod(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = NAN;
+  }
   return res;
 }
 
@@ -744,4 +901,33 @@ int SR830::findCeilInArr(const double arr[], double val){
     if( val <= arr[i] )return i;
   }
   return -1;
+}
+
+std::string SR830::getstr() {
+  std::string res_str("", 256);
+  size_t sz = 0;
+  int data;
+  while(sz <= res_str.size()) {
+    data = ttym_readchar(tty);
+    if(data == ' ') continue;
+
+    // std::cout << data;
+
+    if(data <= 0 && sz > 0){ //timeout
+      return res_str;
+    } else if(data <= 0 && sz <= 0) {
+      return "";
+    }
+
+    if(data == '\r' || data == '\n') {
+      if(sz != 0) break;
+      else continue;
+    }
+    
+    res_str[sz] = (char)data;
+    sz++;
+  }
+  res_str[sz] = 0;
+  res_str.resize(sz);
+  return res_str;
 }

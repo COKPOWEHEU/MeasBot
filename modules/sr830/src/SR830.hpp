@@ -9,13 +9,16 @@ class SR830 {
   private:
     ttym_t tty;
     int findCeilInArr(const double arr[], double val);
+    std::string getstr();
   public:
     SR830();
     ~SR830();
     int connect(char portName[], int baud);
     void setRS232();
     void reset();
-    char* readID();
+    //char* readID();
+    std::string readID();
+
     void clrRegs();
 
     //TODO разбить каждую команду на функции
