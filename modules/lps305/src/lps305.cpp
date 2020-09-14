@@ -19,7 +19,8 @@ int LPS305::connect(char portName[] , int baud) {
     printf("No connect!\n");
     return (int)NULL;
   }
-  ttym_timeout(tty, 1000);
+  //ttym_timeout(tty, 1000);
+  ttym_timeout(tty, 200);
   
   setOutput(0);
   setVoltage(1, 0);
@@ -37,8 +38,8 @@ void LPS305::setVoltage(int channel, double volt) {
     return;
   }
   char buff[256];
-  sprintf(buff, "VSET%d %f\n", channel, volt);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "VSET%d %.3lf\r\n", channel, volt);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 }
 
@@ -48,8 +49,8 @@ void LPS305::setCurrent(int channel, double curr) {
     return;
   }
   char buff[256];
-  sprintf(buff, "ISET%d %f\n", channel, curr);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "ISET%d %.3f\r\n", channel, curr);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 }
 
@@ -59,8 +60,8 @@ void LPS305::setOutput(int mode) {
     return;
   }
   char buff[256];
-  sprintf(buff, "OUT%d\n", mode);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "OUT%d\r\n", mode);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 }
 
@@ -70,8 +71,8 @@ void LPS305::setModeTracking(int mode) {
     return;
   }
   char buff[256];
-  sprintf(buff, "TRACK%d\n", mode);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "TRACK%d\r\n", mode);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 }
 
@@ -81,8 +82,8 @@ void LPS305::setBeeper(int mode) {
     return;
   }
   char buff[256];
-  sprintf(buff, "BEEP%d\n", mode);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "BEEP%d\r\n", mode);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 } 
 
@@ -92,8 +93,8 @@ void LPS305::setDigOutput(int mode) {
     return;
   }
   char buff[256];
-  sprintf(buff, "VDD%d\n", mode);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "VDD%d\r\n", mode);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 }
 
@@ -103,8 +104,8 @@ void LPS305::setCompensatedOutput(int mode) {
     return;
   }
   char buff[256];
-  sprintf(buff, "LOWA%d\n", mode);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "LOWA%d\r\n", mode);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 }
   
@@ -115,8 +116,8 @@ double LPS305::getVoltage(int channel) {
   }
   double res;
   char buff[256];
-  sprintf(buff, "VOUT%d\n", channel);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "VOUT%d\r\n", channel);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
 
   res = atof(buff);
@@ -130,8 +131,8 @@ double LPS305::getCurrent(int channel) {
   }
   double res;
   char buff[256];
-  sprintf(buff, "IOUT%d\n", channel);
-  ttym_write(tty, buff, strlen(buff));
+  int size = sprintf(buff, "IOUT%d\r\n", channel);
+  ttym_write(tty, buff, size);
   ttym_read(tty, buff, 255);
   
   res = atof(buff);

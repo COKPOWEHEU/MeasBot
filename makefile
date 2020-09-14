@@ -20,3 +20,5 @@ sr570:
 	bash -c "cd modules/sr570; make $(rarch) $(target) -j"
 sr5105:
 	bash -c "cd modules/sr5105; make $(rarch) $(target) -j"
+lps305:
+	bash -c "cd modules/lps305; make $(rarch) $(target) -j"

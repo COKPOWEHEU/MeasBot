@@ -494,110 +494,85 @@ static int L_connectNewDevice(lua_State *L) {
   }
 
   lua_newtable(L);
+  //сохраняем глобальную переменную в виде поля, после чего меняем
+  //глобальную переменную на саму таблицу
+    lua_getglobal(L, "LPS305");
+    lua_setfield(L, -2, "LPS305");
+    lua_setglobal(L, "LPS305");
+    lua_getglobal(L, "LPS305");
+  
     lua_newtable(L);
-      lua_pushstring(L, "_objLPS305_");
       lua_pushlightuserdata(L, lps);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "__gc");
-      lua_pushcfunction(L,L_disconnect);
-      lua_rawset(L, -3);
-
+      lua_setfield(L, -2, "_objLPS305_");
+      lua_pushcfunction(L, L_disconnect);
+      lua_setfield(L, -2, "__gc");
     lua_setmetatable(L, -2);
-
-    lua_pushstring(L, "pos");
+    
     lua_newtable(L);
       lua_newtable(L);
-        lua_pushstring(L, "_objLPS305_");
         lua_pushlightuserdata(L, lps);
-        lua_rawset(L, -3);
+        lua_setfield(L, -2, "_objLPS305_");
       lua_setmetatable(L, -2);
-      
-      lua_pushstring(L, "setVoltage");
+      lua_getglobal(L, "LPS305");
+      lua_setfield(L, -2, "device");
       lua_pushcfunction(L, L_posSetVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "getVoltage");
+      lua_setfield(L, -2, "setVoltage");
       lua_pushcfunction(L, L_posGetVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "setCurrent");
+      lua_setfield(L, -2, "getVoltage");
       lua_pushcfunction(L, L_posSetCurrent);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "getCurrent");
+      lua_setfield(L, -2, "setCurrent");
       lua_pushcfunction(L, L_posGetCurrent);
-      lua_rawset(L, -3);
+      lua_setfield(L, -2, "getCurrent");
+    lua_setfield(L, -2, "pos");
 
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "neg");
     lua_newtable(L);
       lua_newtable(L);
-        lua_pushstring(L, "_objLPS305_");
         lua_pushlightuserdata(L, lps);
-        lua_rawset(L, -3);
+        lua_setfield(L, -2, "_objLPS305_");
       lua_setmetatable(L, -2);
-      
-      lua_pushstring(L, "setVoltage");
+      lua_getglobal(L, "LPS305");
+      lua_setfield(L, -2, "device");
       lua_pushcfunction(L, L_negSetVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "getVoltage");
+      lua_setfield(L, -2, "setVoltage");
       lua_pushcfunction(L, L_negGetVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "setCurrent");
+      lua_setfield(L, -2, "getVoltage");
       lua_pushcfunction(L, L_negSetCurrent);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "getCurrent");
+      lua_setfield(L, -2, "setCurrent");
       lua_pushcfunction(L, L_negGetCurrent);
-      lua_rawset(L, -3);
+      lua_setfield(L, -2, "getCurrent");
+    lua_setfield(L, -2, "neg");
 
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "both");
     lua_newtable(L);
       lua_newtable(L);
-        lua_pushstring(L, "_objLPS305_");
         lua_pushlightuserdata(L, lps);
-        lua_rawset(L, -3);
+        lua_setfield(L, -2, "_objLPS305_");
       lua_setmetatable(L, -2);
-
-      lua_pushstring(L, "setVoltage");
+      lua_getglobal(L, "LPS305");
+      lua_setfield(L, -2, "device");
       lua_pushcfunction(L, L_bothSetVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "getVoltage");
+      lua_setfield(L, -2, "setVoltage");
       lua_pushcfunction(L, L_bothGetVoltage);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "setCurrent");
+      lua_setfield(L, -2, "getVoltage");
       lua_pushcfunction(L, L_bothSetCurrent);
-      lua_rawset(L, -3);
-
-      lua_pushstring(L, "getCurrent");
+      lua_setfield(L, -2, "setCurrent");
       lua_pushcfunction(L, L_bothGetCurrent);
-      lua_rawset(L, -3);
+      lua_setfield(L, -2, "getCurrent");
+    lua_setfield(L, -2, "both");
 
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "setOutput");
     lua_pushcfunction(L, L_setOutput);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "getModel");
+    lua_setfield(L, -2, "setOutput");
     lua_pushcfunction(L, L_getModel);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "getVersion");
+    lua_setfield(L, -2, "getModel");
     lua_pushcfunction(L, L_getVersion);
-    lua_rawset(L, -3);
-
-    lua_pushstring(L, "getDeviceHelp");
+    lua_setfield(L, -2, "getVersion");
     lua_pushcfunction(L, L_getDeviceHelp);
-    lua_rawset(L, -3);
+    lua_setfield(L, -2, "getDeviceHelp");
+    
+  //восстанавливаем глобальную переменную LPS305 и затираем локальную
+    lua_getfield(L, -1, "LPS305");
+    lua_setglobal(L, "LPS305");
+    lua_pushnil(L);
+    lua_setfield(L, -2, "LPS305");
 
   return 1;
 }
