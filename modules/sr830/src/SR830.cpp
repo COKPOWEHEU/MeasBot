@@ -488,6 +488,69 @@ void SR830::settingEveryAuxOutVolt(double volt1, double volt2, double volt3, dou
   setAuxOutVolt(4, volt4);
 }
 
+int SR830::getInConfig() {
+  int n, res;
+  // char buff[20]
+  std::string resbuff;
+  n = ttym_write(tty, (void*)"ISRC?\r", 6);
+  if(!n) {
+    ERROR_LOG("Error get input config");
+    return -1001;
+  }
+  //ttym_read(tty, buff, 19);
+  //res = strtod(buff, NULL);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = (int)NAN;
+  }
+  return res;
+}
+
+int SR830::getInGndShield() {
+  int n, res;
+  // char buff[20]
+  std::string resbuff;
+  n = ttym_write(tty, (void*)"IGND?\r", 6);
+  if(!n) {
+    ERROR_LOG("Error get input ground shield");
+    return -1001;
+  }
+  //ttym_read(tty, buff, 19);
+  //res = strtod(buff, NULL);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = (int)NAN;
+  }
+  return res;
+}
+
+int SR830::getInCoupling() {
+  int n, res;
+  // char buff[20]
+  std::string resbuff;
+  n = ttym_write(tty, (void*)"ICPL?\r", 6);
+  if(!n) {
+    ERROR_LOG("Error get input coupling");
+    return -1001;
+  }
+  //ttym_read(tty, buff, 19);
+  //res = strtod(buff, NULL);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = (int)NAN;
+  }
+  return res;
+}
+
 double SR830::getPhase() {
   int n;
   double res;
@@ -508,7 +571,6 @@ double SR830::getPhase() {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
     res = NAN;
   }
-
   return res;
 }
 
@@ -528,7 +590,7 @@ int SR830::getSens() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -549,7 +611,7 @@ int SR830::getReserveMode() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -570,7 +632,7 @@ int SR830::getRefSource() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -591,7 +653,7 @@ int SR830::getDetHarm() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -656,7 +718,7 @@ int SR830::getRefTrig() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -677,7 +739,7 @@ int SR830::getNotchFiltStatus() {
     res = stod(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -698,7 +760,7 @@ int SR830::getSyncFiltStatus() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -719,7 +781,7 @@ int SR830::getTimeConst() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
@@ -740,10 +802,37 @@ int SR830::getFiltSlope() {
     res = stoi(resbuff);
   } catch(std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
-    res = NAN;
+    res = (int)NAN;
   }
   return res;
 }
+
+int SR830::getOutSource(int nchannel) {
+  if(nchannel < 1 || nchannel > 2) {
+    ERROR_LOG("Wrong value channel of get output source");
+    return -1001;
+  }
+  int n, res;
+  char buff[20];
+  std::string resbuff;
+  sprintf(buff, "FPOP? %d\r", nchannel);
+  n = ttym_write(tty, buff, 8);
+  if(!n) {
+    ERROR_LOG("Error get filter slope");
+    return -1001;
+  }
+  // ttym_read(tty, buff, 20);
+  // res = atoi(buff);
+  resbuff = getstr();
+  try {
+    res = stoi(resbuff);
+  } catch(std::invalid_argument &e) {
+    std::cerr << "Error: " << e.what() << ": " << resbuff << std::endl;
+    res = (int)NAN;
+  }
+  return res;
+}
+
 //TODO
 std::complex<double> SR830::getOffsetGain(int nchannel) {
   if(nchannel < 1 || nchannel > 3) {

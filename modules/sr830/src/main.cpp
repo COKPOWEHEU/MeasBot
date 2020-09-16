@@ -1297,6 +1297,107 @@ static int L_getTetta(lua_State *L) {
   return 1;
 }
 
+static int L_getInConfig(lua_State *L) {
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    ERROR_LOG("Not metatable!");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR830_");
+  if(!lua_islightuserdata(L, -1)) {
+    ERROR_LOG("Not userdata!");
+    return 0;
+  }
+
+  SR830 *sr = (SR830*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  int res = sr->getInConfig();
+
+  lua_pushnumber(L, res);
+  return 1;
+}
+
+static int L_getInGndShield(lua_State *L) {
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    ERROR_LOG("Not metatable!");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR830_");
+  if(!lua_islightuserdata(L, -1)) {
+    ERROR_LOG("Not userdata!");
+    return 0;
+  }
+
+  SR830 *sr = (SR830*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  bool res = sr->getInGndShield();
+
+  lua_pushboolean(L, res);
+  return 1;
+}
+
+static int L_getInCoupling(lua_State *L) {
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    ERROR_LOG("Not metatable!");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR830_");
+  if(!lua_islightuserdata(L, -1)) {
+    ERROR_LOG("Not userdata!");
+    return 0;
+  }
+
+  SR830 *sr = (SR830*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  bool res = sr->getInCoupling();
+  
+  lua_pushboolean(L, res);
+  return 1;
+}
+
+static int L_getOutSource(lua_State *L) {
+  int nchannel;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) nchannel = lua_tonumber(L, 2);
+  }
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    ERROR_LOG("Not metatable!");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR830_");
+  if(!lua_islightuserdata(L, -1)) {
+    ERROR_LOG("Not userdata!");
+    return 0;
+  }
+
+  SR830 *sr = (SR830*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  int res = sr->getOutSource(nchannel);
+
+  lua_pushnumber(L, res);
+  return 1;
+}
+
+
 static int L_disconnect(lua_State *L) {
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
@@ -1543,6 +1644,23 @@ static int L_connectNewDevice(lua_State *L) {
     lua_pushstring(L, "getTetta");
     lua_pushcfunction(L, L_getTetta);
     lua_rawset(L, -3);
+    
+    lua_pushstring(L, "getInConfig");
+    lua_pushcfunction(L, L_getInConfig);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "getInGndShield");
+    lua_pushcfunction(L, L_getInGndShield);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "getInCoupling");
+    lua_pushcfunction(L, L_getInCoupling);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "getOutSource");
+    lua_pushcfunction(L, L_getOutSource);
+    lua_rawset(L, -3);
+
 
 
 

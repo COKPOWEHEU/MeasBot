@@ -56,6 +56,9 @@ class SR830 {
     void filtSetting(int Nstatus, bool Sstatus, int time, int slope);
     void settingEveryAuxOutVolt(double volt1, double volt2, double volt3, double volt4);
     
+    int getInConfig();
+    int getInGndShield();
+    int getInCoupling();
     double getPhase();
     int getSens();
     int getReserveMode();
@@ -68,6 +71,7 @@ class SR830 {
     int getSyncFiltStatus();
     int getTimeConst();
     int getFiltSlope();
+    int getOutSource(int nchannel);
     std::complex<double> getOffsetGain(int nchannel);
     double getAuxOutVolt(int nOutput);
     double getX();
