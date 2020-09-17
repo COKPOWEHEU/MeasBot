@@ -3,9 +3,9 @@ srcdir = src
 builddir = build
 
 progname := $(resdir)/prog
-files = main SR830 ttym
+files = main ttym
 
-CFLAGS  = -Os -Wall -MD -MP -MT $(builddir)/$(*F).$(arch).o -MF $(builddir)/dep/$(@F).mk
+CFLAGS  = -Os -Wall -Werror -MD -MP -MT $(builddir)/$(*F).$(arch).o -MF $(builddir)/dep/$(@F).mk
 #-D_REENTERAN
 CFLAGS += -I./ -fPIC
 CXXFLAGS = $(CFLAGS) -std=c++11
