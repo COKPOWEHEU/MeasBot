@@ -113,7 +113,17 @@ ssize_t ttym_write(ttym_t tty, void *buf, size_t count){
 
 ssize_t ttym_read(ttym_t tty, void *buf, size_t count){
   if(tty == NULL)return -1;
-  return read( tty->fd, buf, count );
+  char *buff = buf;
+  size_t i = 0;
+  ssize_t res = 0;
+  while(1){
+    res = read( tty->fd, &buff[i], count-i);
+    if(res <= 0)break;
+    i += res;
+  }
+  if(i == 0)return -1;
+  return i;
+  // return read( tty->fd, buf, count );
 }
 
 int ttym_timeout(ttym_t tty, ssize_t time_ms){

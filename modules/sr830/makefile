@@ -3,7 +3,7 @@ srcdir = src
 builddir = build
 
 progname := $(resdir)/prog
-files = main SR830 ttym
+files = main ttym
 
 CFLAGS  = -Os -Wall -MD -MP -MT $(builddir)/$(*F).$(arch).o -MF $(builddir)/dep/$(@F).mk
 #-D_REENTERAN
