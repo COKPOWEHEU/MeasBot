@@ -134,7 +134,7 @@ int getInputGrounded(ttym_t tty) {
   return res;
 }
 
-void setInputCup(ttym_t tty, int mode) {
+void setInputCap(ttym_t tty, int mode) {
   int n;
   char buff[20];
   sprintf(buff, "ICPL %d\r", mode);
@@ -146,7 +146,7 @@ void setInputCup(ttym_t tty, int mode) {
   ttym_read(tty, buff, 19);
 }
 
-int getInputCup(ttym_t tty) {
+int getInputCap(ttym_t tty) {
   int n, res;
   char buff[20];
   n = ttym_write(tty, (void*)"ICPL?\r", 6);
@@ -873,21 +873,21 @@ static int L_setInputGrounded(lua_State *L) {
   }
 }
 
-static int L_setInputCup(lua_State *L) {
+static int L_setInputCap(lua_State *L) {
   sr830_t* device = ReadDevice(L);
   if(device == NULL) return 0;
   int mode;
   if(lua_gettop(L) == 2) {
     if(lua_isboolean(L, 2)) {
       mode = lua_toboolean(L, 2);
-      setInputCup(device->tty, mode);
+      setInputCap(device->tty, mode);
       return 0;
     } else {
       ERROR_LOG("This function must contain at least 1 parameter (bool)");
       return 0;
     }
   } else {
-    mode = getInputCup(device->tty);
+    mode = getInputCap(device->tty);
     lua_pushboolean(L, mode);
     return 1;
   }
@@ -1193,6 +1193,17 @@ static int L_setRange(lua_State *L) {
   return 1;
 }
 
+static int L_SineSetRange(lua_State *L){
+  double range = luaL_checknumber(L, -1);
+  lua_pop(L, 1);
+  if(range > 5 || range < 0 ){
+    ERROR_LOG("Wrong value of range (0 ... +5). Read specification of SR830");
+    return 0;
+  }
+  lua_pushnumber(L, range);
+  return 1;
+}
+
 static int L_OnDestroy(lua_State *L) {
   sr830_t* device = ReadDevice(L);
   if(device == NULL) return 0;
@@ -1283,123 +1294,107 @@ static int L_connectNewDevice(lua_State *L) {
 
     lua_pushcfunction(L, L_rawSend);
     lua_setfield(L, -2, "rawSend");
-
     lua_pushcfunction(L, L_readID);
     lua_setfield(L, -2, "readID");
-
     lua_pushcfunction(L, L_reset_device);
     lua_setfield(L, -2, "reset");
-
-    lua_pushcfunction(L, L_setInputMode);
-    lua_setfield(L, -2, "setInputMode");
-
-    lua_pushcfunction(L, L_setInA);
-    lua_setfield(L, -2, "setInputA");
-
-    lua_pushcfunction(L, L_setInAB);
-    lua_setfield(L, -2, "setInputAB");
-
-    lua_pushcfunction(L, L_setInCurr1Mohm);
-    lua_setfield(L, -2, "setCurrentIn1Mohm");//длинное название
-
-    lua_pushcfunction(L, L_setInCurr100Mohm);
-    lua_setfield(L, -2, "setCurrentIn100Mohm");//длинное название
-
-    lua_pushcfunction(L, L_setInputMode);
-    lua_setfield(L, -2, "getInputMode");
-
-    lua_pushcfunction(L, L_setInputGrounded);
-    lua_setfield(L, -2, "setInputGrounded");
-
-    lua_pushcfunction(L, L_setInputGrounded);
-    lua_setfield(L, -2, "getInputGrounded");
-
-    lua_pushcfunction(L, L_setInputCup);
-    lua_setfield(L, -2, "setInputCup");
-
-    lua_pushcfunction(L, L_setInputCup);
-    lua_setfield(L, -2, "getInputCup");
-
-    lua_pushcfunction(L, L_setPhase);
-    lua_setfield(L, -2, "setPhase");
-
-    lua_pushcfunction(L, L_setPhase);
-    lua_setfield(L, -2, "getPhase");
-
-    lua_pushcfunction(L, L_setSens);
-    lua_setfield(L, -2, "setSens");
-
-    lua_pushcfunction(L, L_setSens);
-    lua_setfield(L, -2, "getSens");
-
-    lua_pushcfunction(L, L_setHarmonic);
-    lua_setfield(L, -2, "setHarmonic");
-
-    lua_pushcfunction(L, L_setHarmonic);
-    lua_setfield(L, -2, "getHarmonic");
-
-    lua_pushcfunction(L, L_setFrequency);
-    lua_setfield(L, -2, "setFreq");
-
-    lua_pushcfunction(L, L_setFrequency);
-    lua_setfield(L, -2, "getFreq");
-
-    lua_pushcfunction(L, L_dynReserve);
-    lua_setfield(L, -2, "setDynamicReserve");
-
-    lua_pushcfunction(L, L_dynReserve);
-    lua_setfield(L, -2, "getDynamicReserve");
-
-    lua_pushcfunction(L, L_refSource);
-    lua_setfield(L, -2, "setRefSource");
-
-    lua_pushcfunction(L, L_refSource);
-    lua_setfield(L, -2, "getRefSource");
-
-    lua_pushcfunction(L, L_timeConst);
-    lua_setfield(L, -2, "setTimeConst");
-
-    lua_pushcfunction(L, L_timeConst);
-    lua_setfield(L, -2, "getTimeConst");
-
-    lua_pushcfunction(L, L_setSlope);
-    lua_setfield(L, -2, "setSlope");
-
-    lua_pushcfunction(L, L_setSlope);
-    lua_setfield(L, -2, "getSlope");
-
-    lua_pushcfunction(L, L_getX);
-    lua_setfield(L, -2, "getX");
-
-    lua_pushcfunction(L, L_getY);
-    lua_setfield(L, -2, "getY");
-
-    lua_pushcfunction(L, L_getR);
-    lua_setfield(L, -2, "getR");
-
-    lua_pushcfunction(L, L_getTetta);
-    lua_setfield(L, -2, "getTetta");
-
-    lua_pushcfunction(L, L_setAmplitude);
-    lua_setfield(L, -2, "setAmplitude");
-
-    lua_pushcfunction(L, L_setAmplitude);
-    lua_setfield(L, -2, "getAmplitude");
-
-    lua_pushcfunction(L, L_setRefTrig);
-    lua_setfield(L, -2, "setTrigger");
-
-    lua_pushcfunction(L, L_setRefTrig);
-    lua_setfield(L, -2, "getTrigger");
-
-    lua_pushcfunction(L, L_setStateOfBandpassFilter);
-    lua_setfield(L, -2, "bandpassFiltersEnable");
-
-    lua_pushcfunction(L, L_setStateOfSyncFilter);
-    lua_setfield(L, -2, "setStateOfSyncFilter");
-
-    lua_pushcfunction(L, L_setStateOfSyncFilter);
-    lua_setfield(L, -2, "getStateOfSyncFilter");
+    
+    lua_newtable(L);
+      lua_newtable(L);
+        lua_getglobal(L, "SR830");
+        lua_setfield(L, -2, "device");
+      lua_setmetatable(L, -2);
+      //abstract DAC
+      lua_pushcfunction(L, L_setAmplitude);
+      lua_setfield(L, -2, "setVoltage");
+      lua_pushcfunction(L, L_setAmplitude);
+      lua_setfield(L, -2, "getVoltage");
+      lua_pushcfunction(L, L_SineSetRange);
+      lua_setfield(L, -2, "setRange");
+      //SRS specific function
+      lua_pushcfunction(L, L_setFrequency);
+      lua_setfield(L, -2, "setFreq");
+      lua_pushcfunction(L, L_setFrequency);
+      lua_setfield(L, -2, "getFreq");
+      lua_pushcfunction(L, L_setRefTrig);
+      lua_setfield(L, -2, "setTrigger");
+      lua_pushcfunction(L, L_setRefTrig);
+      lua_setfield(L, -2, "getTrigger");
+      lua_pushcfunction(L, L_refSource);
+      lua_setfield(L, -2, "setRefSource");
+      lua_pushcfunction(L, L_refSource);
+      lua_setfield(L, -2, "getRefSource");
+      lua_pushcfunction(L, L_setPhase);
+      lua_setfield(L, -2, "setRefPhase");
+      lua_pushcfunction(L, L_setPhase);
+      lua_setfield(L, -2, "getRefPhase");
+      //TODO: разобраться связана ли гармоника с выходным сигналом или все же с входным
+      lua_pushcfunction(L, L_setHarmonic);
+      lua_setfield(L, -2, "setHarmonic");
+      lua_pushcfunction(L, L_setHarmonic);
+      lua_setfield(L, -2, "getHarmonic");
+    lua_setfield(L, -2, "SineOut");
+    
+    lua_newtable(L);
+      lua_newtable(L);
+        lua_getglobal(L, "SR830");
+        lua_setfield(L, -2, "device");
+      lua_setmetatable(L, -2);
+      //Abstract voltmeter
+      lua_pushcfunction(L, L_getR);
+      lua_setfield(L, -2, "getVoltage"); //sinonym getR
+      lua_pushcfunction(L, L_setSens);
+      lua_setfield(L, -2, "setRange");
+      lua_pushcfunction(L, L_setSens);
+      lua_setfield(L, -2, "getRange");
+      //SRS
+      lua_pushcfunction(L, L_getX);
+      lua_setfield(L, -2, "getX");
+      lua_pushcfunction(L, L_getY);
+      lua_setfield(L, -2, "getY");
+      lua_pushcfunction(L, L_getR);
+      lua_setfield(L, -2, "getR");
+      lua_pushcfunction(L, L_getTetta);
+      lua_setfield(L, -2, "getTetta");
+      lua_pushcfunction(L, L_setInputMode);
+      lua_setfield(L, -2, "getInputMode");
+      lua_pushcfunction(L, L_setInputMode);
+      lua_setfield(L, -2, "setInputMode");
+        lua_pushcfunction(L, L_setInA);
+        lua_setfield(L, -2, "setInputA");
+        lua_pushcfunction(L, L_setInAB);
+        lua_setfield(L, -2, "setInputAB");
+        lua_pushcfunction(L, L_setInCurr1Mohm);
+        lua_setfield(L, -2, "setCurrentIn1Mohm");//длинное название
+        lua_pushcfunction(L, L_setInCurr100Mohm);
+        lua_setfield(L, -2, "setCurrentIn100Mohm");//длинное название
+      lua_pushcfunction(L, L_setInputGrounded);
+      lua_setfield(L, -2, "setInputGrounded");
+      lua_pushcfunction(L, L_setInputGrounded);
+      lua_setfield(L, -2, "getInputGrounded");
+      lua_pushcfunction(L, L_setInputCap);
+      lua_setfield(L, -2, "setInputCap");
+      lua_pushcfunction(L, L_setInputCap);
+      lua_setfield(L, -2, "getInputCap");
+      lua_pushcfunction(L, L_dynReserve);
+      lua_setfield(L, -2, "setDynamicReserve");
+      lua_pushcfunction(L, L_dynReserve);
+      lua_setfield(L, -2, "getDynamicReserve");
+      lua_pushcfunction(L, L_timeConst);
+      lua_setfield(L, -2, "setTimeConst");
+      lua_pushcfunction(L, L_timeConst);
+      lua_setfield(L, -2, "getTimeConst");
+      lua_pushcfunction(L, L_setSlope);
+      lua_setfield(L, -2, "setSlope");
+      lua_pushcfunction(L, L_setSlope);
+      lua_setfield(L, -2, "getSlope");
+      lua_pushcfunction(L, L_setStateOfBandpassFilter);
+      lua_setfield(L, -2, "bandpassFiltersEnable");
+      lua_pushcfunction(L, L_setStateOfSyncFilter);
+      lua_setfield(L, -2, "setStateOfSyncFilter");
+      lua_pushcfunction(L, L_setStateOfSyncFilter);
+      lua_setfield(L, -2, "getStateOfSyncFilter");
+    lua_setfield(L, -2, "SineIn");
 
     lua_newtable(L);
       lua_getglobal(L, "SR830");
@@ -1448,27 +1443,20 @@ static int L_connectNewDevice(lua_State *L) {
       }
     lua_setfield(L, -2, "adc");
 
-
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "setDisplaySetting");
-
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "getDisplaySetting");
-
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "setOutSource");
-
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "getOutSource");
-
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "setOffsetGain");
-
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "getOffsetGain");
-
     lua_pushcfunction(L, L_getErr);
-    lua_setfield(L, -2, "");
+    lua_setfield(L, -2, "getDeviceError");
 
   return 1;
 }
