@@ -183,8 +183,9 @@ static int L_help(lua_State *L){
     "  getErrors():str - return composition of all errors (one error by line)\n"
     "  getVersion():str - return Version string from device\n"
     "  reset():nil - reset some parameters: delimiter symbol, input filters, phase, offsets, time constants, output filter\n"
-    "  setSens(num):num - set sensitivity (in Volts per full scale) and return it\n"
-    "  getSens():num - return current sensitivity (in Volts)\n"
+    "  setRange(num):num - set sensitivity (in Volts per full scale) and return it\n"
+    "  getRange():num - return current sensitivity (in Volts)\n"
+    "  getVoltage():num - return amplitude of input signal (in Volts)\n"
     "  getXY():num,num,num - read and return X and Y values of input signal and maximum avaible value (sensitivity)\n"
     "  getMagPhase():num,num,num - read and return Magnitude and Phase and then maximum avaible value of Magnitude\n"
     "  getFreq(nil):num - return reference frequency (in Hertz)\n"
@@ -320,6 +321,20 @@ static int L_GetMagPhase(lua_State *L){
   lua_pushnumber(L, ((double)phase)*0.1);
   lua_pushnumber(L, device->sens);
   return 3;
+}
+
+static int L_GetMag(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  
+  int mag=-100500;
+  char buffer[20];
+  tty_puts(device->tty, "MAG\r");
+  tty_gets(device->tty, buffer, 19);
+  mag = atoi(buffer);
+  lua_pushnumber(L, ((double)mag)*device->sens*0.001);
+  lua_pushnumber(L, device->sens);
+  return 2;
 }
 
 //если вызвано с параметром "auto" (или любой другой строкой) выставляем автоматически
@@ -606,10 +621,13 @@ static int L_connectNewDevice(lua_State *L){
     lua_pushcfunction(L, L_reset);
     lua_setfield(L, -2, "reset");
     
+    
     lua_pushcfunction(L, L_SetSens);
-    lua_setfield(L, -2, "setSens");
+    lua_setfield(L, -2, "setRange");
     lua_pushcfunction(L, L_SetSens); //(!)It is not an error, it is the same function as previous
-    lua_setfield(L, -2, "getSens");
+    lua_setfield(L, -2, "getRange");
+    lua_pushcfunction(L, L_GetMag);
+    lua_setfield(L, -2, "getVoltage");
     lua_pushcfunction(L, L_GetXY);
     lua_setfield(L, -2, "getXY");
     lua_pushcfunction(L, L_GetMagPhase);
