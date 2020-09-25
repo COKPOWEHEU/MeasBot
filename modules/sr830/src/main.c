@@ -1345,6 +1345,21 @@ static int L_connectNewDevice(lua_State *L) {
     }
     ttym_read(device->tty, buff, 19);
   }
+  setInputMode(device->tty, 0);
+  setInputGrounded(device->tty, 1);
+  setInputCap(device->tty, 0);
+  setPhase(device->tty, 0);
+  setSens(device->tty, 1);
+  setDynReserve(device->tty, 1);
+  setRefSource(device->tty, 1);
+  setHarmonic(device->tty, 1);
+  setFrequency(device->tty, 133);
+  setAmplitude(device->tty, 0.004);
+  setRefTrig(device->tty, 0);
+  setStateOfSyncFilter(device->tty, 0);
+  setStateOfBandpassFilter(device->tty, 0);
+  setTimeConst(device->tty, 1);
+  setSlope(device->tty, 24);
 
   setSens(device->tty, 1);
   setInputMode(device->tty, 0);
@@ -1513,6 +1528,11 @@ static int L_connectNewDevice(lua_State *L) {
         lua_rawseti(L, -2, i);
       }
     lua_setfield(L, -2, "adc");
+
+    lua_getfield(L, -1, "SR830");
+    lua_setglobal(L, "SR830");
+    lua_pushnil(L);
+    lua_setfield(L, -2, "SR830");
 
 #if 0 //Not realized yet
     lua_pushcfunction(L, L_getErr);
