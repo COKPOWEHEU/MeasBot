@@ -51,7 +51,7 @@ static const char* sr5105_id(ttym_t tty){
 
 static int findCeilInArr(const double arr[], double val){
   val *= 0.9999; //поправка на машинную точность. Сам SR5105 обладает небольшим запасом, так что небольшая перегрузка допустима
-  for(int i=0; arr[i] != FP_NAN; i++){
+  for(int i=0; arr[i] != NAN; i++){
     if( val <= arr[i] )return i;
   }
   return -1;
@@ -65,7 +65,7 @@ static double sr5105_setSens(ttym_t tty, double sens){
      10e-3, 31.6e-3,
     100e-3, 316e-3,
     1e0,
-    FP_NAN
+    NAN
   };
   
   char buf[20];
@@ -87,7 +87,7 @@ static double SetTimeConst(sr5105_t *device, double time){
   const double time_consts[] = {
     300e-6, 1e-3, 3e-3, 10e-3, 30e-3,
     100e-3, 300e-3, 1, 3, 10,
-    FP_NAN
+    NAN
   };
   char buf[20];
   int time_num = -1;
@@ -379,13 +379,13 @@ static int L_GetFreq(lua_State *L){
 //если параметров нет, возвращаем текущие значения, если есть - меняем
 static int L_Filters(lua_State *L){
   const double hpf_arr[] = { //небольшой хак чтобы поменять подбор "сверху" на подбор "снизу"
-    -1000, -100, -10, -1, FP_NAN
+    -1000, -100, -10, -1, NAN
   };
   const double lpf_arr[] = {
-    50, 500, 5000, 50000, FP_NAN
+    50, 500, 5000, 50000, NAN
   };
   const double lpf_arr2[] = { //TODO: WTF?!
-    2.2e2, 2.2e3, 2.2e4, 2.2e5, FP_NAN
+    2.2e2, 2.2e3, 2.2e4, 2.2e5, NAN
   }; (void)lpf_arr2;
   
   sr5105_t *device = ReadDevice(L);
