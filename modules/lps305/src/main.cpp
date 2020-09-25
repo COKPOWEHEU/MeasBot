@@ -8,6 +8,7 @@ static int L_help(lua_State *L){
             "Module for working with power supply LPS-305\n"
             "  connectNewDevice(path, [baudrate]):table - connecting to a given 'path' with rate a 'baudrate'\n"
             "  setOuput(mode):nil - performs enable/disable outputs of device\n"
+            "  setDigitalOut(mode):nil - sets digital output in mode off, 3.3V or 5V"
             "  getModel():string - gets model of device\n"
             "  getVersion():string - gets version of device\n"
             "  getDeviceHelp() - gets commands for working with the device\n"
@@ -362,6 +363,33 @@ static int L_setOutput(lua_State *L) {
   return 1;
 }
 
+static int L_setDigOutput(lua_State *L) {
+  int mode = 0;
+  if(lua_gettop(L) >= 2) {
+    if(lua_isnumber(L, 2)) mode = lua_tointeger(L, 2);
+  }
+  
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)) {
+    printf("Not metatable!\n");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objLPS305_");
+  if(!lua_islightuserdata(L, -1)) {
+    printf("Not userdata!\n");
+    return 0;
+  }
+  LPS305 *lps  = (LPS305*)lua_touserdata(L, -1);
+  if(lps == NULL) {
+    fprintf(stderr, "Call 'connectNewDevice' before using anything functions");
+    return -1;
+  }
+  lps->setDigOutput(mode);
+
+  return 0;
+}
+
 static int L_getModel(lua_State *L) {
   lua_getmetatable(L, -1);
   if(!lua_istable(L, -1)) {
@@ -573,6 +601,8 @@ static int L_connectNewDevice(lua_State *L) {
 
     lua_pushcfunction(L, L_setOutput);
     lua_setfield(L, -2, "setOutput");
+    lua_pushcfunction(L, L_setDigOutput);
+    lua_setfield(L, -2, "setDigitalOut");
     lua_pushcfunction(L, L_getModel);
     lua_setfield(L, -2, "getModel");
     lua_pushcfunction(L, L_getVersion);
