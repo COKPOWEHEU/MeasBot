@@ -9,6 +9,7 @@ class SR570 {
     ttym_t tty;
     int findCeilInArr(const float arr[], float val);
   public:
+		float sensitivity;
     SR570();
     ~SR570();
     //Подключиться к удалённому прибору по заданному portName и скорости передачи baud

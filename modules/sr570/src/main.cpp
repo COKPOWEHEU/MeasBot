@@ -71,6 +71,30 @@ static int L_setSens(lua_State *L){
   return 0;
 }
 
+static int L_getSens(lua_State *L) {
+	lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)){
+    ERROR_LOG("Not metatable!");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)){
+    ERROR_LOG("Not userdata!");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL) {
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+	
+	lua_pushnumber(L, sr->sensitivity);
+  
+  return 1;
+}
+
 static int L_reset(lua_State *L){
   lua_getmetatable(L, 1);
   if(!lua_istable(L, -1)) {
@@ -613,7 +637,7 @@ static int L_connectNewDevice(lua_State *L) {
       lua_pushlightuserdata(L, sr);
       lua_rawset(L, -3);
       
-      lua_pushstring(L, "_gcc");
+      lua_pushstring(L, "__gc");
       lua_pushcfunction(L, L_disconnect);
       lua_rawset(L, -3);
     lua_setmetatable(L, -2);
@@ -621,6 +645,10 @@ static int L_connectNewDevice(lua_State *L) {
     lua_pushstring(L, "setSens");
     lua_pushcfunction(L, L_setSens);
     lua_rawset(L, -3);
+
+		lua_pushstring(L, "getSens");
+		lua_pushcfunction(L, L_getSens);
+		lua_rawset(L, -3);	
 
     lua_pushstring(L, "reset");
     lua_pushcfunction(L, L_reset);
