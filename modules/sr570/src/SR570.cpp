@@ -7,6 +7,7 @@
 
 SR570::SR570() {
   tty = NULL;
+	sensitivity = 1e-3;
 }
 
 SR570::~SR570() {
@@ -64,8 +65,9 @@ void SR570::setSens(float sens_A_V){
     1e-3,
     FP_NAN
   };
-  
+  	
   int sens_num = findCeilInArr(sens, sens_A_V);
+	sensitivity = sens[sens_num];
   if(sens_num < 0){
     ERROR_LOG("Wrong sens");
     return;
