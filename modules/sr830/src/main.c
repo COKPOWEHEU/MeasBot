@@ -44,7 +44,7 @@ static void stackDump (lua_State *L) {
 #endif
 
 int findCeilInArr(const double arr[], double val){
-  for(int i = 0; arr[i] != FP_NAN; i++){
+  for(int i = 0; arr[i] != NAN; i++){
     if(val <= arr[i] )return i;
   }
   return -1;
@@ -354,7 +354,7 @@ void setTimeConst(ttym_t tty, double time) {
     1e+2, 3e+2,
     1e+3, 3e+3,
     1e+4, 3e+4,
-    FP_NAN
+    NAN
   };
 
   int n, time_num = -1;
@@ -386,7 +386,7 @@ double getTimeConst(ttym_t tty) {
     1e+2, 3e+2,
     1e+3, 3e+3,
     1e+4, 3e+4,
-    FP_NAN
+    NAN
   };
   int n, res;
   char buff[20];
