@@ -668,7 +668,78 @@ int ReadChannel(lua_State *L) {
 
 static int L_help(lua_State *L) {
   const char helpstring[] = 
-        "SR830\n";
+    "SR830\n"
+    "  connectNewDevice(path, [baudrate]):table - connect to SR830\n"
+    "  help():string - return this help\n"
+    "  rawSend(str):str - send raw string to device and return it response\n"
+    "  getID():str - return ID string of device\n"
+    "  reset():nil - reset device\n"
+    "\n"
+    "  SineOut: table\n"
+    "    setVoltage(num):nil - set output amplitude (in Volts)\n"
+    "    getVoltage():num - get setted amplitude (in Volts)\n"
+    "    setRange():num - set maximum output amplitude (in Volts). Dummy function due fixed range (0...+5 V)\n"
+    "    setFreq(num):nil - set output frequency (in Hertz)\n"
+    "    getFreq():num - get setted frequency (in Hertz)\n"
+    "    setIntRefSource(bool):nil - set internal (true) or external (false) reference signal\n"
+    "    getRefSource():bool - return source of reference signal: true=internal, false=external\n"
+    "    setTrigger(num):nil - set condition of external reference signal:\n"
+    "      0 - zero value in sine signal\n"
+    "      1 - on rising edge (0->1) in TTL signal\n"
+    "      2 - on falling edge (1->0) in TTL signal\n"
+    "    getTrigger(nil):num - get trigger condition\n"
+    "    setRefPhase(num):nil - set reference signal phase relative to output (in degrees)\n"
+    "    getRefPhase():num - get reference signal phase\n"
+    //TODO harmonic
+    "\n"
+    "  SineIn:table\n"
+    "    getVoltage():num - get amplitude of input signal (recommended to use this function as link to getX, getY or getR) (in Volts)\n"
+    "    setRange(num):nil - set maximum of input signal (in Volts)\n"
+    "    getRange():num - get setted maximun\n"
+    "    getX():num - get X (real part) of complex input signal (in Volts)\n"
+    "    getY():num - get Y (imaginary part) of complex input signal (in Volts)\n"
+    "    getR():num - get Amplitude of exponential form of complex input signal (in Volts)\n"
+    "    getTetta():num - get Phase of exponential form of complex input signal (in degrees)\n"
+    "    setInputMode(num):nil - set input mode:\n"
+    "      0 - 'A' (sinonym: setInputA)\n"
+    "      1 - 'A-B' (sinonym: setInputAB)\n"
+    "      2 - Current input with resistance 1 MOhm (sinonym: setCurrentIn1Mohm)\n"
+    "      3 - Current input with resistance 100 MOhm (sinonym: setCurrentIn100Mohm)\n"
+    "    getInputMode():num - get setted input mode\n"
+    "    setInputA = setInputMode(0)\n"
+    "    setInputAB = setInputMode(1)\n"
+    "    setCurrentIn1Mohm = setInputMode(2)\n"
+    "    setCurrentIn100Mohm = setInputMode(3)\n"
+    "    setInputGrounded(bool):nil - use grounded (true) or floating (false) input mode\n"
+    "    getInputGrounded():bool - get setted value 'setInputGrounded'\n"
+    "    setInputCap(bool):nil - use AC (true) or DC (false) input mode\n"
+    "    getInputCap():bool - get setted value 'setInputCap'\n"
+    "    setDynamicReserve(num):nil - set dynamic reserve:\n"
+    "      0 - High reserve\n"
+    "      1 - Normal\n"
+    "      2 - Low reserve\n"
+    "    getDynamicReserve():num - get setted dynamic reserve\n"
+    "    setTimeConst(num):nil - set time constant (in seconds)\n"
+    "    getTimeConst():num - get time constant (in seconds)\n"
+    "    setSlope(num):nil - set High-pass filter slope:\n"
+    "      0 - 6 dB/oct\n"
+    "      1 - 12 dB/oct\n"
+    "      2 - 18 dB/oct\n"
+    "      3 - 24 dB/oct\n"
+    "    getSlope():num - get setted slope\n"
+    "    bandpassFiltersEnable(bool) - enable or disable bandpass filter\n"
+    "    setStateOfSyncFilter(bool):nil - enable or disable synchronous filter below 200 Hz\n"
+    "    getStateOfSyncFilter():bool - get status of sync filter\n"
+    "\n"
+    "  dac[4]: table\n"
+    "    setVoltage(num):nil - set voltage on AUX outputs (in Volts)\n"
+    "    getVoltage():num - get setted voltage on AUX outputs\n"
+    "    setRange(num):nil - set maximum voltage on AUX outputs (in Volts). Dummy function due fixed range (-10.5 ... +10.5 V)\n"
+    "\n"
+    "  adc[4]: table\n"
+    "    getVoltage():num - read voltage from AUX inputs (in Volts)\n"
+    "    setRange(num):nil - set maximun input voltage (in Volts). Dummy function due fixed range (-10.5 ... +10.5 V)\n"
+    ;
   
   lua_pushstring(L, helpstring);
   return 1;
@@ -1321,7 +1392,7 @@ static int L_connectNewDevice(lua_State *L) {
       lua_pushcfunction(L, L_setRefTrig);
       lua_setfield(L, -2, "getTrigger");
       lua_pushcfunction(L, L_refSource);
-      lua_setfield(L, -2, "setRefSource");
+      lua_setfield(L, -2, "setIntRefSource");
       lua_pushcfunction(L, L_refSource);
       lua_setfield(L, -2, "getRefSource");
       lua_pushcfunction(L, L_setPhase);
@@ -1443,10 +1514,11 @@ static int L_connectNewDevice(lua_State *L) {
       }
     lua_setfield(L, -2, "adc");
 
+#if 0 //Not realized yet
     lua_pushcfunction(L, L_getErr);
-    lua_setfield(L, -2, "setDisplaySetting");
+    lua_setfield(L, -2, "setDisplaySettings");
     lua_pushcfunction(L, L_getErr);
-    lua_setfield(L, -2, "getDisplaySetting");
+    lua_setfield(L, -2, "getDisplaySettings");
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "setOutSource");
     lua_pushcfunction(L, L_getErr);
@@ -1455,8 +1527,7 @@ static int L_connectNewDevice(lua_State *L) {
     lua_setfield(L, -2, "setOffsetGain");
     lua_pushcfunction(L, L_getErr);
     lua_setfield(L, -2, "getOffsetGain");
-    lua_pushcfunction(L, L_getErr);
-    lua_setfield(L, -2, "getDeviceError");
+#endif
 
   return 1;
 }
