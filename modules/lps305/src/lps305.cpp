@@ -88,8 +88,8 @@ void LPS305::setBeeper(int mode) {
 } 
 
 void LPS305::setDigOutput(int mode) {
-  if(mode != 0 || mode != 3 || mode != 5) {
-    printf("Setup digital output error");
+  if(mode != 0 && mode != 3 && mode != 5) {
+    printf("Setup digital output error\n");
     return;
   }
   char buff[256];
