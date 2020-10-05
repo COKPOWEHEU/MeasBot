@@ -63,7 +63,7 @@ void SR570::setSens(float sens_A_V){
     10e-6,  20e-6,  50e-6,
     100e-6, 200e-6, 500e-6,
     1e-3,
-    FP_NAN
+    NAN
   };
   	
   int sens_num = findCeilInArr(sens, sens_A_V);
@@ -91,7 +91,7 @@ void SR570::setCalOffsetCurrentLVL(float curr_A){
     10e-6,  20e-6,  50e-6,
     100e-6, 200e-6, 500e-6,
     1e-3,   2e-3,   5e-3,
-    FP_NAN
+    NAN
   };
   
   int curr_num = findCeilInArr(curr, curr_A);
@@ -131,7 +131,7 @@ void SR570::setHighFilter(float freqFilter){
     // 3e4,  
     // 1e5, 3e5,
     // 1e6,
-    FP_NAN
+    NAN
   };
   int freq_num = findCeilInArr(freq, freqFilter);
   
@@ -157,7 +157,7 @@ void SR570::setLowFilter(float freqFilter){
     1e4, 3e4, 
     1e5, 3e5,
     1e6,
-    FP_NAN
+    NAN
   };
   int freq_num = findCeilInArr(freq, freqFilter);
   
@@ -314,7 +314,7 @@ void SR570::closePort() {
 }
 
 int SR570::findCeilInArr(const float arr[], float val){
-  for(int i=0; arr[i] != FP_NAN; i++){
+  for(int i=0; arr[i] != NAN; i++){
     if( val <= arr[i] )return i;
   }
   return -1;
