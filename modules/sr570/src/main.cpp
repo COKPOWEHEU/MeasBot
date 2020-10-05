@@ -276,7 +276,7 @@ static int L_setUncalInOffsetVernier(lua_State *L){
 static int L_setInOffsetCalMode(lua_State *L){
   int calMode;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    calMode = lua_tointeger(L, 2);
+    calMode = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (calmode)");
     return 0;
@@ -307,7 +307,7 @@ static int L_setInOffsetCalMode(lua_State *L){
 static int L_turnInOffsetCurr(lua_State *L){
   int val;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    val = lua_tointeger(L, 2);
+    val = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (value)");
     return 0;
@@ -338,7 +338,7 @@ static int L_turnInOffsetCurr(lua_State *L){
 static int L_turnBiasVolt(lua_State *L){
   int val;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    val = lua_tointeger(L, 2);
+    val = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (value)");
     return 0;
@@ -369,7 +369,7 @@ static int L_turnBiasVolt(lua_State *L){
 static int L_setSenCal(lua_State *L){
   int calMode;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    calMode = lua_tointeger(L, 2);
+    calMode = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (calmode)");
     return 0;
@@ -400,7 +400,7 @@ static int L_setSenCal(lua_State *L){
 static int L_setInOffsetCurrSign(lua_State *L){
   int sign;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    sign = lua_tointeger(L, 2);
+    sign = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (sign)");
     return 0;
@@ -431,7 +431,7 @@ static int L_setInOffsetCurrSign(lua_State *L){
 static int L_setSigInvertSense(lua_State *L){
   int mode;
   if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
-    mode = lua_tointeger(L, 2);
+    mode = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (mode)");
     return 0;
@@ -455,6 +455,37 @@ static int L_setSigInvertSense(lua_State *L){
     return 0;
   }
   sr->setSigInvertSense(mode);
+
+  return 0;
+}
+
+static int L_setBlanksOutAmplifier(lua_State *L) {
+  int mode;
+  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+    mode = lua_toboolean(L, 2);
+  }else{
+    ERROR_LOG("This function must contain at least 1 parameter (mode)");
+    return 0;
+  }
+
+  lua_getmetatable(L, 1);
+  if(!lua_istable(L, -1)){
+    ERROR_LOG("Not metatable!");
+    return 0;
+  }
+
+  lua_getfield(L, -1, "_objSR570_");
+  if(!lua_islightuserdata(L, -1)){
+    ERROR_LOG("Not userdata!");
+    return 0;
+  }
+
+  SR570 *sr = (SR570*)lua_touserdata(L, -1);
+  if(sr == NULL){
+    ERROR_LOG("Call 'connectNewDevice' before using anything functions");
+    return 0;
+  }
+  sr->setBlanksOutAmplifier(mode);
 
   return 0;
 }
@@ -696,6 +727,10 @@ static int L_connectNewDevice(lua_State *L) {
 
     lua_pushstring(L, "setSigInvertSense");
     lua_pushcfunction(L, L_setSigInvertSense);
+    lua_rawset(L, -3);
+
+    lua_pushstring(L, "setBlanksOutAmplifier");
+    lua_pushcfunction(L, L_setBlanksOutAmplifier);
     lua_rawset(L, -3);
 
     lua_pushstring(L, "setUncalSensVernier");
