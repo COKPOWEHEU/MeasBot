@@ -1303,7 +1303,6 @@ static int L_connectNewDevice(lua_State *L) {
   if(lua_gettop(L) >= 3) {
     if(lua_isnumber(L, 3)) baudrate = lua_tonumber(L, 3);
   }
-
   sr830_t *device = (sr830_t*)malloc(sizeof(sr830_t));
   if(device == NULL) {
     ERROR_LOG("Connection to device failed.\nTry again!");
@@ -1338,8 +1337,8 @@ static int L_connectNewDevice(lua_State *L) {
   {
     int n;
     char buff[20];
-    n = ttym_write(device->tty, (void*)"*ESE 53;LIAE 15;ERRE 214;*SRE 63;\r", strlen(buff));
-    if(!n) {
+    n = ttym_write(device->tty, (void*)"*ESE 53;LIAE 15;ERRE 214;*SRE 63;\r", 34);
+    if(n != 34) {
       ERROR_LOG("Error of set status registers");
       return 0;
     }
@@ -1389,6 +1388,8 @@ static int L_connectNewDevice(lua_State *L) {
       lua_newtable(L);
         lua_getglobal(L, "SR830");
         lua_setfield(L, -2, "device");
+        lua_pushlightuserdata(L, device);
+        lua_setfield(L, -2, "handle");
       lua_setmetatable(L, -2);
       //abstract DAC
       lua_pushcfunction(L, L_setAmplitude);
@@ -1425,6 +1426,8 @@ static int L_connectNewDevice(lua_State *L) {
       lua_newtable(L);
         lua_getglobal(L, "SR830");
         lua_setfield(L, -2, "device");
+        lua_pushlightuserdata(L, device);
+        lua_setfield(L, -2, "handle");
       lua_setmetatable(L, -2);
       //Abstract voltmeter
       lua_pushcfunction(L, L_getR);
