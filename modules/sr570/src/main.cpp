@@ -275,7 +275,7 @@ static int L_setUncalInOffsetVernier(lua_State *L){
 
 static int L_setInOffsetCalMode(lua_State *L){
   int calMode;
-  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+  if((lua_gettop(L) >= 2) && (lua_isboolean(L, 2))){
     calMode = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (calmode)");
@@ -306,7 +306,7 @@ static int L_setInOffsetCalMode(lua_State *L){
 
 static int L_turnInOffsetCurr(lua_State *L){
   int val;
-  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+  if((lua_gettop(L) >= 2) && (lua_isboolean(L, 2))){
     val = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (value)");
@@ -337,7 +337,7 @@ static int L_turnInOffsetCurr(lua_State *L){
 
 static int L_turnBiasVolt(lua_State *L){
   int val;
-  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+  if((lua_gettop(L) >= 2) && (lua_isboolean(L, 2))){
     val = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (value)");
@@ -368,7 +368,7 @@ static int L_turnBiasVolt(lua_State *L){
 
 static int L_setSenCal(lua_State *L){
   int calMode;
-  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+  if((lua_gettop(L) >= 2) && (lua_isboolean(L, 2))){
     calMode = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (calmode)");
@@ -399,7 +399,7 @@ static int L_setSenCal(lua_State *L){
 
 static int L_setInOffsetCurrSign(lua_State *L){
   int sign;
-  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+  if((lua_gettop(L) >= 2) && (lua_isboolean(L, 2))){
     sign = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (sign)");
@@ -430,7 +430,7 @@ static int L_setInOffsetCurrSign(lua_State *L){
 
 static int L_setSigInvertSense(lua_State *L){
   int mode;
-  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+  if((lua_gettop(L) >= 2) && (lua_isboolean(L, 2))){
     mode = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (mode)");
@@ -461,7 +461,7 @@ static int L_setSigInvertSense(lua_State *L){
 
 static int L_setBlanksOutAmplifier(lua_State *L) {
   int mode;
-  if((lua_gettop(L) >= 2) && (lua_isnumber(L, 2))){
+  if((lua_gettop(L) >= 2) && (lua_isboolean(L, 2))){
     mode = lua_toboolean(L, 2);
   }else{
     ERROR_LOG("This function must contain at least 1 parameter (mode)");
