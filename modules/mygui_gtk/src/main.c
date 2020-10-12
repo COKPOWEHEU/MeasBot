@@ -13,7 +13,7 @@
 
 void window_reg(lua_State*);
 
-struct Gui gui = {.L=NULL, .openedwindows=0, .poolnum=0, .poolidx=0};
+struct Gui gui = {.L=NULL, .openedwindows=0, .poolnum=1, .poolidx=0};
 
 //bash -c "cd /media/data_ext/prog/gtk/modules ; make"
 

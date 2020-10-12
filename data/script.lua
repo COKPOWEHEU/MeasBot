@@ -107,6 +107,8 @@ function spined:OnChange(val)
   print("Change", val)
 end
 
+gui.w2 = gui:NewWindow(200, 200, "Test");
+
 plot.data = tblring
 --plot.data = aaa
 
