@@ -13,7 +13,7 @@
 
 void window_reg(lua_State*);
 
-struct Gui gui = {.L=NULL, .openedwindows=0, .poolnum=1, .poolidx=0};
+struct Gui gui = {.L=NULL, .openedwindows=0, .poolnum=1, .poolidx=0, .wndmain=NULL};
 
 //bash -c "cd /media/data_ext/prog/gtk/modules ; make"
 
@@ -171,6 +171,12 @@ static void OnDestroy(){
   //do nothing
 }
 
+static int L_SetMainWindow(lua_State *L){
+  void *handle = read_handle(L, -1, NULL);
+  gui.wndmain = handle;
+  return 0;
+}
+
 static int L_update(lua_State *L){
   if(!lua_istable(L, -1)){
     printf("Update: Error!\n");
@@ -241,6 +247,9 @@ int luaopen_mygui_gtk(lua_State *L){
   
     lua_pushcfunction(L, L_update);
     lua_setfield(L, -2, "update");
+    lua_pushcfunction(L, L_SetMainWindow);
+    lua_setfield(L, -2, "SetMainWindow");
+    
     window_reg(L);
     gui.L = L;
     

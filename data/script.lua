@@ -116,6 +116,7 @@ end
 function gui.w2.hbtn:OnClick()
   gui.wnd:Show(false)
 end
+gui:SetMainWindow(gui.wnd)
 
 plot.data = tblring
 --plot.data = aaa

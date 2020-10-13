@@ -15,6 +15,7 @@ struct Gui{
   ssize_t openedwindows; //количество открытых окон
   unsigned int poolnum; //количество компонентов в пуле
   int poolidx; //идентификатор таблицы пула
+  void *wndmain;
 };
 extern struct Gui gui;
 
