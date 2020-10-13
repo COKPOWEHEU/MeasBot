@@ -262,9 +262,17 @@ static int L_NewCbBox(lua_State *L){
   CbBox *cbbox = (CbBox*)malloc(sizeof(CbBox));
   cbbox->x = 0; cbbox->y = 0;
   cbbox->items.arr=NULL; cbbox->items.count=0; cbbox->items.maxwidth=0;
+  int items_arr = 0;
+  int items_sel = 0;
   if(lua_gettop(L) >= 3){
     if(lua_isnumber(L, 2))cbbox->x = lua_tonumber(L, 2);
     if(lua_isnumber(L, 3))cbbox->y = lua_tonumber(L, 3);
+  }
+  if(lua_gettop(L) >= 4){
+    if(lua_istable(L, 4))items_arr = 4;
+  }
+  if(lua_gettop(L) >= 5){
+    if(lua_isnumber(L, 5))items_sel = lua_tonumber(L, 5);
   }
   
   cbbox->pool_idx = mk_blank_table(L, cbbox, L_CbBox_GC);
@@ -282,6 +290,18 @@ static int L_NewCbBox(lua_State *L){
   lua_setmetatable(L, -2);
   
   cbbox->obj = gtk_combo_box_text_new();
+  
+  if(items_arr > 0){
+    int prev_init = lua_gettop(L);
+    lua_pushcfunction(L, L_CbBox_SetItems);
+    lua_pushvalue(L, -2); //Combobox object
+    lua_pushvalue(L, items_arr); //input array
+    lua_pcall(L, 2, 0, 0);
+    lua_settop(L, prev_init);
+  }
+  if(items_sel > 0){
+    gtk_combo_box_set_active(GTK_COMBO_BOX(cbbox->obj), items_sel-1);
+  }
   
   gtk_fixed_put(GTK_FIXED(cont), cbbox->obj, cbbox->x, cbbox->y);
   gtk_widget_show(cbbox->obj);
