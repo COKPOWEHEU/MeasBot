@@ -471,10 +471,11 @@ int getDynReserve(ttym_t tty) {
 }
 
 void setAmplitude(ttym_t tty, double volt) {
-  if(volt < 0.004 || volt > 5.000) {
+  if(volt < 0 || volt > 5.000) {
     ERROR_LOG("Wrong value of amplitude of the sine output");
     return;
   }
+  if(volt < 0.004)volt = 0.004;
   int n;
   char buff[20];
   sprintf(buff, "SLVL %f\r", volt);
@@ -1280,7 +1281,6 @@ static int L_OnDestroy(lua_State *L) {
   if(device == NULL) return 0;
   ttym_close(device->tty);
   if(device->tty != NULL) device->tty = NULL;
-  printf("I'm died\n");
   free(device);
   return 0;
 }
