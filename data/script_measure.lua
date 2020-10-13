@@ -44,7 +44,7 @@ function pwr_supl:VisualTab(tab)
   self.ui.port.label = tab:NewLabel(10, 10, "SR830 port")
   
   self.ui.volt = tab:NewSpinEdit(100, 90, 0.004, 5, 3)
-  self.ui.volt.value = 0.4
+  self.ui.volt.value = 0.8
   self.ui.volt.label = tab:NewLabel(0, 90, "Voltage (V)")
   
   self.ui.freq = tab:NewSpinEdit(100, 130, 1, 10000)
@@ -88,9 +88,11 @@ function vmeter:VisualTab(tab)
   
   self.ui.input = tab:NewComboBox(100, 130)
   self.ui.input:SetItems({"A", "A-B", "Curr 1 MOhm", "Curr 100 MOhm"})
+  self.ui.input.selected = 2
   self.ui.input.label = tab:NewLabel(0, 130, "Input")
   
   self.ui.float = tab:NewCheckBox(100, 170, "Floating input")
+  self.ui.float.checked = true
   
   self.ui.acmode = tab:NewCheckBox(100, 210, "AC input mode")
   
@@ -112,8 +114,8 @@ function vmeter:connect()
   
   self.dev = self.srs.SineIn
   self.dev:setInputMode(self.ui.input.selected-1)
-  self.dev:setInputGrounded(not self.ui.float)
-  self.dev:setInputCap(self.ui.acmode)
+  self.dev:setInputGrounded(not self.ui.float.checked)
+  self.dev:setInputCap(self.ui.acmode.checked)
   self.dev:setRange(sens)
   self.dev:setTimeConst(self.ui.timeconst.value)
   self.dev:setSlope(self.ui.slope.selected)
@@ -127,11 +129,26 @@ end
 function ameter:VisualTab(tab)
   self.ui={}
   self.ui.tab = tab
-  self.ui.iport = tab:NewEdit(120, 10, "/dev/ttyUSB2")
-  self.ui.iport.label = tab:NewLabel(0, 10, "SR570 port")
+  self.ui.iport = tab:NewEdit(120, 10, "/dev/ttyACM0")
+  self.ui.iport.label = tab:NewLabel(10, 10, "SR570 port")
   
   self.ui.isens = tab:NewEdit(120, 50, "1e-3")
-  self.ui.isens.label = tab:NewLabel(0, 50, "Sensitivity (A/V)")
+  self.ui.isens.label = tab:NewLabel(10, 50, "Sensitivity (V/A)")
+  
+  self.ui.gainmode = tab:NewComboBox(120, 90)
+  self.ui.gainmode:SetItems({"low noise", "high bandwidth", "low drift"})
+  self.ui.gainmode.label = tab:NewLabel(10, 90, "gain mode");
+  
+  self.ui.filter = tab:NewComboBox(120, 130)
+  self.ui.filter:SetItems({"6 dB Highpass", "12 dB Highpass", "6 dB Bandpass", "6 dB Lowpass", "12 dB Lowpass", "none"})
+  self.ui.filter.selected = 3
+  self.ui.filter.label = tab:NewLabel(10, 130, "Filter")
+  
+  self.ui.hpfilter = tab:NewEdit(120, 170, "0.3")
+  self.ui.hpfilter.label = tab:NewLabel(20, 170, "Highpass (Hz)")
+  self.ui.lpfilter = tab:NewEdit(120, 210, "10e+3")
+  self.ui.lpfilter.label = tab:NewLabel(20, 210, "Lowpass (Hz)")
+  
   
   
   self.ui.vport = tab:NewEdit(400, 10, "/dev/ttyUSB1")
@@ -152,6 +169,7 @@ function ameter:VisualTab(tab)
   self.ui.time.label = tab:NewLabel(310, 210, "Time const")
 end
 function ameter:connect()
+  --5105
   if self.sr5105 == nil then
     self.sr5105 = require("sr5105"):connectNewDevice(self.ui.vport.text)
   end
@@ -160,12 +178,22 @@ function ameter:connect()
   self.sr5105:setFilters(tonumber(self.ui.vf_hi.text), tonumber(self.ui.vf_lo.text))
   if self.ui.slope.selected == 2 then self.sr5105:setOutputSlope_12() else self.sr5105:setOutputSlope_6() end
   self.sr5105:setTimeConstant(tonumber(self.ui.time.text))
-  --TODO: sr570
+  --570
+  if self.sr570 == nil then
+    self.sr570 = require("sr570"):connectNewDevice(self.ui.iport.text)
+  end
+  if self.sr570 == nil then return "Ampermeter: Can not connect SR570" end
+  self.sr570:setSens(tonumber(self.ui.isens.text))
+  self.sr570:setTypeFilter(self.ui.gainmode.selected + 1)
+  self.sr570:setHighFilter(tonumber(self.ui.hpfilter.text))
+  self.sr570:setLowFilter(tonumber(self.ui.lpfilter.text))
+  
   return ""
 end
 function ameter:getCurrent()
-  --TODO sr570
-  return self.sr5105:getVoltage()
+  local U = self.sr5105:getVoltage()
+  local IU = self.sr570:getSens()
+  return U*IU, U
 end
 
 results = {count=0}
@@ -197,6 +225,9 @@ gui.wnd.tabs[3] = "Voltmeter"
 vmeter:VisualTab(gui.wnd.tabs[3])
 gui.wnd.tabs[4] = "Ampermeter"
 ameter:VisualTab(gui.wnd.tabs[4])
+plot = gui.wnd.tabs[1]:NewPlot(0, 50, 300, 300)
+plot.format={x=1, 5}
+plot.data = results
 
 
 -- Device connection stage
@@ -214,25 +245,37 @@ while true do
   if not gui:update() then goto PROG_END end
 end
 
-
 print("Connected!")
 
--- Measure stage
-step = pwr_supl.Umax / com_settings.pnum
-for Uout=0, pwr_supl.Umax+step, step do
-  print(Uout)
-  if not gui:update() then goto PROG_END end
+function measure()
   pwr_supl:setVoltage(Uout)
   --set some val
   gui:delay_ms(1000);
   local U = vmeter:getVoltage()
-  local I = ameter:getCurrent()
-  results:addPoint({Uout, U, I})
+  local I, rawU = ameter:getCurrent()
+  local p = {Uout, U, I, rawU, U/I}
+  results:addPoint(p)
+  plot:Refresh()
+end
+
+-- Measure stage
+step = pwr_supl.Umax / (com_settings.pnum/2)
+for Uout=0, pwr_supl.Umax+step, step do
+  if not gui:update() then goto PROG_END end
+  measure()
+end
+for Uout=pwr_supl.Umax, 0, -step do
+  if not gui:update() then goto PROG_END end
+  measure()
 end
 pwr_supl:setVoltage(0)
 
 -- save results
 results:display()
+
+while gui:update()do
+  if btnClose:WasClicked() then break end
+end
 
 ::PROG_END::
 print("END")
