@@ -160,7 +160,6 @@ void Wnd_OnDestroy(GtkWidget *obj, gpointer data){
   Wnd *wnd = data;
   lua_State *L = gui.L;
   int prev = lua_gettop(L);
-  lua_settop(L, 0);
   read_self(L, wnd->pool_idx);
   lua_getfield(L, -1, "OnDestroy");
   lua_pushvalue(L, -2);
@@ -171,6 +170,29 @@ void Wnd_OnDestroy(GtkWidget *obj, gpointer data){
     lua_pop(L, 3);
   }
   lua_settop(L, prev);
+}
+
+static int L_Show(lua_State *L){
+  char newstate = 1;
+  int top = lua_gettop(L);
+  Wnd *wnd = (Wnd*)read_handle(L, 1, NULL);
+  if(lua_isboolean(L, 2))newstate = lua_toboolean(L, 2);
+  if(newstate){
+    gtk_widget_show(wnd->obj);
+    gtk_widget_show(wnd->fixed);
+  }else{
+    gtk_widget_hide(wnd->obj);
+  }
+  lua_settop(L, top);
+  return 0;
+}
+
+static int L_Hide(lua_State *L){
+  int top = lua_gettop(L);
+  Wnd *wnd = (Wnd*)read_handle(L, -1, NULL);
+  gtk_widget_hide(wnd->obj);
+  lua_settop(L, top);
+  return 0;
 }
 
 static int L_NewWnd(lua_State *L){
@@ -205,6 +227,10 @@ static int L_NewWnd(lua_State *L){
     lua_pushcfunction(L, L_Wndpairs);
     lua_setfield(L, -2, "__pairs");
   lua_setmetatable(L, -2);
+  lua_pushcfunction(L, L_Show);
+  lua_setfield(L, -2, "Show");
+  lua_pushcfunction(L, L_Hide);
+  lua_setfield(L, -2, "Hide");
   REGFUNCS
   
   g_signal_connect(G_OBJECT(wnd->obj), "show", G_CALLBACK(Wnd_OnShow), wnd);

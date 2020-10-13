@@ -108,6 +108,14 @@ function spined:OnChange(val)
 end
 
 gui.w2 = gui:NewWindow(200, 200, "Test");
+gui.w2.sbtn = gui.w2:NewButton(0,0, "Show");
+gui.w2.hbtn = gui.w2:NewButton(0, 40, "Hide");
+function gui.w2.sbtn:OnClick()
+  gui.wnd:Show()
+end
+function gui.w2.hbtn:OnClick()
+  gui.wnd:Hide()
+end
 
 plot.data = tblring
 --plot.data = aaa
