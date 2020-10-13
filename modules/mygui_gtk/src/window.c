@@ -45,10 +45,23 @@ static int getter_resizable(lua_State *L, int tblindex){
   lua_pushboolean(L, en);
   return 1;
 }
+static int setter_visible(lua_State *L, int tblindex){
+  Wnd *wnd = (Wnd*)read_handle(L, tblindex, NULL);
+  char en = lua_toboolean(L, tblindex+2);
+  gtk_widget_set_visible(GTK_WIDGET(wnd->obj), en);
+  return 0;
+}
+static int getter_visible(lua_State *L, int tblindex){
+  Wnd *wnd = (Wnd*)read_handle(L, tblindex, NULL);
+  char en = gtk_widget_get_visible(GTK_WIDGET(wnd->obj));
+  lua_pushboolean(L, en);
+  return 1;
+}
 
 struct WndIntVariables wnd_intvars[] = {
   {.name = "enabled", .setter = setter_enabled, .getter = getter_enabled},
   {.name = "resizable", .setter = setter_resizable, .getter = getter_resizable},
+  {.name = "visible", .setter = setter_visible, .getter = getter_visible},
 };
 #define ARR_COUNT(arr) (sizeof(arr)/sizeof(arr[0]))
 
@@ -175,8 +188,8 @@ void Wnd_OnDestroy(GtkWidget *obj, gpointer data){
 static int L_Show(lua_State *L){
   char newstate = 1;
   int top = lua_gettop(L);
-  Wnd *wnd = (Wnd*)read_handle(L, 1, NULL);
   if(lua_isboolean(L, 2))newstate = lua_toboolean(L, 2);
+  Wnd *wnd = (Wnd*)read_handle(L, 1, NULL);
   if(newstate){
     gtk_widget_show(wnd->obj);
     gtk_widget_show(wnd->fixed);

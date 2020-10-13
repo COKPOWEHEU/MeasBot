@@ -114,7 +114,7 @@ function gui.w2.sbtn:OnClick()
   gui.wnd:Show()
 end
 function gui.w2.hbtn:OnClick()
-  gui.wnd:Hide()
+  gui.wnd:Show(false)
 end
 
 plot.data = tblring
