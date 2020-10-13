@@ -15,6 +15,7 @@
 typedef struct sr5105{
   ttym_t tty;
   double sens;
+  int fracOfScaleMax;
 }sr5105_t;
 
 static void tty_puts(ttym_t tty, char *str){
@@ -173,6 +174,26 @@ static int L_OnDestroy(lua_State *L){
   return 0;
 }
 
+void CallOverloadCallback(lua_State *L){
+  int top = lua_gettop(L);
+  lua_getfield(L, -1, "OnOverload");
+  lua_pushvalue(L, -2);
+  if(lua_isfunction(L, -1)){
+    lua_pcall(L, 1, 0, 0);
+  }
+  lua_settop(L, top);
+}
+
+void CallUnOverloadCallback(lua_State *L){
+  int top = lua_gettop(L);
+  lua_getfield(L, -1, "OnUnOverload");
+  lua_pushvalue(L, -2);
+  if(lua_isfunction(L, -1)){
+    lua_pcall(L, 1, 0, 0);
+  }
+  lua_settop(L, top);
+}
+
 static int L_help(lua_State *L){
   const char helpstring[] = 
     "SR5105\n"
@@ -188,6 +209,7 @@ static int L_help(lua_State *L){
     "  getVoltage():num - return amplitude of input signal (in Volts)\n"
     "  getXY():num,num,num - read and return X and Y values of input signal and maximum avaible value (sensitivity)\n"
     "  getMagPhase():num,num,num - read and return Magnitude and Phase and then maximum avaible value of Magnitude\n"
+    "  getScalePercentage():num - read percentage of full scale of PREVIOUS measure (0 - 100)\n"
     "  getFreq(nil):num - return reference frequency (in Hertz)\n"
     "  setRefPhase(num):nil - set signal phase (in degrees)\n"
     "             (str 'Auto'):nil - set reference phase automatically my maximizing X component and minimizing Y compontnt\n"
@@ -209,6 +231,9 @@ static int L_help(lua_State *L){
     "  setOutputSlope_6():nil - set output filter slope to 6 dB/octave\n"
     "  setOutputSlope_12():nil - set output filter slope to 12 dB/octave\n"
     "  outputConfig(num, bool, bum):str - combination of setTimeConstant (1st), setOutputSlope (2nd) and setDynamicReserve (3rd) and return getErrors()\n"
+    "CALLBACK:\n"
+    "  OnOverload(nil):nil - calls when input signal exceeds device range\n"
+    "  OnUnOverload(nil):nil - calls when input signal decreases from Overload to correct value\n"
   ;
   lua_pushstring(L, helpstring);
   return 1;
@@ -298,9 +323,23 @@ static int L_GetXY(lua_State *L){
   int xval=-100500, yval=100500;
   tty_gets(device->tty, buffer, 20);
   sscanf(buffer, " %d %d", &xval, &yval);
+  
+  int xv = (xval > 0?xval:-xval);
+  int yv = (yval > 0?yval:-yval);
+  if(yv > xv)xv = yv;
+  xv /= 10;
+  if(xv > 100){
+    CallOverloadCallback(L);
+  }
+  if(xv < 100 && device->fracOfScaleMax > 100){
+    CallUnOverloadCallback(L);
+  }
+  device->fracOfScaleMax = xv;
+  
   lua_pushnumber(L, ((double)xval)*device->sens*0.001);
   lua_pushnumber(L, ((double)yval)*device->sens*0.001);
   lua_pushnumber(L, device->sens);
+  
   return 3;
 }
 
@@ -316,10 +355,21 @@ static int L_GetMagPhase(lua_State *L){
   tty_puts(device->tty, "PHA\r");
   tty_gets(device->tty, buffer, 19);
   
+  int xv = (mag > 0?mag:-mag);
+  xv /= 10;
+  if(xv > 100){
+    CallOverloadCallback(L);
+  }
+  if(xv < 100 && device->fracOfScaleMax > 100){
+    CallUnOverloadCallback(L);
+  }
+  device->fracOfScaleMax = xv;
+  
   phase = atoi(buffer);
   lua_pushnumber(L, ((double)mag)*device->sens*0.001);
   lua_pushnumber(L, ((double)phase)*0.1);
   lua_pushnumber(L, device->sens);
+  
   return 3;
 }
 
@@ -332,9 +382,28 @@ static int L_GetMag(lua_State *L){
   tty_puts(device->tty, "MAG\r");
   tty_gets(device->tty, buffer, 19);
   mag = atoi(buffer);
+  
+  int xv = (mag > 0?mag:-mag);
+  xv /= 10;
+  if(xv > 100){
+    CallOverloadCallback(L);
+  }
+  if(xv < 100 && device->fracOfScaleMax > 100){
+    CallUnOverloadCallback(L);
+  }
+  device->fracOfScaleMax = xv;
+  
   lua_pushnumber(L, ((double)mag)*device->sens*0.001);
   lua_pushnumber(L, device->sens);
+  
   return 2;
+}
+
+static int L_FracOfScale(lua_State *L){
+  sr5105_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  lua_pushnumber(L, device->fracOfScaleMax);
+  return 1;
 }
 
 //если вызвано с параметром "auto" (или любой другой строкой) выставляем автоматически
@@ -632,6 +701,8 @@ static int L_connectNewDevice(lua_State *L){
     lua_setfield(L, -2, "getXY");
     lua_pushcfunction(L, L_GetMagPhase);
     lua_setfield(L, -2, "getMagPhase");
+    lua_pushcfunction(L, L_FracOfScale);
+    lua_setfield(L, -2, "getScalePercentage");
     lua_pushcfunction(L, L_SetPhase);
     lua_setfield(L, -2, "setRefPhase");
     lua_pushcfunction(L, L_SetPhase); //(!)It is not an error, it is the same function as previous
