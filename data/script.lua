@@ -81,7 +81,7 @@ cb = gui.wnd:NewComboBox(5, 300, {"A", "B", "C"}, 2)
 function cb:OnChange(val, str)
   --print(val, str)
   a,b = self:SelectedItem()
-  print(a, b)
+  print(a, b, self[b])
 end
 
 function sc:OnChange(val)

@@ -133,6 +133,15 @@ static int L_CbBoxpairs(lua_State *L){
 
 static int L_CbBoxgetter(lua_State *L){
   const char *idx = NULL;
+  //попытка доступа по числовому индексу - возвращаем элемент списка
+  if(lua_isnumber(L, -1)){
+    int index = lua_tonumber(L, -1)-1;
+    CbBox *cbbox = (CbBox*)read_handle(L, -2, NULL);
+    if(index < 0 || index > cbbox->items.count)return 0;
+    lua_pushstring(L, &(cbbox->items.arr[index*(cbbox->items.maxwidth)]));
+    return 1;
+  }
+  //попытка доступа по строковому индексу - вызов геттеров
   if(lua_isstring(L, -1))idx = lua_tostring(L, -1);
   lua_pop(L, 1);
   for(int i=0; i<ARR_COUNT(combobox_intvars); i++){
