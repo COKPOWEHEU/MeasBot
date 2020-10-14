@@ -88,6 +88,11 @@ function sc:OnChange(val)
   print(val)
 end
 
+function gui:OnDestroy()
+  print("Gui destroy callback")
+  print(sc.value)
+end
+
 check = tc[0]:NewCheckBox(10, 10, "Inversion progress")
 
 spined = tc[0]:NewSpinEdit(10, 30, 5)

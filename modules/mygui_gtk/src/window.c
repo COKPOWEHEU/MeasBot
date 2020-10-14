@@ -144,7 +144,8 @@ GtkWidget* Wnd_GetHandle(lua_State *L, int tblindex){
 }
 
 gboolean Wnd_OnDelete(GtkWidget *widget, GdkEvent *event, gpointer data){
-  if(data == gui.wndmain)return 0;
+  //if(data == gui.wndmain)return 0;
+  if(data == gui.wndmain)gui.openedwindows--;
   Wnd *wnd = data;
   gtk_widget_hide(GTK_WIDGET(wnd->obj));
   return 1;
@@ -174,23 +175,6 @@ void Wnd_OnHide(GtkWidget *obj, gpointer data){
   int prev = lua_gettop(L);
   read_self(L, wnd->pool_idx);
   lua_getfield(L, -1, "OnHide");
-  lua_pushvalue(L, -2);
-  if(lua_isfunction(L, -2)){
-    lua_pcall(L, 1, 0, 0);
-    lua_pop(L, 1);
-  }else{
-    lua_pop(L, 3);
-  }
-  lua_settop(L, prev);
-}
-
-void Wnd_OnDestroy(GtkWidget *obj, gpointer data){
-  Wnd *wnd = data;
-  lua_State *L = gui.L;
-  gui.openedwindows = 0;
-  int prev = lua_gettop(L);
-  read_self(L, wnd->pool_idx);
-  lua_getfield(L, -1, "OnDestroy");
   lua_pushvalue(L, -2);
   if(lua_isfunction(L, -2)){
     lua_pcall(L, 1, 0, 0);
@@ -266,7 +250,6 @@ static int L_NewWnd(lua_State *L){
   g_signal_connect(G_OBJECT(wnd->obj), "show", G_CALLBACK(Wnd_OnShow), wnd);
   g_signal_connect(G_OBJECT(wnd->obj), "hide", G_CALLBACK(Wnd_OnHide), wnd);
   g_signal_connect(G_OBJECT(wnd->obj), "delete-event", G_CALLBACK(Wnd_OnDelete), wnd);
-  g_signal_connect(G_OBJECT(wnd->obj), "destroy", G_CALLBACK(Wnd_OnDestroy), wnd);
   
   gtk_widget_show(wnd->obj);
   gtk_widget_show(wnd->fixed);

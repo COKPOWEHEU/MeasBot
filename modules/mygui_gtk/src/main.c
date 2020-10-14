@@ -167,8 +167,17 @@ static int L_help(lua_State *L){
   return 1;
 }
 
-static void OnDestroy(){
-  //do nothing
+static void OnDestroy(lua_State *L){
+  int prev = lua_gettop(L);
+  lua_getfield(L, -1, "OnDestroy");
+  lua_pushvalue(L, -2);
+  if(lua_isfunction(L, -2)){
+    lua_pcall(L, 1, 0, 0);
+    lua_pop(L, 1);
+  }else{
+    lua_pop(L, 3);
+  }
+  lua_settop(L, prev);
 }
 
 static int L_SetMainWindow(lua_State *L){
@@ -185,7 +194,7 @@ static int L_update(lua_State *L){
   while(gtk_events_pending())gtk_main_iteration_do(0);
   usleep(0);
   
-  if(gui.openedwindows <= 0)OnDestroy();
+  if(gui.openedwindows <= 0)OnDestroy(L);
   lua_pushboolean(L, (gui.openedwindows>0));
   return 1;
 }
