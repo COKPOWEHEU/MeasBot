@@ -92,8 +92,7 @@ static int getter_selected(lua_State *L, int tblindex){
   CbBox *cbbox = (CbBox*)read_handle(L, tblindex, NULL);
   int sel = gtk_combo_box_get_active(GTK_COMBO_BOX(cbbox->obj));
   lua_pushnumber(L, sel+1);
-  lua_pushstring(L, &(cbbox->items.arr[sel*(cbbox->items.maxwidth)]));
-  return 2;
+  return 1;
 }
 
 struct CbBoxIntVariables combobox_intvars[] = {
@@ -202,6 +201,7 @@ static int L_CbBox_SetItems(lua_State *L){
       continue;
     }
     curstr = (char*)lua_tostring(L, -1);
+    lua_pop(L, 1);
     int len = strlen(curstr);
     if(len > cbbox->items.maxwidth)cbbox->items.maxwidth=len;
   }
@@ -235,6 +235,18 @@ static int L_CbBox_GetItems(lua_State *L){
     lua_rawseti(L, -2, i+1);
   }
   return 1;
+}
+
+static int L_CbBox_GetSelected(lua_State *L){
+  int top = lua_gettop(L);
+  CbBox *cbbox = (CbBox*)read_handle(L, 1, NULL);
+  if(cbbox == NULL){printf("Call methods as METHODS, not single functions!\n"); return 0;}
+  if(cbbox->items.arr == NULL)return 0;
+  int sel = gtk_combo_box_get_active(GTK_COMBO_BOX(cbbox->obj));
+  lua_settop(L, top);
+  lua_pushstring(L, &(cbbox->items.arr[sel*(cbbox->items.maxwidth)]));
+  lua_pushnumber(L, sel+1);
+  return 2;
 }
 
 static int L_CbBox_GC(lua_State *L){
@@ -280,6 +292,8 @@ static int L_NewCbBox(lua_State *L){
   lua_setfield(L, -2, "SetItems");
   lua_pushcfunction(L, L_CbBox_GetItems);
   lua_setfield(L, -2, "GetItems");
+  lua_pushcfunction(L, L_CbBox_GetSelected);
+  lua_setfield(L, -2, "SelectedItem");
   lua_getmetatable(L, -1);
     lua_pushcfunction(L, L_CbBoxsetter);
     lua_setfield(L, -2, "__newindex");

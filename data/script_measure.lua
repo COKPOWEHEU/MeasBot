@@ -247,7 +247,7 @@ end
 
 print("Connected!")
 
-function measure()
+function measure(Uout)
   pwr_supl:setVoltage(Uout)
   --set some val
   gui:delay_ms(1000);
@@ -259,19 +259,23 @@ function measure()
 end
 
 -- Measure stage
+Uout = 0
 step = pwr_supl.Umax / (com_settings.pnum/2)
 for Uout=0, pwr_supl.Umax+step, step do
   if not gui:update() then goto PROG_END end
-  measure()
+  measure(Uout)
 end
 for Uout=pwr_supl.Umax, 0, -step do
   if not gui:update() then goto PROG_END end
-  measure()
+  measure(Uout)
 end
+measure(0)
 pwr_supl:setVoltage(0)
 
 -- save results
 results:display()
+
+print("---DONE---")
 
 while gui:update()do
   if btnClose:WasClicked() then break end
