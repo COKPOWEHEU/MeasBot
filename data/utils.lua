@@ -1,7 +1,7 @@
 local utils = {}
 
 function utils:buffer()
-	local vector = {len = 0}
+	local vector = {size = 0}
 	local metavector = {data = {}}
 	
 	function metavector:__index(idx)
@@ -20,13 +20,17 @@ function utils:buffer()
       rawset(mt.data, i, val)
     end
   end
+
+  function metavector:__len()
+    return self.size
+  end
 	
 	setmetatable(vector, metavector)
 	
 	function vector:add(val)
     local it = 1
     return function(val)
-			self.len = it
+			self.size = it
       self[it] = val
       it = it + 1
       return it
