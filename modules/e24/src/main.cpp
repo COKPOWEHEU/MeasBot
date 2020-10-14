@@ -1,7 +1,7 @@
 #include <lua5.2/lua.hpp>
 #include <math.h>
 
-#define TEST_ADC
+// #define TEST_ADC
 
 #if defined(TEST_ADC)
   #define DEVICE_PATH_FMT "modules/e24/test_adc/adc%d.adc"
