@@ -1,0 +1,16 @@
+Большая часть реализованных на данный момент приборов общается с компьютером по интерфейсу RS232. Аппаратных портов обычно не хватает, поэтому применяются преобразователи USB-RS232. Проблема в том, что их нумерация в системе может меняться от подключения к подключению. Чтобы несколько сгладить этот недостаток, можно воспользоваться средствами udev:
+
+1. создаем скрипт /etc/udev/rules.d/calc_ft232r.sh
+#!/bin/bash
+x = ls /dev | grep $1 | wc -l
+echo $x
+
+2. Прописываем правила /etc/udev/rules.d/98-usbserial.rules
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", PROGRAM="/etc/udev/rules.d/calc_ft232r.sh tty_ft232r_", SYMLINK+="tty_ft232r_%c"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", PROGRAM="/etc/udev/rules.d/calc_ft232r.sh tty_hl340_", SYMLINK+="tty_hl340_%c"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", PROGRAM="/etc/udev/rules.d/calc_ft232r.sh tty_cp210x_", SYMLINK+="tty_cp210x_%c"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", PROGRAM="/etc/udev/rules.d/calc_ft232r.sh tty_pl2303_", SYMLINK+="tty_pl2302_%c"
+
+3. Переподключаем устройства (рестартить udev почему-то не обязательно)
+
+4. В зависимости от VID:PID каждому из них будет присвоена символьная ссылка вроде /dev/tty_cp210x_0 или /dev/tty_ft232r_5, которыми и можно пользоваться для подключения
