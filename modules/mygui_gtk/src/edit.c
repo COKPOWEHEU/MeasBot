@@ -51,6 +51,7 @@ static int setter_width(lua_State *L, int tblindex){
 }
 static int getter_width(lua_State *L, int tblindex){
   Edit *ed = (Edit*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(ed->obj), &(ed->w), &(ed->h));
   lua_pushnumber(L, ed->w);
   return 1;
 }
@@ -62,6 +63,7 @@ static int setter_height(lua_State *L, int tblindex){
 }
 static int getter_height(lua_State *L, int tblindex){
   Edit *ed = (Edit*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(ed->obj), &(ed->w), &(ed->h));
   lua_pushnumber(L, ed->h);
   return 1;
 }
@@ -205,7 +207,7 @@ static int L_NewEdit(lua_State *L){
   
   gtk_fixed_put(GTK_FIXED(cont), ed->obj, x, y);
   gtk_widget_show(ed->obj);
-  
+  gtk_widget_get_size_request(GTK_WIDGET(ed->obj), &(ed->w), &(ed->h));
   return 1;
 }
 

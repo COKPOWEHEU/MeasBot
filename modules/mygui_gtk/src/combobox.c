@@ -56,6 +56,7 @@ static int setter_width(lua_State *L, int tblindex){
 }
 static int getter_width(lua_State *L, int tblindex){
   CbBox *cbbox = (CbBox*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(cbbox->obj), &(cbbox->w), &(cbbox->h));
   lua_pushnumber(L, cbbox->w);
   return 1;
 }
@@ -67,6 +68,7 @@ static int setter_height(lua_State *L, int tblindex){
 }
 static int getter_height(lua_State *L, int tblindex){
   CbBox *cbbox = (CbBox*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(cbbox->obj), &(cbbox->w), &(cbbox->h));
   lua_pushnumber(L, cbbox->h);
   return 1;
 }
@@ -328,6 +330,7 @@ static int L_NewCbBox(lua_State *L){
   
   gtk_fixed_put(GTK_FIXED(cont), cbbox->obj, cbbox->x, cbbox->y);
   gtk_widget_show(cbbox->obj);
+  gtk_widget_get_size_request(GTK_WIDGET(cbbox->obj), &(cbbox->w), &(cbbox->h));
   g_signal_connect(G_OBJECT(cbbox->obj), "changed", G_CALLBACK(CbBoxOnChange), cbbox);
   return 1;
 }

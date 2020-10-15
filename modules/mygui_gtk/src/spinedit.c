@@ -126,6 +126,7 @@ static int setter_width(lua_State *L, int tblindex){
 }
 static int getter_width(lua_State *L, int tblindex){
   SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(spined->obj), &(spined->w), &(spined->h));
   lua_pushnumber(L, spined->w);
   return 1;
 }
@@ -137,6 +138,7 @@ static int setter_height(lua_State *L, int tblindex){
 }
 static int getter_height(lua_State *L, int tblindex){
   SpinEd *spined = (SpinEd*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(spined->obj), &(spined->w), &(spined->h));
   lua_pushnumber(L, spined->h);
   return 1;
 }
@@ -283,6 +285,7 @@ static int L_NewSpinEd(lua_State *L){
   gtk_fixed_put(GTK_FIXED(cont), spined->obj, spined->x, spined->y);
   g_signal_connect(G_OBJECT(spined->obj), "value-changed", G_CALLBACK(SpinEdOnChange), spined);
   gtk_widget_show(spined->obj);
+  gtk_widget_get_size_request(GTK_WIDGET(spined->obj), &(spined->w), &(spined->h));
   return 1;
 }
 

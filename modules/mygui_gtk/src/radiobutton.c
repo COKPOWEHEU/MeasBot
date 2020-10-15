@@ -51,6 +51,7 @@ static int setter_width(lua_State *L, int tblindex){
 }
 static int getter_width(lua_State *L, int tblindex){
   RadioBtn *btn = (RadioBtn*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(btn->obj), &(btn->w), &(btn->h));
   lua_pushnumber(L, btn->w);
   return 1;
 }
@@ -62,6 +63,7 @@ static int setter_height(lua_State *L, int tblindex){
 }
 static int getter_height(lua_State *L, int tblindex){
   RadioBtn *btn = (RadioBtn*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(btn->obj), &(btn->w), &(btn->h));
   lua_pushnumber(L, btn->h);
   return 1;
 }
@@ -279,6 +281,7 @@ static int L_RNewBtn(lua_State *L){
   
   gtk_fixed_put(GTK_FIXED(cont), btn->obj, btn->x, btn->y);
   gtk_widget_show(btn->obj);
+  gtk_widget_get_size_request(GTK_WIDGET(btn->obj), &(btn->w), &(btn->h));
   return 1;
 }
 

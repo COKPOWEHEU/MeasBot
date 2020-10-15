@@ -53,6 +53,7 @@ static int setter_width(lua_State *L, int tblindex){
 }
 static int getter_width(lua_State *L, int tblindex){
   Scroller *scrl = (Scroller*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(scrl->obj), &(scrl->w), &(scrl->h));
   lua_pushnumber(L, scrl->w);
   return 1;
 }
@@ -64,6 +65,7 @@ static int setter_height(lua_State *L, int tblindex){
 }
 static int getter_height(lua_State *L, int tblindex){
   Scroller *scrl = (Scroller*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(scrl->obj), &(scrl->w), &(scrl->h));
   lua_pushnumber(L, scrl->h);
   return 1;
 }
@@ -278,7 +280,7 @@ static int L_NewScrl(lua_State *L){
   gtk_fixed_put(GTK_FIXED(cont), scrl->obj, scrl->x, scrl->y);
   gtk_widget_show(scrl->obj);
   g_signal_connect(G_OBJECT(scrl->obj), "change-value", G_CALLBACK(ScrlOnChange), scrl);
-  
+  gtk_widget_get_size_request(GTK_WIDGET(scrl->obj), &(scrl->w), &(scrl->h));
   return 1;
 }
 void scroller_reg(lua_State *L){

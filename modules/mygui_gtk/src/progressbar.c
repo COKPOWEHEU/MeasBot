@@ -120,6 +120,7 @@ static int setter_width(lua_State *L, int tblindex){
 }
 static int getter_width(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(pb->obj), &(pb->w), &(pb->h));
   lua_pushnumber(L, pb->w);
   return 1;
 }
@@ -132,6 +133,7 @@ static int setter_height(lua_State *L, int tblindex){
 }
 static int getter_height(lua_State *L, int tblindex){
   Progress *pb = (Progress*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(pb->obj), &(pb->w), &(pb->h));
   lua_pushnumber(L, pb->h);
   return 1;
 }
@@ -253,6 +255,7 @@ static int L_NewProgress(lua_State *L){
   Progress_resize(pb);
   gtk_fixed_put(GTK_FIXED(cont), pb->obj, pb->x, pb->y);
   gtk_widget_show(pb->obj);
+  gtk_widget_get_size_request(GTK_WIDGET(pb->obj), &(pb->w), &(pb->h));
   return 1;
 }
 
