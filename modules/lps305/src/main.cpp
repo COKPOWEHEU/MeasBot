@@ -492,17 +492,6 @@ static int L_disconnect(lua_State *L) {
   return 1;
 }
 
-static int L_FakeTable(lua_State *L){
-  lua_newtable(L);
-    lua_pushnil(L);
-    lua_setfield(L, -2, "pos");
-    lua_pushnil(L);
-    lua_setfield(L, -2, "neg");
-    lua_pushnil(L);
-    lua_setfield(L, -2, "both");
-  return 1;
-}
-
 static int L_connectNewDevice(lua_State *L) {
   char *portname = nullptr;
   int baud = 2400, checkError = 0;
@@ -510,7 +499,7 @@ static int L_connectNewDevice(lua_State *L) {
     if(lua_isstring(L, 2)) portname = (char*)lua_tostring(L, 2);
   } else {
     std::cerr << "LPS-305 error: This function must contain at least 1 parameter (port name)" << std::endl;
-    return L_FakeTable(L);
+    return 0;
   }
   if(lua_gettop(L) >= 3) {
     if(lua_isnumber(L, 3)) baud = lua_tonumber(L, 3);
@@ -521,7 +510,7 @@ static int L_connectNewDevice(lua_State *L) {
     lps = new LPS305;
   } catch (std::bad_alloc &ba) {
     std::cerr << ba.what() << std::endl;
-    return L_FakeTable(L);
+    return 0;
   }
 
   checkError = lps->connect(portname, baud);
@@ -529,8 +518,7 @@ static int L_connectNewDevice(lua_State *L) {
   if(checkError == 0) {
     std::cerr << "Port isn't open" << std::endl;
     delete lps;
-    
-    return L_FakeTable(L);
+    return 0;
   }
 
   lua_newtable(L);
