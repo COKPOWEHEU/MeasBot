@@ -256,7 +256,7 @@ static int L_NewSpinEd(lua_State *L){
   GtkWidget *cont = read_container(L, 1, NULL);
   SpinEd *spined = (SpinEd*)malloc(sizeof(SpinEd));
   spined->x = 0; spined->y = 0; spined->w = 100; spined->h = 10;
-  spined->min = 0; spined->max = 1; spined->digits = 1;
+  spined->min = 0; spined->max = 1; spined->digits = 1; spined->step = 0.1;
   
   if(lua_gettop(L) >= 3){
     if(lua_isnumber(L, 2))spined->x = lua_tonumber(L, 2);
@@ -267,7 +267,8 @@ static int L_NewSpinEd(lua_State *L){
     if(lua_isnumber(L, 4))spined->min = lua_tonumber(L, 4);
     if(lua_isnumber(L, 5))spined->max = lua_tonumber(L, 5);
   }
-  if(lua_gettop(L) == 6)if(lua_isnumber(L, 6))spined->digits = lua_tonumber(L, 6);
+  if(lua_gettop(L) >= 6)if(lua_isnumber(L, 6))spined->digits = lua_tonumber(L, 6);
+  if(lua_gettop(L) >= 7)if(lua_isnumber(L, 7))spined->step = lua_tonumber(L, 7);
   
   spined->pool_idx = mk_blank_table(L, spined, L_SpinEd_GC);
   lua_getmetatable(L, -1);
@@ -279,7 +280,7 @@ static int L_NewSpinEd(lua_State *L){
     lua_setfield(L, -2, "__pairs");
   lua_setmetatable(L, -2);
   
-  spined->obj = gtk_spin_button_new_with_range(spined->min, spined->max, 0.1);
+  spined->obj = gtk_spin_button_new_with_range(spined->min, spined->max, spined->step);
   gtk_spin_button_set_digits(GTK_SPIN_BUTTON(spined->obj), spined->digits);
   gtk_spin_button_set_update_policy(GTK_SPIN_BUTTON(spined->obj), GTK_UPDATE_IF_VALID);
   gtk_fixed_put(GTK_FIXED(cont), spined->obj, spined->x, spined->y);
