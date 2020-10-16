@@ -100,6 +100,9 @@ pb = tc[0]:NewProgressBar(10, 100, 100, 20)
 pb.min, pb.max = 0, tblring.size
 
 ed.text = "TPATATA"
+function ed:OnEnter(str)
+  print("On Enter: ", str)
+end
 
 function btn:OnClick()
   name = gui.wnd:OpenFileDialog("TPATATA")

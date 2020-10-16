@@ -173,6 +173,23 @@ int L_Ed_GC(lua_State *L){
   return 0;
 }
 
+static void EdOnActivate(GtkWidget *obj, gpointer data){
+  Edit *ed = data;
+  lua_State *L = gui.L;
+  int prev = lua_gettop(L);
+  read_self(L, ed->pool_idx);
+  
+  lua_getfield(L, -1, "OnEnter");
+  lua_pushvalue(L, -2);
+  if(lua_isfunction(L, -2)){
+    const char *text = gtk_entry_get_text((GtkEntry*)(ed->obj));
+    lua_pushstring(L, text);
+    lua_pcall(L, 2, 0, 0);
+    lua_pop(L, 1);
+  }
+  lua_settop(L, prev);
+}
+
 static int L_NewEdit(lua_State *L){
   int x=0, y=0;
   const char *text="";
@@ -204,6 +221,7 @@ static int L_NewEdit(lua_State *L){
   
   ed->obj = gtk_entry_new();
   gtk_entry_set_text((GtkEntry*)(ed->obj), text);
+  g_signal_connect(G_OBJECT(ed->obj), "activate", G_CALLBACK(EdOnActivate), ed);
   
   gtk_fixed_put(GTK_FIXED(cont), ed->obj, x, y);
   gtk_widget_show(ed->obj);
