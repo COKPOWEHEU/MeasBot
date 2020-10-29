@@ -27,3 +27,5 @@ lps305:
 	bash -c "cd modules/lps305; make $(rarch) $(target) -j"
 e24:
 	bash -c "cd modules/e24; make $(rarch) $(target) -j"
+timer:
+	bash -c "cd modules/timer; make $(rarch) $(target) -j"
