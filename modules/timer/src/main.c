@@ -11,13 +11,18 @@ extern "C"{
   
 #include <unistd.h>
 #include <sys/time.h>
+#include <stdlib.h>
 int luaopen_timer(lua_State*);
   
 #ifdef __cplusplus
 }
 #endif
 
+static uint64_t timer_interval_ms = 100;
+//static void *timer_table = NULL;
+static unsigned int timer_cbc_num = 0;
 static lua_State *LG = NULL;
+static lua_State *L_glob = NULL;
 
 static uint64_t get_time_ms(){
   struct timeval tv;
@@ -27,8 +32,8 @@ static uint64_t get_time_ms(){
   return time_ms;
 }
 
-static void Timer_init(lua_State *LG);
-static void Timer_destroy(lua_State *LG);
+static void Timer_init();
+static void Timer_destroy();
 static void TimerHook(lua_State *L, lua_Debug *ar);
 static void Timer_SetInterval(unsigned int time_ms);
 
@@ -42,16 +47,18 @@ static int L_Test(lua_State *L);
  */
 
 #ifdef linux
-#define MAX_TIMEOUT_ms 1000
+#define MAX_TIMEOUT_ms 100
 #define TIMER_DEFMASK 0
 #define TIMER_HOOK_VAL 1
-#define WorkaroundFunc(L)
+#define WorkaroundFunc(L) do{if(timer_flag){TimerHook(L, NULL); timer_flag=0;} }while(0)
 #include <signal.h>
+volatile char timer_flag = 0;
 static struct itimerval timer = {{0,0},{0,0}}; //нет, это не две совы!
 void (*prev_signal)(int) = NULL;
 
 static void AlarmSignal(int sig){
-  lua_sethook(LG, TimerHook, LUA_MASKCOUNT, 1);
+  timer_flag = 1;
+  lua_sethook(L_glob, TimerHook, LUA_MASKCOUNT, 1);
 }
 
 static void Timer_SetInterval(unsigned int time_ms){
@@ -60,16 +67,17 @@ static void Timer_SetInterval(unsigned int time_ms){
   timer.it_value.tv_sec = timer.it_interval.tv_sec;
   timer.it_value.tv_usec = timer.it_interval.tv_usec;
   setitimer(ITIMER_REAL, &timer, NULL);
+  timer_interval_ms = time_ms;
 }
 
-static void Timer_init(lua_State *LG){
-  Timer_SetInterval(100);
+static void Timer_init(){
+  Timer_SetInterval(timer_interval_ms);
   prev_signal = signal(SIGALRM, AlarmSignal);
 }
 
-static void Timer_destroy(lua_State *LG){
+static void Timer_destroy(){
   Timer_SetInterval(0);
-  signal(SIGALRM, prev_signal);
+  //signal(SIGALRM, prev_signal);
 }
 
 /*******************************************************************************************
@@ -86,11 +94,11 @@ static void Timer_destroy(lua_State *LG){
 static void Timer_SetInterval(unsigned int time_ms){
   //disabled
 }
-static void Timer_init(lua_State *LG){
-  lua_sethook(LG, TimerHook, TIMER_DEFMASK, TIMER_HOOK_VAL);
+static void Timer_init(){
+  lua_sethook(L_glob, TimerHook, TIMER_DEFMASK, TIMER_HOOK_VAL);
 }
-static void Timer_destroy(lua_State *LG){
-  lua_sethook(LG, TimerHook, 0, 0);
+static void Timer_destroy(){
+  lua_sethook(L_glob, TimerHook, 0, 0);
 }
 #endif
 
@@ -100,62 +108,54 @@ static void Timer_destroy(lua_State *LG){
  *******************************************************************************************
  *******************************************************************************************
  */
-typedef struct timer_callback{
-  lua_State *func;
-  uint64_t period_ms;
-  uint64_t next_time_ms;
-}timer_callback_t;
 
-static struct{
-  timer_callback_t *arr;
-  uint64_t next_time_ms;
+typedef struct{
+  uint64_t time_ms;
+  uint64_t interval_ms;
+}timeint_t;
+#define TIMER_STEP 10
+struct{
+  timeint_t *time;
+  uint64_t mintime_ms;
   unsigned int max;
-  unsigned int count;
-}timer_pool = {NULL, (1ULL<<63), 0, 0};
-
-//TODO: придумать как вызывать функции по таймеру. Lua_newthread?
-
-static lua_State *Lfunc = NULL;
+}timer_cbc_times = {NULL, ~0, 0};
 
 void TimerHook(lua_State *L, lua_Debug *ar){
-  //static uint64_t prev_time = 0;
+  static uint64_t next_time = 0;
   uint64_t cur_time = get_time_ms();
-  lua_sethook(LG, TimerHook, TIMER_DEFMASK, TIMER_HOOK_VAL);
-  printf("Hook\n");
-  if( cur_time < timer_pool.next_time_ms )return;
-  timer_pool.next_time_ms = (1ULL << 63);
-  for(int i=0; i<timer_pool.count; i++){
-    if( cur_time < timer_pool.arr[i].next_time_ms )continue;
-    timer_pool.arr[i].next_time_ms += timer_pool.arr[i].period_ms;
-    if( timer_pool.arr[i].next_time_ms < timer_pool.next_time_ms ){
-      timer_pool.next_time_ms = timer_pool.arr[i].next_time_ms;
-    }
-    int nargs = lua_gettop(Lfunc);
-    for(int i=1; i<nargs; i++){
-      lua_pushvalue(Lfunc, i);
-    }
-    lua_pcall(Lfunc, nargs-2, 0, 0);
-    lua_settop(Lfunc, nargs);
-  }
+  if(cur_time < next_time)return;
+  next_time = cur_time + timer_interval_ms;
   
-  /*if(cur_time - prev_time > 1000){
-    //printf("1s\n");
-    prev_time = cur_time;
-    if(Lfunc != NULL){
-      
-      int nargs = lua_gettop(Lfunc);
-      //printf("Nargs = %i\n", nargs);
-      for(int i=1; i<nargs; i++){
-        lua_pushvalue(Lfunc, i);
-      }
-
-      int res = lua_pcall(Lfunc, nargs-2, 0, 0);
-      //printf("res=%i\n", res);
-      //printf("LFunc top = %i\n", lua_gettop(Lfunc));
-      lua_settop(Lfunc, nargs);
-      
+  lua_sethook(LG, TimerHook, TIMER_DEFMASK, TIMER_HOOK_VAL);
+  
+  if(timer_cbc_times.mintime_ms > cur_time)return;
+  
+  timer_cbc_times.mintime_ms = ~0ULL;
+  
+  int tt_top = lua_gettop(LG);
+  for(int i=1; i<=timer_cbc_num; i++){
+    if(timer_cbc_times.time[i-1].time_ms > cur_time)continue;
+    timer_cbc_times.time[i-1].time_ms += timer_cbc_times.time[i-1].interval_ms;
+    if(timer_cbc_times.mintime_ms > timer_cbc_times.time[i-1].time_ms){
+      timer_cbc_times.mintime_ms = timer_cbc_times.time[i-1].time_ms;
     }
-  }*/
+    
+    lua_settop(LG, tt_top);
+    
+    lua_rawgeti(LG, 1, i);
+    if(!lua_istable(LG, -1)){
+      printf("[%i] is not table\n", i);
+      continue;
+    }
+    lua_len(LG, 2);
+    int nargs = lua_tonumber(LG, -1);
+    lua_getfield(LG, 2, "func");
+    for(int i=1; i<=nargs; i++){
+      lua_rawgeti(LG, 2, i);
+    }
+    lua_pcall(LG, nargs, 0, 0);
+  }
+  lua_settop(LG, tt_top);
 }
 
 static int L_Help(lua_State *L){
@@ -163,18 +163,62 @@ static int L_Help(lua_State *L){
   return 0;
 }
 
+//создаем новую coroutine, записываем ее в self.metatable.callbacks[i].thread
+//в ту же таблицу в поле func кладем функцию
+//потом по номерным индексам кладем аргументы
+//а вот время будет храниться в глобальнм массиве
 static int L_SetTimedCallback(lua_State *L){
+  /*void *tbl = (void*)lua_topointer(L, 1);
+  if(tbl != timer_table){
+    fprintf(stderr, "Timer:SetTimedCallback\n");
+    return 0;
+  }*/
+  if(!lua_istable(L, 1)){
+    fprintf(stderr, "Timer:SetTimedCallback\n");
+    return 0;
+  }
+  if(!lua_isnumber(L, 2)){
+    fprintf(stderr, "Timer:SetTimedCallback( time, func, [args...] )\n");
+    return 0;
+  }
+  double time = lua_tonumber(L, 2);
+  timer_cbc_num++;
   
-  //TODO
-  /*if(Lfunc != NULL)return 0;
-  int top = lua_gettop(L); // func + args = 1+N
-  printf("Set callback top = %i\n", top);
-  Lfunc = lua_newthread(L);
-  //кладет на вершину стека thread
-  lua_xmove(L, Lfunc, top+1);
-  lua_xmove(Lfunc, L, 1);
-  //копирует весь переданный стек: (func, [args]) в Lfunc
-  return 1;*/
+  //realloc buffer if needed
+  if(timer_cbc_num >= timer_cbc_times.max){
+    size_t newmax = timer_cbc_times.max + TIMER_STEP;
+    void *temp = realloc(timer_cbc_times.time, sizeof(timeint_t)*newmax);
+    if(temp == NULL){
+      fprintf(stderr, "Timer: Can not allocate %lu bytes\n", (unsigned long)sizeof(timeint_t)*newmax);
+      return 0;
+    }
+    timer_cbc_times.time = temp;
+    timer_cbc_times.max = newmax;
+  }
+  timer_cbc_times.time[timer_cbc_num-1].interval_ms = time*1000;
+  timer_cbc_times.time[timer_cbc_num-1].time_ms = timer_cbc_times.time[timer_cbc_num-1].interval_ms + get_time_ms();
+  if(timer_cbc_times.time[timer_cbc_num-1].time_ms < timer_cbc_times.mintime_ms){
+    timer_cbc_times.mintime_ms = timer_cbc_times.time[timer_cbc_num-1].time_ms;
+  }
+  
+  int top = lua_gettop(L);
+  lua_getmetatable(L, 1);
+  lua_getfield(L, -1, "callbacks");
+  
+  lua_createtable(L, 0, 0);
+    lua_newthread(L);
+    lua_setfield(L, -2, "thread");
+    lua_pushvalue(L, 3);
+    lua_setfield(L, -2, "func");
+    for(int i=1; i<=top-3; i++){
+      lua_pushvalue(L, i+3);
+      lua_rawseti(L, -2, i);
+    }
+  lua_rawseti(L, -2, timer_cbc_num);
+  
+  lua_settop(L, 0);
+  lua_pushnumber(L, timer_cbc_num);
+  return 1;
 }
 
 static int L_SetTimerQuantum(lua_State *L){
@@ -224,17 +268,20 @@ static int L_Test(lua_State *L){
 }
 
 static int L_GC(lua_State *L){
-  //TODO
-  Timer_destroy(LG);
-  LG = NULL;
-  printf("Timer deleted\n");
+  if(timer_cbc_times.time != NULL){
+    free(timer_cbc_times.time);
+    timer_cbc_times.time = NULL;
+    timer_cbc_times.max = 0;
+  }
+  Timer_destroy();
+  //printf("Timer deleted\n");
   return 0;
 }
 
 int luaopen_timer(lua_State *L){
   if(LG != NULL)return 0; //объект таймера должен быть только один
-  LG = L;
-  Timer_init(L);
+  L_glob = L;
+  Timer_init();
   
   //при импорте вызываем внешнюю функцию OnImport (если она есть)
   lua_getglobal(L, "OnImport");
@@ -248,6 +295,10 @@ int luaopen_timer(lua_State *L){
       lua_setfield(L, -2, "__gc");
       lua_createtable(L, 0, 0);
       lua_setfield(L, -2, "callbacks");
+      LG = lua_newthread(L);
+      lua_setfield(L, -2, "timer_thread");
+        lua_getfield(L, -1, "callbacks");
+        lua_xmove(L, LG, 1);
     lua_setmetatable(L, -2);
     lua_pushcfunction(L, L_Help);
     lua_setfield(L, -2, "Help");
