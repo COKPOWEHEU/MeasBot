@@ -204,7 +204,7 @@ static int L_SetTimedCallback(lua_State *L){
   int top = lua_gettop(L);
   lua_getmetatable(L, 1);
   lua_getfield(L, -1, "callbacks");
-  
+  //TODO: change behaviour to avoid usage of Timer object
   lua_createtable(L, 0, 0);
     lua_newthread(L);
     lua_setfield(L, -2, "thread");
@@ -257,9 +257,9 @@ static int L_Sleep(lua_State *L){
   return 0;
 }
 
-static int L_GetTime(lua_State *L){
-  //TODO
-  return 0;
+static int L_GetSysTime(lua_State *L){
+  lua_pushnumber(L, get_time_ms() * 0.001);
+  return 1;
 }
 
 static int L_Test(lua_State *L){
@@ -274,7 +274,6 @@ static int L_GC(lua_State *L){
     timer_cbc_times.max = 0;
   }
   Timer_destroy();
-  //printf("Timer deleted\n");
   return 0;
 }
 
@@ -308,8 +307,8 @@ int luaopen_timer(lua_State *L){
     lua_setfield(L, -2, "SetTimerQuantum"); //set update interval of timer
     lua_pushcfunction(L, L_Sleep);
     lua_setfield(L, -2, "Sleep"); //sleep ??? secs
-    lua_pushcfunction(L, L_GetTime);
-    lua_setfield(L, -2, "GetTime");
+    lua_pushcfunction(L, L_GetSysTime); //return time from OS start
+    lua_setfield(L, -2, "GetSysTime");
     
     lua_pushcfunction(L, L_Test);
     lua_setfield(L, -2, "test");
