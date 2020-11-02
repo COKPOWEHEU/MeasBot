@@ -19,7 +19,6 @@ int luaopen_timer(lua_State*);
 #endif
 
 static uint64_t timer_interval_ms = 100;
-//static void *timer_table = NULL;
 static unsigned int timer_cbc_num = 0;
 static lua_State *LG = NULL;
 static lua_State *L_glob = NULL;
@@ -168,23 +167,18 @@ static int L_Help(lua_State *L){
 //потом по номерным индексам кладем аргументы
 //а вот время будет храниться в глобальнм массиве
 static int L_SetTimedCallback(lua_State *L){
-  /*void *tbl = (void*)lua_topointer(L, 1);
-  if(tbl != timer_table){
-    fprintf(stderr, "Timer:SetTimedCallback\n");
-    return 0;
-  }*/
+  int tbl_start = 2;
   if(!lua_istable(L, 1)){
-    fprintf(stderr, "Timer:SetTimedCallback\n");
-    return 0;
+    tbl_start = 1;
   }
-  if(!lua_isnumber(L, 2)){
+  if(!lua_isnumber(L, tbl_start)){
     fprintf(stderr, "Timer:SetTimedCallback( time, func, [args...] )\n");
     return 0;
   }
-  double time = lua_tonumber(L, 2);
+  double time = lua_tonumber(L, tbl_start);
   timer_cbc_num++;
   
-  //realloc buffer if needed
+  //realloc time buffer if needed
   if(timer_cbc_num >= timer_cbc_times.max){
     size_t newmax = timer_cbc_times.max + TIMER_STEP;
     void *temp = realloc(timer_cbc_times.time, sizeof(timeint_t)*newmax);
@@ -202,34 +196,23 @@ static int L_SetTimedCallback(lua_State *L){
   }
   
   int top = lua_gettop(L);
-  lua_getmetatable(L, 1);
-  lua_getfield(L, -1, "callbacks");
-  //TODO: change behaviour to avoid usage of Timer object
   
   lua_createtable(LG, 0, 0);
     lua_newthread(LG);
     lua_setfield(LG, -2, "thread");
-    lua_pushvalue(L, 3); //func
+    lua_pushvalue(L, tbl_start+1); //func
     lua_xmove(L, LG, 1);
     lua_setfield(LG, -2, "func");
-    for(int i=1; i<=top-3; i++){
-      lua_pushvalue(L, i+3);
+    tbl_start++;
+    for(int i=1; i<=top-tbl_start+1; i++){
+      lua_pushvalue(L, i+tbl_start);
       lua_xmove(L, LG, 1);
       lua_rawseti(LG, -2, i);
     }
   lua_rawseti(LG, 1, timer_cbc_num);
-  /*lua_createtable(L, 0, 0);
-    lua_newthread(L);
-    lua_setfield(L, -2, "thread");
-    lua_pushvalue(L, 3);
-    lua_setfield(L, -2, "func");
-    for(int i=1; i<=top-3; i++){
-      lua_pushvalue(L, i+3);
-      lua_rawseti(L, -2, i);
-    }
-  lua_rawseti(L, -2, timer_cbc_num);
-  */
+
   lua_settop(L, 0);
+  
   lua_pushnumber(L, timer_cbc_num);
   return 1;
 }
@@ -287,6 +270,7 @@ static int L_GC(lua_State *L){
     timer_cbc_times.max = 0;
   }
   Timer_destroy();
+  printf("Destroy\n");
   return 0;
 }
 
