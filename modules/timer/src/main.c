@@ -36,8 +36,6 @@ static void Timer_destroy();
 static void TimerHook(lua_State *L, lua_Debug *ar);
 static void Timer_SetInterval(unsigned int time_ms);
 
-static int L_Test(lua_State *L);
-
 /*******************************************************************************************
  *******************************************************************************************
  *             LINUX
@@ -158,8 +156,16 @@ void TimerHook(lua_State *L, lua_Debug *ar){
 }
 
 static int L_Help(lua_State *L){
-  //TODO
-  return 0;
+  const char helpstring[] = 
+    "Timer\n"
+    "  Help():string / help():string - return this help\n"
+    "  SetTimedCallback(time, func, [args...]):num - sets callback function <func> with arguments <args> that will be called every <time> seconds. Return value = callback number in internal pool\n"
+    "  SetTimerQuantum(time):nil - sets minimal timer quantum (in seconds)\n"
+    "  Sleep(time):nil - waits <time> seconds\n"
+    "  GetSysTime():num - return time from system start (in seconds)\n"
+    ;
+  lua_pushstring(L, helpstring);
+  return 1;
 }
 
 //создаем новую coroutine, записываем ее в self.metatable.callbacks[i].thread
@@ -258,11 +264,6 @@ static int L_GetSysTime(lua_State *L){
   return 1;
 }
 
-static int L_Test(lua_State *L){
-  printf("Test\n");
-  return 0;
-}
-
 static int L_GC(lua_State *L){
   if(timer_cbc_times.time != NULL){
     free(timer_cbc_times.time);
@@ -270,7 +271,6 @@ static int L_GC(lua_State *L){
     timer_cbc_times.max = 0;
   }
   Timer_destroy();
-  printf("Destroy\n");
   return 0;
 }
 
@@ -304,6 +304,8 @@ int luaopen_timer(lua_State *L){
     lua_setmetatable(L, -2);
     lua_pushcfunction(L, L_Help);
     lua_setfield(L, -2, "Help");
+    lua_pushcfunction(L, L_Help);
+    lua_setfield(L, -2, "help");
     lua_pushcfunction(L, L_SetTimedCallback);
     lua_setfield(L, -2, "SetTimedCallback"); //create callback each ??? secs
     lua_pushcfunction(L, L_SetTimerQuantum);
@@ -312,8 +314,5 @@ int luaopen_timer(lua_State *L){
     lua_setfield(L, -2, "Sleep"); //sleep ??? secs
     lua_pushcfunction(L, L_GetSysTime); //return time from OS start
     lua_setfield(L, -2, "GetSysTime");
-    
-    lua_pushcfunction(L, L_Test);
-    lua_setfield(L, -2, "test");
   return 1;
 }
