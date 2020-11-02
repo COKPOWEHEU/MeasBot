@@ -19,7 +19,6 @@ int luaopen_timer(lua_State*);
 #endif
 
 static uint64_t timer_interval_ms = 100;
-static unsigned int timer_cbc_num = 0;
 static lua_State *LG = NULL;
 static lua_State *L_glob = NULL;
 
@@ -114,8 +113,9 @@ typedef struct{
 struct{
   timeint_t *time;
   uint64_t mintime_ms;
+  unsigned int num;
   unsigned int max;
-}timer_cbc_times = {NULL, ~0, 0};
+}timer_cbc_times = {NULL, ~0, 0, 0};
 
 void TimerHook(lua_State *L, lua_Debug *ar){
   static uint64_t next_time = 0;
@@ -130,7 +130,7 @@ void TimerHook(lua_State *L, lua_Debug *ar){
   timer_cbc_times.mintime_ms = ~0ULL;
   
   int tt_top = lua_gettop(LG);
-  for(int i=1; i<=timer_cbc_num; i++){
+  for(int i=1; i<=timer_cbc_times.num; i++){
     if(timer_cbc_times.time[i-1].time_ms > cur_time)continue;
     timer_cbc_times.time[i-1].time_ms += timer_cbc_times.time[i-1].interval_ms;
     if(timer_cbc_times.mintime_ms > timer_cbc_times.time[i-1].time_ms){
@@ -184,10 +184,10 @@ static int L_SetTimedCallback(lua_State *L){
     return 0;
   }
   double time = lua_tonumber(L, tbl_start);
-  timer_cbc_num++;
+  timer_cbc_times.num++;
   
   //realloc time buffer if needed
-  if(timer_cbc_num >= timer_cbc_times.max){
+  if(timer_cbc_times.num >= timer_cbc_times.max){
     size_t newmax = timer_cbc_times.max + TIMER_STEP;
     void *temp = realloc(timer_cbc_times.time, sizeof(timeint_t)*newmax);
     if(temp == NULL){
@@ -197,10 +197,10 @@ static int L_SetTimedCallback(lua_State *L){
     timer_cbc_times.time = temp;
     timer_cbc_times.max = newmax;
   }
-  timer_cbc_times.time[timer_cbc_num-1].interval_ms = time*1000;
-  timer_cbc_times.time[timer_cbc_num-1].time_ms = timer_cbc_times.time[timer_cbc_num-1].interval_ms + get_time_ms();
-  if(timer_cbc_times.time[timer_cbc_num-1].time_ms < timer_cbc_times.mintime_ms){
-    timer_cbc_times.mintime_ms = timer_cbc_times.time[timer_cbc_num-1].time_ms;
+  timer_cbc_times.time[timer_cbc_times.num-1].interval_ms = time*1000;
+  timer_cbc_times.time[timer_cbc_times.num-1].time_ms = timer_cbc_times.time[timer_cbc_times.num-1].interval_ms + get_time_ms();
+  if(timer_cbc_times.time[timer_cbc_times.num-1].time_ms < timer_cbc_times.mintime_ms){
+    timer_cbc_times.mintime_ms = timer_cbc_times.time[timer_cbc_times.num-1].time_ms;
   }
   
   int top = lua_gettop(L);
@@ -217,11 +217,11 @@ static int L_SetTimedCallback(lua_State *L){
       lua_xmove(L, LG, 1);
       lua_rawseti(LG, -2, i);
     }
-  lua_rawseti(LG, 1, timer_cbc_num);
+  lua_rawseti(LG, 1, timer_cbc_times.num);
 
   lua_settop(L, 0);
   
-  lua_pushnumber(L, timer_cbc_num);
+  lua_pushnumber(L, timer_cbc_times.num);
   return 1;
 }
 
@@ -231,7 +231,7 @@ static int L_UnregisterCallback(lua_State *L){
     return 0;
   }
   unsigned int num = lua_tonumber(L, -1);
-  if(num > timer_cbc_num || num < 1){
+  if(num > timer_cbc_times.num || num < 1){
     fprintf(stderr, "Timer:UnregisterCallback: value out of range\n");
     return 0;
   }
