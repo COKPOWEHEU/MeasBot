@@ -118,19 +118,24 @@ struct{
 }timer_cbc_times = {NULL, ~0, 0, 0};
 
 void TimerHook(lua_State *L, lua_Debug *ar){
+  static uint8_t busy_flag = 0; //workaround to avoid recursion
   static uint64_t next_time = 0;
   uint64_t cur_time = get_time_ms();
-  if(cur_time < next_time)return;
+  if(busy_flag)return;
+  busy_flag = 1;
+  if(cur_time < next_time){busy_flag = 0; return;}
+  printf("Hook\n");
   next_time = cur_time + timer_interval_ms;
   
   lua_sethook(LG, TimerHook, TIMER_DEFMASK, TIMER_HOOK_VAL);
   
-  if(timer_cbc_times.mintime_ms > cur_time)return;
+  if(timer_cbc_times.mintime_ms > cur_time){busy_flag = 0; return;}
   
   timer_cbc_times.mintime_ms = ~0ULL;
   
   int tt_top = lua_gettop(LG);
   for(int i=1; i<=timer_cbc_times.num; i++){
+    printf("[%i]:", i);
     if(timer_cbc_times.time[i-1].time_ms > cur_time)continue;
     timer_cbc_times.time[i-1].time_ms += timer_cbc_times.time[i-1].interval_ms;
     if(timer_cbc_times.mintime_ms > timer_cbc_times.time[i-1].time_ms){
@@ -154,6 +159,7 @@ void TimerHook(lua_State *L, lua_Debug *ar){
     lua_pcall(LG, nargs, 0, 0);
   }
   lua_settop(LG, tt_top);
+  {busy_flag = 0; return;}
 }
 
 static int L_Help(lua_State *L){
