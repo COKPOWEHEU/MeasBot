@@ -141,7 +141,8 @@ void TimerHook(lua_State *L, lua_Debug *ar){
     
     lua_rawgeti(LG, 1, i);
     if(!lua_istable(LG, -1)){
-      printf("[%i] is not table\n", i);
+      timer_cbc_times.time[i-1].time_ms = ~0ULL;
+      timer_cbc_times.time[i-1].interval_ms = ~0ULL;
       continue;
     }
     lua_len(LG, 2);
@@ -160,6 +161,7 @@ static int L_Help(lua_State *L){
     "Timer\n"
     "  Help():string / help():string - return this help\n"
     "  SetTimedCallback(time, func, [args...]):num - sets callback function <func> with arguments <args> that will be called every <time> seconds. Return value = callback number in internal pool\n"
+    "  UnregisterCallback(num):nil - deletes [num]'th callback\n"
     "  SetTimerQuantum(time):nil - sets minimal timer quantum (in seconds)\n"
     "  Sleep(time):nil - waits <time> seconds\n"
     "  GetSysTime():num - return time from system start (in seconds)\n"
@@ -221,6 +223,23 @@ static int L_SetTimedCallback(lua_State *L){
   
   lua_pushnumber(L, timer_cbc_num);
   return 1;
+}
+
+static int L_UnregisterCallback(lua_State *L){
+  if(!lua_isnumber(L, -1)){
+    fprintf(stderr, "Timer:UnregisterCallback(num)\n");
+    return 0;
+  }
+  unsigned int num = lua_tonumber(L, -1);
+  if(num > timer_cbc_num || num < 1){
+    fprintf(stderr, "Timer:UnregisterCallback: value out of range\n");
+    return 0;
+  }
+  timer_cbc_times.time[num-1].time_ms = ~0ULL;
+  timer_cbc_times.time[num-1].interval_ms = ~0ULL;
+  lua_pushnil(LG);
+  lua_rawseti(LG, 1, num);
+  return 0;
 }
 
 static int L_SetTimerQuantum(lua_State *L){
@@ -308,6 +327,8 @@ int luaopen_timer(lua_State *L){
     lua_setfield(L, -2, "help");
     lua_pushcfunction(L, L_SetTimedCallback);
     lua_setfield(L, -2, "SetTimedCallback"); //create callback each ??? secs
+    lua_pushcfunction(L, L_UnregisterCallback);
+    lua_setfield(L, -2, "UnregisterCallback");
     lua_pushcfunction(L, L_SetTimerQuantum);
     lua_setfield(L, -2, "SetTimerQuantum"); //set update interval of timer
     lua_pushcfunction(L, L_Sleep);
