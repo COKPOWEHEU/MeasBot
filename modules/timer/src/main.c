@@ -205,7 +205,20 @@ static int L_SetTimedCallback(lua_State *L){
   lua_getmetatable(L, 1);
   lua_getfield(L, -1, "callbacks");
   //TODO: change behaviour to avoid usage of Timer object
-  lua_createtable(L, 0, 0);
+  
+  lua_createtable(LG, 0, 0);
+    lua_newthread(LG);
+    lua_setfield(LG, -2, "thread");
+    lua_pushvalue(L, 3); //func
+    lua_xmove(L, LG, 1);
+    lua_setfield(LG, -2, "func");
+    for(int i=1; i<=top-3; i++){
+      lua_pushvalue(L, i+3);
+      lua_xmove(L, LG, 1);
+      lua_rawseti(LG, -2, i);
+    }
+  lua_rawseti(LG, 1, timer_cbc_num);
+  /*lua_createtable(L, 0, 0);
     lua_newthread(L);
     lua_setfield(L, -2, "thread");
     lua_pushvalue(L, 3);
@@ -215,7 +228,7 @@ static int L_SetTimedCallback(lua_State *L){
       lua_rawseti(L, -2, i);
     }
   lua_rawseti(L, -2, timer_cbc_num);
-  
+  */
   lua_settop(L, 0);
   lua_pushnumber(L, timer_cbc_num);
   return 1;
@@ -278,7 +291,11 @@ static int L_GC(lua_State *L){
 }
 
 int luaopen_timer(lua_State *L){
-  if(LG != NULL)return 0; //объект таймера должен быть только один
+  if(LG != NULL){ //если объект уже создан, созвращаем ссылку на него же
+    lua_getfield(LG, 1, "handle");
+    lua_xmove(LG, L, 1);
+    return 1;
+  }
   L_glob = L;
   Timer_init();
   
@@ -293,6 +310,8 @@ int luaopen_timer(lua_State *L){
       lua_pushcfunction(L, L_GC);
       lua_setfield(L, -2, "__gc");
       lua_createtable(L, 0, 0);
+        lua_pushvalue(L, -3); //main table
+        lua_setfield(L, -2, "handle");
       lua_setfield(L, -2, "callbacks");
       LG = lua_newthread(L);
       lua_setfield(L, -2, "timer_thread");
