@@ -244,9 +244,9 @@ double plot_autorange(double *a, double *b){
   if(pmax < 0){pmax++; ipwr--;}
   //
   double dx;
-  if( pmax < log10(3) )dx = 2*pow(10, ipwr-1);
-    else if( pmax < log10(7) )dx = 5*pow(10, ipwr-1);
-    else dx = 10*pow(10, ipwr-1);
+  if( pmax < log10(2) )dx = 0.2*pow(10, ipwr);
+    else if( pmax < log10(6) )dx = 0.5*pow(10, ipwr);
+    else dx = 1*pow(10, ipwr);
     
   double min = *a - fmod(*a, dx);
   double max = *b - fmod(*b, dx);
