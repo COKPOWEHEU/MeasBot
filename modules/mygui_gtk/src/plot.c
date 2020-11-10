@@ -468,16 +468,19 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
     if((rng <= 100 && rng >= 1) || rng < 1e-100)fmt = "%.1f"; else fmt = "%.1e";
   }
   char par=0;
+  double wid_prev = 0;
   for(x = cmin;  x<cmax;  x+=dx, rx+=rd, par=!par){
     if(fabs(x) < dx/2)x = 0;
     cr_line(cr,rx,0, rx,rect.height);
     sprintf(buf, fmt, x);
     cairo_text_extents_t strprop;
     cairo_text_extents(cr, buf, &strprop);
-    if(par && strprop.width > rd*0.9){
+    if(par && (strprop.width + wid_prev) > rd*1.9){
       cairo_move_to(cr, rx - strprop.width/4, y - 1.5*fontsize);
+      wid_prev = strprop.width;
     }else{
-      if(x == cmin)strprop.width = 0;
+      if(x != cmin)wid_prev = strprop.width;
+        else{ wid_prev = strprop.width*1.5; strprop.width = 0; }
       cairo_move_to(cr, rx - strprop.width/4, y - 0.2*fontsize);
     }
     cairo_show_text(cr, buf);
