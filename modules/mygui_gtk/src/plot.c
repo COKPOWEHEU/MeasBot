@@ -227,9 +227,12 @@ double plot_autorange(double *a, double *b){
   if(*b - *a < 1e-100){
     if(*a < 1e-100){
       *a = -1; *b=1;
+      return 0.5;
     }else{
-      *a -= *b/10;
-      *b += *b/10;
+      double dx = fabs(*b);
+      *a -= dx*0.1;
+      *b += dx*0.1;
+      return dx*0.05;
     }
   }
   double pmax;
@@ -238,28 +241,22 @@ double plot_autorange(double *a, double *b){
   pmax = log10(*b - *a);
   ipwr = (int)pmax;
   pmax -= ipwr;
-  
-  if(pmax < log10(2)){
-    if(ipwr < 0)ipwr--;
-    man = 2;
-  }else if(pmax < log10(5)){
-    man = 5;
-  }else{
-    man = 10;
-  }
-  
-  int min = (int)(*a * pow(0.1, ipwr-1));
-  int max = (int)(*b * pow(0.1, ipwr-1));
-  
-  int diff = min % man;
-  if(min > 0){min -= diff;}else{min -= man+diff;}
-  diff = max % man;
-  if(max < 0){max -= diff;}else{max += man-diff;}
-  
-  *a = (min)*pow(10, ipwr-1);
-  *b = (max)*pow(10, ipwr-1);
+  if(pmax < 0){pmax++; ipwr--;}
+  //
+  double dx;
+  if( pmax < log10(3) )dx = 2*pow(10, ipwr-1);
+    else if( pmax < log10(7) )dx = 5*pow(10, ipwr-1);
+    else dx = 10*pow(10, ipwr-1);
+    
+  double min = *a - fmod(*a, dx);
+  double max = *b - fmod(*b, dx);
+  if(min <= 0)min -= dx;
+  if(max >= 0)max += dx;
 
-  return man * pow(10, ipwr-1);
+  *a = min;
+  *b = max;
+  
+  return dx;
 }
 
 void fixlua_geti(lua_State *L, int idx, int i){
@@ -477,7 +474,7 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
     sprintf(buf, fmt, x);
     cairo_text_extents_t strprop;
     cairo_text_extents(cr, buf, &strprop);
-    if(par && strprop.width > rd){
+    if(par && strprop.width > rd*0.9){
       cairo_move_to(cr, rx - strprop.width/4, y - 1.5*fontsize);
     }else{
       if(x == cmin)strprop.width = 0;
