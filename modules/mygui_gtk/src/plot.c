@@ -439,17 +439,6 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
   plot->rel_x = plot->x_min + (plot->x_max - plot->x_min)*plot->abs_x / plot->w;
   plot->rel_y = plot->y_max - (plot->y_max - plot->y_min)*plot->abs_y / plot->h;
   
-  //отрисовка кривых
-  for(int line=1; line<fmtlen; line++){
-    cairo_set_source_rgb(cr, plot_colors[line-1][0], plot_colors[line-1][1], plot_colors[line-1][2]);
-    
-    cairo_move_to(cr, bx + kx*arr[0], by + ky*arr[line]);
-    size_t imax = data_len*fmtlen;
-    for(size_t i=line; i<imax; i+=fmtlen){
-      cairo_line_to(cr, bx + kx*arr[i-line], by + ky*arr[i]);
-    }
-    cairo_stroke(cr);
-  }
   //отрисовка осей
   cairo_set_source_rgb(cr, 1, 1, 1);
   if(cmin <= 0 && cmax >= 0){
@@ -538,8 +527,21 @@ static gboolean PlotOnDraw(GtkWidget *widget, GdkEventExpose *event, gpointer da
     cairo_move_to(cr, tx, ty);
     cairo_show_text(cr, buf);
   }
-  
   cairo_stroke(cr);
+  
+  //отрисовка кривых
+  for(int line=1; line<fmtlen; line++){
+    cairo_set_source_rgb(cr, plot_colors[line-1][0], plot_colors[line-1][1], plot_colors[line-1][2]);
+    
+    cairo_move_to(cr, bx + kx*arr[0], by + ky*arr[line]);
+    size_t imax = data_len*fmtlen;
+    for(size_t i=line; i<imax; i+=fmtlen){
+      cairo_line_to(cr, bx + kx*arr[i-line], by + ky*arr[i]);
+    }
+    cairo_stroke(cr);
+  }
+  
+  //cairo_stroke(cr);
   
   cairo_destroy (cr);
   
