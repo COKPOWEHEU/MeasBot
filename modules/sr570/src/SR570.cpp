@@ -314,6 +314,7 @@ void SR570::closePort() {
 }
 
 int SR570::findCeilInArr(const float arr[], float val){
+  val *= 0.99995; //поправка на машинную точность
   for(int i=0; arr[i] != NAN; i++){
     if( val <= arr[i] )return i;
   }
