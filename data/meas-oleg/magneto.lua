@@ -80,7 +80,7 @@ function magneto:setField(field)
 	self.old_field = math.abs(self.old_field)
 	local diff
 
-	delay(magneto.tab.delay.value)
+	delay(magneto.tab.delay.value * 0.001)
 	
 	if(new_field > self.old_field) then diff = 0.5
 	else diff = -0.5
@@ -95,7 +95,7 @@ function magneto:setField(field)
 	end
 	self.source.both:setVoltage(new_U)
 	delay(0.5)
-	delay(magneto.tab.delay.value)
+	delay(magneto.tab.delay.value * 0.001)
 	self.old_field = field
 end
 
@@ -110,7 +110,7 @@ end
 ]]--
 function magneto:getField()
 	local Uout = self.magnetometr:getVoltage()
-	local recount_ratio = 70--some value
+	local recount_ratio = 73.5 --some value
 	local field_T = Uout * recount_ratio * 0.1
 	return field_T
 end
