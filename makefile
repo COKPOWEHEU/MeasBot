@@ -8,7 +8,7 @@ endif
 
 selected:
 	@echo "Specify module and set variable 'target' to local target"
-	@echo "  make [arch=arch_...] [target=...] <module>"
+	@echo "  make [arch=...] [target=...] <module>"
 	@echo
 	@echo "  <modules> are:"
 	@grep ":$$" makefile
@@ -29,3 +29,5 @@ e24:
 	bash -c "cd modules/e24; make $(rarch) $(target) -j"
 timer:
 	bash -c "cd modules/timer; make $(rarch) $(target) -j"
+akip_114x:
+	bash -c "cd modules/akip_114x; make $(rarch) $(target) -j"
