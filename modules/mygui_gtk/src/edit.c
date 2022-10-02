@@ -46,6 +46,7 @@ static int setter_width(lua_State *L, int tblindex){
   float w = lua_tonumber(L, tblindex+2);
   Edit *ed = (Edit*)read_handle(L, tblindex, NULL);
   ed->w = w;
+  if((ed->w <= 0) || (ed->h <= 0))return 0;
   gtk_widget_set_size_request(ed->obj, ed->w, ed->h);
   return 0;
 }
@@ -58,6 +59,7 @@ static int getter_width(lua_State *L, int tblindex){
 static int setter_height(lua_State *L, int tblindex){
   Edit *ed = (Edit*)read_handle(L, tblindex, NULL);
   ed->h = lua_tonumber(L, tblindex+2);
+  if((ed->w <= 0) || (ed->h <= 0))return 0;
   gtk_widget_set_size_request(ed->obj, ed->w, ed->h);
   return 0;
 }

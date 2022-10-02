@@ -10,6 +10,7 @@ typedef struct{
   GtkWidget *obj;
   int pool_idx;
   int x, y;
+  int w, h;
 }Label;
 
 
@@ -43,6 +44,33 @@ static int getter_y(lua_State *L, int tblindex){
   lua_pushnumber(L, lbl->y);
   return 1;
 }
+static int setter_width(lua_State *L, int tblindex){
+  float w = lua_tonumber(L, tblindex+2);
+  Label *lbl = (Label*)read_handle(L, tblindex, NULL);
+  lbl->w = w;
+  if((lbl->w <= 0) || (lbl->h <= 0))return 0;
+  gtk_widget_set_size_request(lbl->obj, lbl->w, lbl->h);
+  return 0;
+}
+static int getter_width(lua_State *L, int tblindex){
+  Label *lbl = (Label*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(lbl->obj), &(lbl->w), &(lbl->h));
+  lua_pushnumber(L, lbl->w);
+  return 1;
+}
+static int setter_height(lua_State *L, int tblindex){
+  Label *lbl = (Label*)read_handle(L, tblindex, NULL);
+  lbl->h = lua_tonumber(L, tblindex+2);
+  if((lbl->w <= 0) || (lbl->h <= 0))return 0;
+  gtk_widget_set_size_request(lbl->obj, lbl->w, lbl->h);
+  return 0;
+}
+static int getter_height(lua_State *L, int tblindex){
+  Label *lbl = (Label*)read_handle(L, tblindex, NULL);
+  gtk_widget_get_size_request(GTK_WIDGET(lbl->obj), &(lbl->w), &(lbl->h));
+  lua_pushnumber(L, lbl->h);
+  return 1;
+}
 static int setter_text(lua_State *L, int tblindex){
   int top = lua_gettop(L);
   const char *text = "DEFAULT";
@@ -62,6 +90,8 @@ static int getter_text(lua_State *L, int tblindex){
 struct LabelIntVariables label_intvars[] = {
   {.name = "x", .setter = setter_x, .getter = getter_x},
   {.name = "y", .setter = setter_y, .getter = getter_y},
+  {.name = "width", .setter = setter_width, .getter = getter_width},
+  {.name = "height",.setter = setter_height,.getter = getter_height},
   {.name = "text", .setter = setter_text, .getter = getter_text},
   {.name = "label", .setter = setter_text, .getter = getter_text},
 };
@@ -166,6 +196,8 @@ static int L_NewLbl(lua_State *L){
   lua_setmetatable(L, -2);
   
   lbl->obj = gtk_label_new(text);
+  gtk_label_set_line_wrap(GTK_LABEL(lbl->obj), 1);
+  
   
   gtk_fixed_put(GTK_FIXED(cont), lbl->obj, lbl->x, lbl->y);
   gtk_widget_show(lbl->obj);
