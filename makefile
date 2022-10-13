@@ -31,3 +31,6 @@ timer:
 	bash -c "cd modules/timer; make $(rarch) $(target) -j"
 akip_114x:
 	bash -c "cd modules/akip_114x; make $(rarch) $(target) -j"
+hid_digout:
+	bash -c "cd modules/hid_digout; make $(rarch) $(target) -j"
+	
