@@ -4,7 +4,7 @@
 #include <lua5.2/lua.h>
 #include <string.h>
 
-#define tty_log
+//#define tty_log
 
 typedef struct{
   ttym_t tty;
@@ -28,11 +28,9 @@ static void tty_gets(ttym_t tty, char *buf, size_t len){
       if(res > 0){j=0; break;}
     }
     if(j>0){
-#ifdef tty_log
-      printf("read timeout\n");
+      printf("AKIP-114x read timeout\n");
       buf[0] = 0;
-      return;
-#endif      
+      return;     
     }
     if(buf[i] == '\r' || buf[i] == '\n')break;
   }
@@ -50,7 +48,7 @@ static int L_help(lua_State *L){
   return 1;
 }
 
-#define ERROR_LOG(msg) fprintf(stderr, "%s.%s at %d : %s\n", __FILE__, __func__, __LINE__, msg)
+#define ERROR_LOG(msg) fprintf(stderr, "AKIP-114x.%s.%s at %d : %s\n", __FILE__, __func__, __LINE__, msg)
 
 device_t* ReadDevice(lua_State *L){
   lua_getmetatable(L, 1);
@@ -75,6 +73,7 @@ void dev_reset(ttym_t tty){
   tty_puts(tty, "*CLS\r\n");
   tty_puts(tty, "SYST:ERR?\r\n");
   tty_gets(tty, buf, sizeof(buf));
+  tty_puts(tty, "SYST:COMM:SEL RS232\r\n");
 }
 
 void dev_disconnect(ttym_t tty){
@@ -155,9 +154,6 @@ static int L_getVoltage(lua_State *L){
   char buf[100];
   tty_puts(dev->tty, "MEAS:VOLT?\r\n");
   tty_gets(dev->tty, buf, sizeof(buf));
-  //printf("Meas volt = [%s]\n", buf);
-  //tty_puts(dev->tty, "VOLT?\r\n");
-  //tty_gets(dev->tty, buf, sizeof(buf));
   float res;
   sscanf(buf, "%f", &res);
   lua_pushnumber(L, res);
@@ -181,9 +177,6 @@ static int L_getCurrent(lua_State *L){
   char buf[100];
   tty_puts(dev->tty, "MEAS:CURR?\r\n");
   tty_gets(dev->tty, buf, sizeof(buf));
-  //printf("Meas curr = [%s]\n", buf);
-  //tty_puts(dev->tty, "CURR?\r\n");
-  //tty_gets(dev->tty, buf, sizeof(buf));
   float res;
   sscanf(buf, "%f", &res);
   lua_pushnumber(L, res);
@@ -287,7 +280,32 @@ static int L_OnDestroy(lua_State *L){
   dev_disconnect(device->tty);
   ttym_close(device->tty);
   free(device);
-  printf("AKIP-114x close\n");
+  //printf("AKIP-114x close\n");
+  return 0;
+}
+
+static int L_reconnect(lua_State *L){
+  device_t *device = ReadDevice(L);
+  if(device == NULL)return 0;
+  char *portname = NULL;
+  int baud = 9600;
+  if(lua_gettop(L) >= 2){
+    if(lua_isstring(L, 2)) portname = (char*)lua_tostring(L, 2);
+  }else{
+    fprintf(stderr, "AKIP-114x error: This function must contain at least 1 parameter (port name)");
+    return 0;
+  }
+  if(lua_gettop(L) >= 3) {
+    if(lua_isnumber(L, 3)) baud = lua_tonumber(L, 3);
+  }
+  device->tty = ttym_open(portname, baud);
+  if(device->tty == NULL){
+    fprintf(stderr, "AKIP-114x error: Can not open [%s]\n", portname);
+    free(device); device = NULL;
+    return 0;
+  }
+  ttym_timeout(device->tty, 100);
+  dev_reset(device->tty);
   return 0;
 }
 
@@ -317,7 +335,6 @@ static int L_connectNewDevice(lua_State *L) {
   }
   ttym_timeout(dev->tty, 100);
   dev_reset(dev->tty);
-  //checkError = lps->connect(portname, baud);
 
   lua_newtable(L);
     lua_newtable(L);
@@ -332,6 +349,8 @@ static int L_connectNewDevice(lua_State *L) {
     lua_setfield(L, -2, "rawSend");
     lua_pushcfunction(L, L_get_id);
     lua_setfield(L, -2, "getID");
+    lua_pushcfunction(L, L_reconnect);
+    lua_setfield(L, -2, "reconnect");
     
     lua_pushcfunction(L, L_setVoltage);
     lua_setfield(L, -2, "setVoltage");
