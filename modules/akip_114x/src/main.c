@@ -143,7 +143,7 @@ static int L_setVoltage(lua_State *L){
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) U = lua_tonumber(L, 2);
   }
-  sprintf(buf, "VOLT %lg\r\n", U);
+  sprintf(buf, "VOLT %.3f\r\n", U);
   tty_puts(dev->tty, buf);
   return 0;
 }
@@ -167,7 +167,7 @@ static int L_setCurrent(lua_State *L){
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) I = lua_tonumber(L, 2);
   }
-  sprintf(buf, "CURR %lg\r\n", I);
+  sprintf(buf, "CURR %.3f\r\n", I);
   tty_puts(dev->tty, buf);
   return 0;
 }
@@ -191,7 +191,7 @@ static int L_CurrentChangeTime(lua_State *L){
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) t = lua_tonumber(L, 2);
   }
-  sprintf(buf, "CURR:RISE %lg\r\nCURR:FALL %lg\r\n", t, t);
+  sprintf(buf, "CURR:RISE %.3f\r\nCURR:FALL %.3f\r\n", t, t);
   tty_puts(dev->tty, buf);
   return 0;
 }
@@ -204,7 +204,7 @@ static int L_VoltageChangeTime(lua_State *L){
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) t = lua_tonumber(L, 2);
   }
-  sprintf(buf, "VOLT:RISE %lg\r\nVOLT:FALL %lg\r\n", t, t);
+  sprintf(buf, "VOLT:RISE %.3f\r\nVOLT:FALL %.3f\r\n", t, t);
   tty_puts(dev->tty, buf);
   return 0;
 }
@@ -251,7 +251,7 @@ static int L_setMaxPower(lua_State *L){
   if(lua_gettop(L) >= 2) {
     if(lua_isnumber(L, 2)) P = lua_tonumber(L, 2);
   }
-  sprintf(buf, "POW:MAX %lg\r\n", P);
+  sprintf(buf, "POW:MAX %.3f\r\n", P);
   tty_puts(dev->tty, buf);
   return 1;
 }
