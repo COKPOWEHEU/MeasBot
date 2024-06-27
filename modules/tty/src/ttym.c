@@ -76,6 +76,33 @@ speed_t speed_convert(unsigned int baudrate){
   }
 }
 
+#if 0
+//код Эдди для нестандартных скоростей
+#define SPEED 115200
+    int fd, ret;
+    struct termios2 config;
+
+    fd = open("/dev/ttyUSB0", O_RDWR);
+    if (fd < 0){
+        printf("Failed to open /dev/ttyS1 - fd = %d\n", fd);
+        return -1;
+    }
+
+    // Set custom buad rate
+    ret = ioctl(fd, TCGETS2, &config);
+    if(!ret){
+        config.c_cflag &= ~CBAUD;
+        config.c_cflag |= BOTHER;
+        config.c_ispeed = SPEED;
+        config.c_ospeed = SPEED;
+        ret = ioctl(fd, TCSETS2, &config);
+        if(!ret) printf("set speed to %d, ret=%d\n", SPEED, ret);
+    } else { /*error*/}.
+    ioctl(fd, TCGETS2, &config); // need to check return
+    printf("ispeed: %d, ospeed: %d, cflag=%d (BOTHER=%d)\n", config.c_ispeed, config.c_ospeed, config.c_cflag&CBAUD, BOTHER);
+    system("stty -F /dev/ttyS1");
+#endif
+
 ttym_t ttym_open(char name[], unsigned int baudrate){
   speed_t speed = speed_convert(baudrate);
   ttym_t res = (struct ttym*)malloc(sizeof(struct ttym));

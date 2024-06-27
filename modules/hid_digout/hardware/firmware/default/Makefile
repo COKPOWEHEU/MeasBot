@@ -85,7 +85,7 @@ ftdi:
 #MOSI = 1 / Rx
 #SCK = 0 / Tx
 #RST = 3 / CTS
-#buff = ~4 / DTR (1-idle, 0-work)
+#(это не работает, buff берем с RST) buff = ~4 / DTR (1-idle, 0-work)
 
 
 ## Other dependencies

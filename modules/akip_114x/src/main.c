@@ -5,6 +5,13 @@
 #include <string.h>
 
 //#define tty_log
+//#define DEBUG
+
+#ifdef DEBUG
+  #define dbg_printf(x...) fprintf(stderr, x)
+#else
+  #define dbg_printf(x...)
+#endif
 
 typedef struct{
   ttym_t tty;
@@ -28,7 +35,8 @@ static void tty_gets(ttym_t tty, char *buf, size_t len){
       if(res > 0){j=0; break;}
     }
     if(j>0){
-      printf("AKIP-114x read timeout\n");
+      //printf("AKIP-114x read timeout\n");
+      dbg_printf("AKIP-114x read timeout\n");
       buf[0] = 0;
       return;     
     }
@@ -66,14 +74,16 @@ device_t* ReadDevice(lua_State *L){
   return dev;
 }
 
-void dev_reset(ttym_t tty){
+char dev_reset(ttym_t tty){
   char buf[100];
   tty_puts(tty, "SYST:REM\r\n");
   tty_puts(tty, "*RST\r\n");
   tty_puts(tty, "*CLS\r\n");
   tty_puts(tty, "SYST:ERR?\r\n");
   tty_gets(tty, buf, sizeof(buf));
+  if(buf[0] == 0)return 0;
   tty_puts(tty, "SYST:COMM:SEL RS232\r\n");
+  return 1;
 }
 
 void dev_disconnect(ttym_t tty){
@@ -292,7 +302,8 @@ static int L_reconnect(lua_State *L){
   if(lua_gettop(L) >= 2){
     if(lua_isstring(L, 2)) portname = (char*)lua_tostring(L, 2);
   }else{
-    fprintf(stderr, "AKIP-114x error: This function must contain at least 1 parameter (port name)");
+    //fprintf(stderr, "AKIP-114x error: This function must contain at least 1 parameter (port name)");
+    ERROR_LOG("AKIP-114x error: This function must contain at least 1 parameter (port name)");
     return 0;
   }
   if(lua_gettop(L) >= 3) {
@@ -300,7 +311,9 @@ static int L_reconnect(lua_State *L){
   }
   device->tty = ttym_open(portname, baud);
   if(device->tty == NULL){
-    fprintf(stderr, "AKIP-114x error: Can not open [%s]\n", portname);
+    char errmsg[200];
+    sprintf(errmsg, "Can not open [%s]\n", portname);
+    ERROR_LOG(errmsg);
     free(device); device = NULL;
     return 0;
   }
@@ -315,7 +328,7 @@ static int L_connectNewDevice(lua_State *L) {
   if(lua_gettop(L) >= 2){
     if(lua_isstring(L, 2)) portname = (char*)lua_tostring(L, 2);
   }else{
-    fprintf(stderr, "AKIP-114x error: This function must contain at least 1 parameter (port name)");
+    ERROR_LOG("Function 'connectNewDevice' must contain at least 1 parameter (port name)");
     return 0;
   }
   if(lua_gettop(L) >= 3) {
@@ -324,17 +337,19 @@ static int L_connectNewDevice(lua_State *L) {
   
   device_t *dev = (device_t*)malloc(sizeof(device_t));
   if(dev == NULL){
-    fprintf(stderr, "AKIP-114x error: not enough space\n");
+    ERROR_LOG("not enough space\n");
     return 0;
   }
   dev->tty = ttym_open(portname, baud);
   if(dev->tty == NULL){
-    fprintf(stderr, "AKIP-114x error: Can not open [%s]\n", portname);
+    char errmsg[200];
+    sprintf(errmsg, "Can not open [%s]\n", portname);
+    ERROR_LOG(errmsg);
     free(dev); dev = NULL;
     return 0;
   }
   ttym_timeout(dev->tty, 100);
-  dev_reset(dev->tty);
+  if(dev_reset(dev->tty) == 0)return 0;
 
   lua_newtable(L);
     lua_newtable(L);

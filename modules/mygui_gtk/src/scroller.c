@@ -225,7 +225,7 @@ static gboolean ScrlOnChange(GtkWidget *obj, GtkScrollType scroll, gdouble value
     lua_pop(L, 1);
   }else{
     lua_pop(L, 3);
-    printf("Not found\n");
+    //printf("Not found\n");
   }
   lua_settop(L, prev);
   return 0;
