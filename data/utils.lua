@@ -1,5 +1,14 @@
 local utils = {}
 
+--[[
+  @brief
+  Создание и инициализация массива
+
+  @return table
+
+  @example
+    *variable* = utils:buffer()
+]]--
 function utils:buffer()
 	local vector = {size = 0}
 	local metavector = {data = {}}
@@ -40,6 +49,17 @@ function utils:buffer()
   return vector	
 end
 
+--[[
+  @brief
+  Создание и инициализация кольцевого буффера с заданным размером
+
+  @param size:number - размер буффера
+
+  @return table
+
+  @example
+    *variable* = utils:circular_buff(20)
+]]--
 function utils:circular_buff(size)
   local vector = {size = size}
   local metavector = {data={}}
@@ -84,7 +104,20 @@ function utils:circular_buff(size)
   return vector
 end
 
-function utils.sleep(n)  -- seconds
+--[[
+  @brief
+  Функция задержки с указанием времени в секундах
+
+  @param n:number - кол-во секунд
+
+  @example
+    utils:sleep(1)
+    или
+    *variable* = require("utils").sleep
+    *variable*(1)
+
+]]--
+function utils.sleep(n)
   local t0 = os.clock()
   while os.clock() - t0 <= n do end
 end

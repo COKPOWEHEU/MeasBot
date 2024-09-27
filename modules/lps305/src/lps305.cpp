@@ -25,8 +25,8 @@ int LPS305::connect(char portName[] , int baud) {
   setOutput(0);
   setVoltage(1, 0);
   setVoltage(2, 0);
-  setCurrent(1, 0);
-  setCurrent(2, 0);
+  setCurrent(1, 2.5);
+  setCurrent(2, 2.5);
   
   ttym_read(tty,buff,200);
   return 1;

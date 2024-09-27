@@ -14,6 +14,7 @@ typedef struct sr830{
 }sr830_t;
 
 int findCeilInArr(const double arr[], double val){
+  val *= 0.99995; //поправка на машинную точностьs
   for(int i = 0; arr[i] != NAN; i++){
     if(val <= arr[i] )return i;
   }
